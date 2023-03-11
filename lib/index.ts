@@ -6,5 +6,11 @@
  */
 declare module '.';
 
+import * as parser from './parser';
+export { parser };
+
+import * as command from './command';
+export { command };
+
 import * as Def from '.';
 export default Def;
