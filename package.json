@@ -3,7 +3,9 @@
 	"version": "0.9.0",
 	"description": "Using JS to program Minecraft commands",
 	"main": "index.js",
+	"types": "./types/index.d.ts",
 	"scripts": {
+		"build": "node dobuild"
 	},
 	"keywords": [
 		"minecraft",
@@ -26,6 +28,10 @@
 	"dependencies": {
 	},
 	"devDependencies": {
+		"lethal-build": "^1.2.0",
+		"export-tester": "^1.0.2",
+		"typescript": "",
+		"webpack": ""
 	},
 	"homepage": "https://github.com/E0SelmY4V/func2code#readme"
 }
