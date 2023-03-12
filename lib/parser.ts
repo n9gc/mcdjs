@@ -1,6 +1,8 @@
 /**
  * 全局解析器模块
+ * @module mcdjs/lib/parser
  * @version 0.9.0
+ * @license GPL-3.0-or-later
  */
 declare module './parser';
 declare global {
@@ -10,7 +12,7 @@ declare global {
 
 import CommandObj from './command';
 
-export class Parser {
+export default class Parser {
 	constructor(context: string) {
 		this.context = context;
 		this.commandObj = new CommandObj(this);
@@ -23,4 +25,3 @@ export class Parser {
 	context: string;
 	command: string[] = [];
 }
-export default Parser;

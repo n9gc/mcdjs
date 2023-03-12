@@ -1,12 +1,14 @@
 /**
  * 命令集模块
+ * @module mcdjs/lib/command
  * @version 0.9.0
+ * @license GPL-3.0-or-later
  */
 declare module "./command";
 
 import type Parser from './parser';
 
-class CommandObj {
+export default class CommandObj {
 	constructor(parser: Parser) {
 		this.parser = parser;
 	}
@@ -19,4 +21,3 @@ class CommandObj {
 		this.push(cmd);
 	}
 }
-export default CommandObj;
