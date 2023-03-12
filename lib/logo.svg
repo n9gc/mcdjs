@@ -1,13 +1,13 @@
 <?xml version="1.0" standalone="yes"?>
 <svg version="1.1" viewBox="0 -1000 1000 1000" xmlns="http://www.w3.org/2000/svg">
 	<polygon points="0,-1000 1000,-1000 1000,0 0,0" fill="#000000" />
-	<polygon points="790,-125 875,-125 875,-900 790,-900" fill="#ffffff" />
-	<polygon points="458,-900 542,-900 542,-500 458,-500" fill="#ffffff" />
-	<polygon points="790,-900 875,-815 542,-500 458,-585" fill="#ffffff" />
-	<polygon points="125,-500 210,-500 542,-815 458,-900 125 -585" fill="#ffffff" />
-	<circle cx="292" cy="-292" r="166" fill="#ffffff" />
+	<polygon points="790,-125 875,-125 875,-900 790,-900" fill="#a5b2eb" />
+	<polygon points="458,-900 542,-900 542,-500 458,-500" fill="#a5b2eb" />
+	<polygon points="790,-900 875,-815 542,-500 458,-585" fill="#a5b2eb" />
+	<polygon points="125,-500 210,-500 542,-815 458,-900 125 -585" fill="#a5b2eb" />
+	<circle cx="292" cy="-292" r="166" fill="#a5b2eb" />
 	<circle cx="292" cy="-292" r="81" fill="#000000" />
-	<circle cx="708" cy="-292" r="166" fill="#ffffff" />
+	<circle cx="708" cy="-292" r="166" fill="#a5b2eb" />
 	<circle cx="708" cy="-292" r="81" fill="#000000" />
 	<polygon points="292,-292 500,-208 500,-375" fill="#000000" />
 </svg>
