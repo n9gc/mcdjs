@@ -20,7 +20,7 @@ snake(
 	], 'lib/index.js'),
 	cps(mv.map(m => [`build/${m}.js`, `lib/${m}.js`])),
 	dels(/build[\/\\].*js$/),
-	dels(['exp', 'exout'].map(m => `build/${m}.d.ts`)),
+	dels(['exp'].map(m => `build/${m}.d.ts`)),
 	cps([...mv, 'index'].map(m => [`lib/${m}.js`, `build/${m}.js`])),
 	dels([...mv, 'index'].map(m => `lib/${m}.js`)),
 	...mn.map(m => outFS([[1, `module.exports=require('.').${m}`]], `build/${m}.js`)),
