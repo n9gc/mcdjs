@@ -1,0 +1,4 @@
+/// <reference types="mcdjs" />
+
+console.log(123);
+C.say('123');
