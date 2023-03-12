@@ -2,8 +2,8 @@
 	"name": "mcdjs",
 	"version": "0.9.0",
 	"description": "Using JS to program Minecraft commands",
-	"main": "index.js",
-	"types": "./types/index.d.ts",
+	"main": "./build/index.js",
+	"types": "./build/index.d.ts",
 	"scripts": {
 		"build": "node dobuild"
 	},

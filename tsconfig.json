@@ -16,7 +16,7 @@
 		"alwaysStrict": true,
 		"noImplicitThis": true,
 		"declaration": true,
-		"declarationDir": "./types",
-		"outDir": "./types"
+		"declarationDir": "./build",
+		"outDir": "./build"
 	}
 }
