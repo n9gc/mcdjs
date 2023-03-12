@@ -9,3 +9,8 @@ declare module './config';
 export const env = {
 	version: '0.9.0',
 } as const;
+
+export namespace Types {
+	export type Command = string[];
+	export type Mods = 'cli' | 'command' | 'config' | 'hfile' | 'parser';
+}

@@ -26,6 +26,7 @@
 		"url": "https://github.com/E0SelmY4V/func2code/issues"
 	},
 	"dependencies": {
+		"promise-snake": "^1.0.0"
 	},
 	"devDependencies": {
 		"lethal-build": "^1.2.6",

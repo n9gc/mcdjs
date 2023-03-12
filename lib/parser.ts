@@ -10,6 +10,7 @@ declare global {
 	var Command: CommandObj;
 }
 
+import type { Types } from './config';
 import CommandObj from './command';
 
 export default class Parser {
@@ -23,5 +24,5 @@ export default class Parser {
 	}
 	commandObj: CommandObj;
 	context: string;
-	command: string[] = [];
+	command: Types.Command = [];
 }
