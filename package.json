@@ -28,7 +28,7 @@
 	"dependencies": {
 	},
 	"devDependencies": {
-		"lethal-build": "^1.2.5",
+		"lethal-build": "^1.2.6",
 		"export-tester": "^1.0.2",
 		"typescript": "",
 		"webpack": ""

@@ -1,13 +1,10 @@
-const { snake, exec, getCmt, dels, setCmt, outFS, log } = require('lethal-build')(__dirname);
-
-// match(/types[\/\\].*js$/).then(e => console.log(e));
+const { snake, exec, cmt, dels, outFS, log } = require('lethal-build')(__dirname);
 
 snake(
 	exec('tsc'),
 	exec('webpack'),
-	setCmt('lib/index.ts'),
 	outFS([
-		[1, getCmt()],
+		[1, cmt('lib/index.ts')],
 		[1, '!function(exp){'],
 		[0, 'types/packed.js'],
 		[1, '}(typeof module==="undefined"?false:module)']
