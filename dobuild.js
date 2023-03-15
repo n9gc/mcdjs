@@ -10,8 +10,8 @@ const mn = [
 	'parser',
 ];
 snake(
-	exec('tsc'),
-	exec('webpack'),
+	exec('npm exec tsc'),
+	exec('npm exec webpack'),
 	outFS([
 		[1, cmt('lib/index.ts')],
 		[1, '!function(exp){'],

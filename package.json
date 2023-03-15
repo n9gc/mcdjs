@@ -32,10 +32,11 @@
 		"promise-snake": "^1.0.0"
 	},
 	"devDependencies": {
-		"lethal-build": "^1.2.6",
 		"export-tester": "^1.0.2",
+		"lethal-build": "^1.2.6",
 		"typescript": "",
-		"webpack": ""
+		"webpack": "",
+		"webpack-cli": "^5.0.1"
 	},
 	"homepage": "https://github.com/E0SelmY4V/func2code#readme"
 }
