@@ -6,7 +6,7 @@
  */
 declare module './hfile';
 
-import type { Types } from './config';
+import { Types, errCatcher, ErrType, ErrNoSuchFile } from './config';
 import 'promise-snake';
 import Parser from './parser';
 import * as path from 'path';
@@ -30,18 +30,24 @@ export const resolveList = [
 	'.mjs',
 	'.cjs',
 ];
+function isExist(file: string) {
+	return new Promise<boolean>(res => fs.access(file, fs.constants.F_OK, err => res(!err)));
+}
+function trapFileErr(rej: (err: ErrNoSuchFile) => void, files: string[], tracker: Error) {
+	return () => rej({ type: ErrType.NoSuchFile, files, tracker });
+}
 export async function resolve({ inputs }: RunInfos) {
 	const files: string[] = [];
 	await Promise.snake(inputs
 		.map(input => path.resolve(input))
 		.map(file => path.extname(file) ? file : resolveList.map(ext => file + ext))
 		.map(file => (res, rej) => typeof file === 'string'
-			? fsp.access(file, fs.constants.F_OK).then(() => (files.push(file), res()), rej)
+			? isExist(file).then(n => n ? (files.push(file), res()) : trapFileErr(rej, [file], Error())())
 			: Promise.snake(file.map(may => (res, rej) =>
-				fsp.access(may, fs.constants.F_OK).then(() => rej(may), res)
-			)).then(() => fsp.access(file[0], fs.constants.F_OK), (sure) => (files.push(sure), res()))
+				isExist(may).then(n => n ? rej(may) : res())
+			)).then(trapFileErr(rej, file, Error()), (sure) => (files.push(sure), res()))
 		)
-	);
+	).catch(errCatcher);
 	return files;
 }
 export interface Commands {
@@ -49,11 +55,10 @@ export interface Commands {
 }
 export async function compile(files: string[]) {
 	const commands: Commands = {};
-	await Promise.snake(files.map(file => async res => {
+	await Promise.thens(files.map(file => async () => {
 		const parser = new Parser(file);
 		await import(file);
 		commands[file] = parser.command;
-		return res();
 	}));
 	return commands;
 }

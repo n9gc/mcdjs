@@ -29,11 +29,11 @@
 		"url": "https://github.com/E0SelmY4V/func2code/issues"
 	},
 	"dependencies": {
-		"promise-snake": "^1.0.0"
+		"promise-snake": "^1.2.0"
 	},
 	"devDependencies": {
 		"export-tester": "^1.0.2",
-		"lethal-build": "^1.2.6",
+		"lethal-build": "^1.2.8",
 		"typescript": "",
 		"webpack": "",
 		"webpack-cli": "^5.0.1"

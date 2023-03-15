@@ -1,4 +1,4 @@
-/// <reference types="mcdjs" />
+/// <reference path="../lib/index.ts" />
 
 console.log(123);
 C.say('123');
