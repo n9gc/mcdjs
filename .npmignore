@@ -4,3 +4,4 @@ test
 lib
 dobuild.js
 webpack.config.js
+tsconfig.json

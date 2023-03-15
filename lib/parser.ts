@@ -1,7 +1,7 @@
 /**
  * 全局解析器模块
  * @module mcdjs/lib/parser
- * @version 0.9.0
+ * @version 0.10.0
  * @license GPL-3.0-or-later
  */
 declare module './parser';

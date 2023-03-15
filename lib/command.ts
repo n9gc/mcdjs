@@ -1,6 +1,6 @@
 /**
  * 命令集
- * @version 0.9.0
+ * @version 0.10.0
  * @license GPL-3.0-or-later
  */
 namespace Command {

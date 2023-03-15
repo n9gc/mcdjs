@@ -7,7 +7,7 @@
 declare module './config';
 
 export const env = {
-	version: '0.9.0',
+	version: '0.9.2',
 } as const;
 
 export namespace Types {
