@@ -4,17 +4,20 @@
  * @license GPL-3.0-or-later
  */
 namespace Command {
-	const parser: import('./parser').default[] = [];
+	const parsers: import('./parser').default[] = [];
+	const config = McdJS.config;
 	globalThis.chCommand = {
-		come(op) {
-			parser.push(op);
+		come(parser) {
+			parsers.push(parser);
 		},
 		exit() {
-			parser.pop();
-		}
+			parsers.pop();
+		},
 	};
 	function push(cmd: string) {
-		parser[0].command.push(cmd);
+		const parser = parsers.at(-1);
+		if (!parser) config.throwErr(config.EType.ErrNoParser, Error());
+		else parser.command.push(cmd);
 	}
 	export function say(text: string) {
 		const cmd = `say ${text}`;

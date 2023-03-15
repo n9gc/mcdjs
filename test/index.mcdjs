@@ -1,4 +1,5 @@
 /// <reference path="../lib/index.ts" />
 
 console.log(123);
-C.say('123');
+Command.say('890');
+Command.say('890');

@@ -6,7 +6,8 @@
  */
 declare module './hfile';
 
-import { Types, errCatcher, ErrType, ErrNoSuchFile } from './config';
+import '.';
+import { Types, errCatcher, EType, trapErr } from './config';
 import 'promise-snake';
 import Parser from './parser';
 import * as path from 'path';
@@ -33,19 +34,16 @@ export const resolveList = [
 function isExist(file: string) {
 	return new Promise<boolean>(res => fs.access(file, fs.constants.F_OK, err => res(!err)));
 }
-function trapFileErr(rej: (err: ErrNoSuchFile) => void, files: string[], tracker: Error) {
-	return () => rej({ type: ErrType.NoSuchFile, files, tracker });
-}
 export async function resolve({ inputs }: RunInfos) {
 	const files: string[] = [];
 	await Promise.snake(inputs
 		.map(input => path.resolve(input))
 		.map(file => path.extname(file) ? file : resolveList.map(ext => file + ext))
 		.map(file => (res, rej) => typeof file === 'string'
-			? isExist(file).then(n => n ? (files.push(file), res()) : trapFileErr(rej, [file], Error())())
+			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, Error(), file)())
 			: Promise.snake(file.map(may => (res, rej) =>
 				isExist(may).then(n => n ? rej(may) : res())
-			)).then(trapFileErr(rej, file, Error()), (sure) => (files.push(sure), res()))
+			)).then(trapErr(rej, EType.ErrNoSuchFile, Error(), file), (sure) => (files.push(sure), res()))
 		)
 	).catch(errCatcher);
 	return files;

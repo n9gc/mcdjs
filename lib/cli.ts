@@ -6,6 +6,7 @@
  */
 declare module './cli';
 
+import '.';
 import run, { out, RunInfos } from './hfile';
 import { env } from './config';
 

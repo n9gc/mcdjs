@@ -6,9 +6,13 @@
  * @see {@link https://github.com/n9gc/mcdjs 在线代码仓库}
  */
 declare module '.';
-
-export * as config from './config';
-export * as parser from './parser';
+declare global {
+	var McdJS: typeof import('.');
+}
 
 import * as Def from '.';
 export default Def;
+globalThis.McdJS = Def;
+
+export * as config from './config';
+export * as parser from './parser';
