@@ -5,24 +5,23 @@
  * @license GPL-3.0-or-later
  */
 declare module './parser';
-declare global {
-	var C: CommandObj;
-	var Command: CommandObj;
-}
 
 import type { Types } from './config';
-import CommandObj from './command';
+import './command';
 
 export default class Parser {
 	constructor(context: string) {
 		this.context = context;
-		this.commandObj = new CommandObj(this);
-		this.chOpn();
+		this.come();
 	}
-	chOpn() {
-		return globalThis.C = globalThis.Command = this.commandObj;
+	come() {
+		chCommand.come(this);
+		return this;
 	}
-	commandObj: CommandObj;
+	exit() {
+		chCommand.exit();
+		return this;
+	}
 	context: string;
 	command: Types.Command = [];
 }

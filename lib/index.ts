@@ -9,7 +9,6 @@ declare module '.';
 
 export * as config from './config';
 export * as parser from './parser';
-export * as command from './command';
 
 import * as Def from '.';
 export default Def;
