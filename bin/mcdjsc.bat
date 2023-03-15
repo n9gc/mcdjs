@@ -1,1 +1,1 @@
-@node %~dp0mcdjsc.js %*
+@node %~dp0mcdjsc %*
