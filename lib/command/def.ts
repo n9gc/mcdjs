@@ -1,5 +1,12 @@
-/**McdJS 命令集 */
+/**
+ * McdJS 命令集
+ * @license GPL-3.0-or-later
+ */
 namespace Command {
+	/**版本信息 */
+	export namespace Ver {
+		export const base = '1.0.0';
+	}
 	type Parser = import('../parser').default;
 	type Command = import('../config').Types.Command;
 	const parsers: Parser[] = [];
@@ -17,7 +24,7 @@ namespace Command {
 			else parser.command.push(cmd);
 		},
 		merge(space) {
-			Object.assign(Command, space);
+			globalThis.Command = Object.assign(space, Command);
 		},
 	};
 }
