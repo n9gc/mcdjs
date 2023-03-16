@@ -20,3 +20,4 @@ globalThis.McdJS = Def;
 
 export * as config from './config';
 export * as parser from './parser';
+export * as err from './err';

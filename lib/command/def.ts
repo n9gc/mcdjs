@@ -3,7 +3,7 @@ namespace Command {
 	type Parser = import('../parser').default;
 	type Command = import('../config').Types.Command;
 	const parsers: Parser[] = [];
-	const config = McdJS.config;
+	const err = McdJS.err;
 	globalThis.chCommand = {
 		come(parser) {
 			parsers.push(parser);
@@ -13,7 +13,7 @@ namespace Command {
 		},
 		push(cmd: Command) {
 			const parser = parsers.at(-1);
-			if (!parser) config.throwErr(config.EType.ErrNoParser, Error());
+			if (!parser) err.throwErr(err.EType.ErrNoParser, Error());
 			else parser.command.push(cmd);
 		},
 		merge(space) {

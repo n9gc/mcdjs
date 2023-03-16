@@ -7,7 +7,8 @@
 declare module './hfile';
 
 import '.';
-import { Types, errCatcher, EType, trapErr } from './config';
+import { Types } from './config';
+import { errCatcher, EType, trapErr } from './err';
 import 'promise-snake';
 import Parser from './parser';
 import * as path from 'path';

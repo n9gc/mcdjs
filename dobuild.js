@@ -6,6 +6,7 @@ const mv = [
 ];
 const mn = [
 	'config',
+	'err',
 	'parser',
 ];
 snake(
