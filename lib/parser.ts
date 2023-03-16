@@ -6,12 +6,14 @@
  */
 declare module './parser';
 
-import type { Types } from './config';
+import { Types } from './config';
 import { chCommand } from './command';
 
 export default class Parser {
-	constructor(context: string) {
+	constructor(context: string, fileInfo: Types.FileParsed = {}) {
 		this.context = context;
+		this.fileInfo = fileInfo;
+		fileInfo[context] = this.commands;
 		this.come();
 	}
 	come() {
@@ -23,5 +25,15 @@ export default class Parser {
 		return this;
 	}
 	context: string;
-	command: Types.Commands = [];
+	commands: Types.Commands = [];
+	fileInfo: Types.FileParsed;
+	head = true;
+	push(code: string, con = false) {
+		this.commands.push({
+			code,
+			type: this.head
+				? (this.head = false, Types.CbType.Impulse)
+				: Types.CbType[con ? 'Chain' : 'ChainCon']
+		});
+	}
 }

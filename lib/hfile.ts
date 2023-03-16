@@ -1,12 +1,13 @@
 /**
  * 文件解析处理模块
  * @module mcdjs/lib/hfile
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './hfile';
 
 import '.';
+import { parse } from "./entry";
 import { Types } from './config';
 import { errCatcher, EType, trapErr } from './err';
 import 'promise-snake';
@@ -24,7 +25,7 @@ export class RunInfos {
 	inputs: string[];
 	outfile: string;
 }
-export const resolveList = [
+export const assocList = [
 	'',
 	'.mcdjs',
 	'.js',
@@ -39,7 +40,7 @@ export async function resolve({ inputs }: RunInfos) {
 	const files: string[] = [];
 	await Promise.snake(inputs
 		.map(input => path.resolve(input))
-		.map(file => path.extname(file) ? file : resolveList.map(ext => file + ext))
+		.map(file => path.extname(file) ? file : assocList.map(ext => file + ext))
 		.map(file => (res, rej) => typeof file === 'string'
 			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, Error(), file)())
 			: Promise.snake(file.map(may => (res, rej) =>
@@ -49,19 +50,14 @@ export async function resolve({ inputs }: RunInfos) {
 	).catch(errCatcher);
 	return files;
 }
-export interface Parsed {
-	[file: string]: Types.Commands;
-}
 export async function compile(files: string[]) {
-	const commands: Parsed = {};
-	await Promise.thens(files.map(file => async () => {
-		const parser = new Parser(file);
-		await import(file);
-		commands[file] = parser.command;
-	}));
+	const commands: Types.RoundParsed = {};
+	await Promise.thens(files.map(file => async () =>
+		commands[file] = await parse(() => import(file))
+	));
 	return commands;
 }
-export async function out(infos: RunInfos, commands: Parsed) {
+export async function out(infos: RunInfos, commands: Types.RoundParsed) {
 	await fsp.writeFile(path.resolve(infos.outfile), JSON.stringify(commands));
 }
 export default async function run(infos: RunInfos) {

@@ -8,6 +8,7 @@ const mn = [
 	'config',
 	'err',
 	'parser',
+	'entry',
 ];
 snake(
 	exec('npm exec tsc'),
