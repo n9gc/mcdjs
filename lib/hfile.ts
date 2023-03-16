@@ -48,11 +48,11 @@ export async function resolve({ inputs }: RunInfos) {
 	).catch(errCatcher);
 	return files;
 }
-export interface Commands {
-	[file: string]: Types.Command;
+export interface Parsed {
+	[file: string]: Types.Commands;
 }
 export async function compile(files: string[]) {
-	const commands: Commands = {};
+	const commands: Parsed = {};
 	await Promise.thens(files.map(file => async () => {
 		const parser = new Parser(file);
 		await import(file);
@@ -60,7 +60,7 @@ export async function compile(files: string[]) {
 	}));
 	return commands;
 }
-export async function out(infos: RunInfos, commands: Commands) {
+export async function out(infos: RunInfos, commands: Parsed) {
 	await fsp.writeFile(path.resolve(infos.outfile), JSON.stringify(commands));
 }
 export default async function run(infos: RunInfos) {

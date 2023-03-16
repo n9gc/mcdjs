@@ -5,7 +5,6 @@ const mv = [
 	'cli',
 ];
 const mn = [
-	'command',
 	'config',
 	'parser',
 ];

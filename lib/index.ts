@@ -10,6 +10,10 @@ declare global {
 	var McdJS: typeof import('.');
 }
 
+export function cmer(space: typeof Command) {
+	chCommand.merge(space);
+}
+
 import * as Def from '.';
 export default Def;
 globalThis.McdJS = Def;

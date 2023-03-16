@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 /// <reference path="../lib/index.ts" />
 
 console.log(123);
 Command.say('890');
-Command.say('890');
+Command.say('8&fh0');

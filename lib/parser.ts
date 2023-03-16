@@ -7,7 +7,7 @@
 declare module './parser';
 
 import type { Types } from './config';
-import './command';
+import { chCommand } from './command';
 
 export default class Parser {
 	constructor(context: string) {
@@ -23,5 +23,5 @@ export default class Parser {
 		return this;
 	}
 	context: string;
-	command: Types.Command = [];
+	command: Types.Commands = [];
 }

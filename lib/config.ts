@@ -11,7 +11,9 @@ export const env = {
 } as const;
 
 export namespace Types {
-	export type Command = string[];
+	export type Commands = Command[];
+	export interface Command extends String {
+	}
 	export type Mods = 'cli' | 'command' | 'config' | 'hfile' | 'parser';
 }
 export enum EType {
