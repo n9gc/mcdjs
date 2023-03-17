@@ -6,9 +6,14 @@
  */
 declare module '.';
 
-import '..';
+import { tAdd, tDel } from '../mcdtemp';
+import out from '../glodef';
+
+tAdd();
+
 import './def';
 import './lib';
+export const Command = out('Command', McdTemp.Cmd);
+export const chCommand = out('chCommand', McdTemp.Chc);
 
-export const Command = globalThis.Command;
-export const chCommand = globalThis.chCommand;
+tDel();

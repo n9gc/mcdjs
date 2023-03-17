@@ -6,13 +6,14 @@
 void 0;
 
 namespace Command {
-    McdJS.cmer(Command);
-    export namespace Ver {
-        export const lib = '0.1.1';
-    }
-    export function say(text: string) {
-        const cmd = `say ${text}`;
-        const parser = chCommand.parserNow;
-        parser.push(cmd);
-    }
+	const Chc = McdTemp.Chc;
+	Chc.merge(Command);
+	export namespace Ver {
+		export const lib = '0.1.1';
+	}
+	export function say(text: string) {
+		const cmd = `say ${text}`;
+		const parser = Chc.parserNow;
+		parser.push(cmd);
+	}
 }

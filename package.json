@@ -31,11 +31,15 @@
 	"dependencies": {
 		"promise-snake": "^1.2.0"
 	},
+	"bundledDependencies": [
+		"you-can-too"
+	],
 	"devDependencies": {
 		"export-tester": "^1.0.2",
 		"lethal-build": "^1.2.8",
 		"typescript": "",
 		"webpack": "",
+		"you-can-too": "^1.0.0",
 		"webpack-cli": "^5.0.1"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"

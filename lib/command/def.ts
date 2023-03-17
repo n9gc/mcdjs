@@ -3,19 +3,19 @@
  * @license GPL-3.0-or-later
  */
 namespace Command {
+	McdTemp.Cmd = Command;
 	/**版本信息 */
 	export namespace Ver {
 		export const base = '1.0.0';
 	}
 	type Parser = import('../parser').default;
-	type Command = import('../config').Types.Command;
 	const parsers: Parser[] = [];
-	const err = McdJS.err;
+	const err = McdTemp.Imp.err;
 	function testIdx<T>(tracker: Error, n?: T) {
 		if (!n) return err.throwErr(err.EType.ErrNoParser, tracker);
 		else return n;
 	}
-	const chc = globalThis.chCommand = {
+	const chc = McdTemp.Chc = {
 		parsers,
 		parserNow: parsers[0],
 		come(parser) {
@@ -26,18 +26,7 @@ namespace Command {
 			chc.parserNow = parsers.at(-1)!;
 		},
 		merge(space) {
-			globalThis.Command = Object.assign(space, Command);
+			McdTemp.Cmd = Object.assign(space, McdTemp.Cmd);
 		},
 	};
-}
-globalThis.Command = Command;
-/**修改命令集 */
-declare namespace chCommand {
-	type Parser = import('../parser').default;
-	type Command = import('../config').Types.Command;
-	function come(parser: Parser): void;
-	function exit(): void;
-	function merge(space: typeof Command): void;
-	const parsers: Parser[];
-	const parserNow: Parser;
 }

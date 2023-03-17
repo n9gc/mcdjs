@@ -6,19 +6,13 @@
  * @see {@link https://github.com/n9gc/mcdjs 在线代码仓库}
  */
 declare module '.';
-declare global {
-	var McdJS: typeof import('.');
-}
-
-export function cmer(space: typeof Command) {
-	chCommand.merge(space);
-}
 
 import * as Def from '.';
 export default Def;
-globalThis.McdJS = Def;
 
 export * as config from './config';
 export * as parser from './parser';
 export * as err from './err';
 export * as entry from './entry';
+export * as mcdtemp from './mcdtemp';
+export * as glodef from './glodef';

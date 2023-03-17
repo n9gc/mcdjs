@@ -9,15 +9,18 @@ const mn = [
 	'err',
 	'parser',
 	'entry',
+	'glodef',
+	'mcdtemp',
 ];
 snake(
+	dels(/build[\/\\].*/),
 	exec('npm exec tsc'),
 	exec('npm exec webpack'),
 	outFS([
 		[1, cmt('lib/index.ts')],
-		[1, '!function(exp){'],
+		[1, '((exp,McdTemp)=>{'],
 		[0, 'build/packed.js'],
-		[1, '}(typeof module==="undefined"?false:module)']
+		[1, '})(typeof module==="undefined"?false:module,{});']
 	], 'lib/index.js'),
 	cps(mv.map(m => [`build/${m}.js`, `lib/${m}.js`])),
 	dels(/build[\/\\].*js$/),
