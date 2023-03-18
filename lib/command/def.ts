@@ -10,9 +10,9 @@ namespace Command {
 	}
 	type Parser = import('../parser').default;
 	const parsers: Parser[] = [];
-	const err = McdTemp.Imp.err;
+	const errlib = McdTemp.Imp.errlib;
 	function testIdx<T>(tracker: Error, n?: T) {
-		if (!n) return err.throwErr(err.EType.ErrNoParser, tracker);
+		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);
 		else return n;
 	}
 	const chc = McdTemp.Chc = {

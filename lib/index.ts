@@ -12,7 +12,7 @@ export default Def;
 
 export * as config from './config';
 export * as entry from './entry';
-export * as err from './err';
+export * as errlib from './errlib';
 export * as glodef from './glodef';
 export * as mcdtemp from './mcdtemp';
 export * as parser from './parser';

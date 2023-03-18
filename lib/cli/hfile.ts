@@ -12,7 +12,7 @@ import * as path from 'path';
 import 'promise-snake';
 import { Types } from '../config';
 import { parse } from "../entry";
-import { errCatcher, EType, trapErr } from '../err';
+import { errCatcher, EType, trapErr } from '../errlib';
 
 export interface ParRunInfos extends Partial<RunInfos> { }
 export class RunInfos {

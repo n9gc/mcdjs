@@ -14,11 +14,11 @@ const {
 
 const mn = [
 	'config',
-	'err',
-	'parser',
 	'entry',
+	'errlib',
 	'glodef',
 	'mcdtemp',
+	'parser',
 ];
 // match().then(e => console.log(e));
 snake(

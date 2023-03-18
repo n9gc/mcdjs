@@ -1,10 +1,10 @@
 /**
  * 错误处理模块
- * @module mcdjs/lib/err
+ * @module mcdjs/lib/errlib
  * @version 1.0.0
  * @license GPL-3.0-or-later
  */
-declare module './err';
+declare module './errlib';
 
 export enum EType {
 	ErrNoSuchFile = '找不到文件',
