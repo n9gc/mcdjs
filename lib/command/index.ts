@@ -6,8 +6,8 @@
  */
 declare module '.';
 
-import { tAdd, tDel } from '../mcdtemp';
 import out from '../glodef';
+import { tAdd, tDel } from '../mcdtemp';
 
 tAdd();
 

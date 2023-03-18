@@ -4,10 +4,10 @@
  * @version 1.0.1
  * @license GPL-3.0-or-later
  */
-declare module './cli';
+declare module '.';
 
+import { env } from '../config';
 import run, { out, RunInfos } from './hfile';
-import { env } from './config';
 
 export default async function handle() {
 	const input = process.argv.at(-2);

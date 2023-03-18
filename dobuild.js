@@ -1,9 +1,17 @@
-const { snake, exec, cmt, dels, outFS, log, cps } = require('lethal-build')(__dirname);
+const {
+	snake,
+	mkdir,
+	exec,
+	mvs,
+	cmt,
+	dels,
+	outFS,
+	log,
+	match,
+	comp,
+	goodReg,
+} = require('lethal-build')(__dirname);
 
-const mv = [
-	'hfile',
-	'cli',
-];
 const mn = [
 	'config',
 	'err',
@@ -12,21 +20,26 @@ const mn = [
 	'glodef',
 	'mcdtemp',
 ];
+// match().then(e => console.log(e));
 snake(
-	dels(/build[\/\\].*/),
+	dels('build'),
 	exec('npm exec tsc'),
 	exec('npm exec webpack'),
+	mkdir('temp'),
 	outFS([
 		[1, cmt('lib/index.ts')],
 		[1, '((exp,McdTemp)=>{'],
 		[0, 'build/packed.js'],
 		[1, '})(typeof module==="undefined"?false:module,{});']
-	], 'lib/index.js'),
-	cps(mv.map(m => [`build/${m}.js`, `lib/${m}.js`])),
-	dels(/build[\/\\].*js$/),
-	dels(['exp'].map(m => `build/${m}.d.ts`)),
-	cps([...mv, 'index'].map(m => [`lib/${m}.js`, `build/${m}.js`])),
-	dels([...mv, 'index'].map(m => `lib/${m}.js`)),
+	], 'temp/index.js'),
+	mvs([
+		['build/cli', 'temp/cli'],
+	]),
+	dels([
+		RegExp(`^${goodReg(comp('build'))}.*js$`),
+		'build/exp.d.ts',
+	]),
+	mvs(['temp', 'build']),
 	...mn.map(m => outFS([[1, `module.exports=require('.').${m}`]], `build/${m}.js`)),
 	log('OK.')
 );

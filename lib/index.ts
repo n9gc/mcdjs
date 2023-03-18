@@ -11,8 +11,8 @@ import * as Def from '.';
 export default Def;
 
 export * as config from './config';
-export * as parser from './parser';
-export * as err from './err';
 export * as entry from './entry';
-export * as mcdtemp from './mcdtemp';
+export * as err from './err';
 export * as glodef from './glodef';
+export * as mcdtemp from './mcdtemp';
+export * as parser from './parser';

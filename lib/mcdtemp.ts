@@ -6,8 +6,8 @@
  */
 declare module './mcdtemp';
 
-import * as Imp from '.';
 import { callback } from 'you-can-too';
+import * as Imp from '.';
 
 const voidFn = callback.giveAndReturn as () => void;
 export const packed = typeof McdTemp !== 'undefined';

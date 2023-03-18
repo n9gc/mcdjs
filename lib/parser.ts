@@ -6,8 +6,8 @@
  */
 declare module './parser';
 
-import { Types } from './config';
 import { chCommand } from './command';
+import { Types } from './config';
 
 export default class Parser {
 	constructor(context: string, fileInfo: Types.FileParsed = {}) {
