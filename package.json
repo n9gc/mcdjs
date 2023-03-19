@@ -10,6 +10,15 @@
 	"bin": {
 		"mcdjsc": "./bin/mcdjsc"
 	},
+	"files": [
+		"bin",
+		"build",
+		"lib/logo.svg",
+		"global.d.ts",
+		"LICENSE",
+		"README.md",
+		"README-en.md"
+	],
 	"keywords": [
 		"minecraft",
 		"command",
