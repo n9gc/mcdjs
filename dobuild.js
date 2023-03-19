@@ -1,3 +1,8 @@
+/**
+ * 自动化构建脚本
+ * @license GPL-3.0-or-later
+ */
+"use strict";
 const {
 	snake,
 	mkdir,
@@ -11,6 +16,9 @@ const {
 	judge,
 	comp,
 	goodReg,
+	time,
+	timeEnd,
+	timeStart,
 } = require('lethal-build')(__dirname);
 const fsp = require('fs/promises');
 require('promise-snake');
@@ -20,9 +28,13 @@ const mv = [
 	'cli',
 ];
 snake(
+	timeStart(),
 	dels('build'),
 	exec('npm exec tsc'),
+	timeEnd(),
+	log('\nTS compiled in', time(), 'ms\n'),
 	judge(process.argv.at(-1) === '-prod'),
+	timeStart(),
 	async () => Object.keys(require('./build')).forEach(e => e != 'default' && mn.push(e)),
 	exec('npm exec webpack'),
 	mkdir('temp'),
@@ -32,6 +44,8 @@ snake(
 		[0, 'build/packed.js'],
 		[1, '})(typeof module==="undefined"?false:module);']
 	], 'temp/index.js'),
+	timeEnd(),
+	log('\nwebpack compiled in', time(), 'ms\n'),
 	mvs(mv.map(e => [`build/${e}`, `temp/${e}`])),
 	dels([
 		RegExp(`^${goodReg(comp('build'))}.*js$`),
@@ -41,5 +55,6 @@ snake(
 	() => Promise.thens(mn.map(m =>
 		fsp.writeFile(`build/${m}.js`, `module.exports=require('.').${m};`)
 	)),
-	log('OK.')
+	timeEnd(),
+	log('\nBuilt in', time(), 'ms\n')
 );
