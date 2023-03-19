@@ -17,3 +17,4 @@ export * as errlib from './errlib';
 export * as glodef from './glodef';
 export * as hoaxer from './hoaxer';
 export * as parser from './parser';
+export * as struct from './struct';

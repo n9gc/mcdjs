@@ -14,12 +14,14 @@ namespace McdJSTemp {
 		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);
 		else return n;
 	}
+	/**McdJS 命令集 */
 	export namespace Command {
 		/**版本信息 */
 		export namespace Ver {
 			export const base = '1.0.0';
 		}
 	}
+	/**命令集间接操作相关 */
 	export namespace chCommand {
 		export const parsers = _parsers;
 		export let parserNow = parsers[0];

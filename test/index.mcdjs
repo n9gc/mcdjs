@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-/// <reference path="../lib/index.ts" />
+/// <reference types="mcdjs/global" />
 
 console.log(123);
 Command.say('890');
 Command.say('8&fh0');
-console.log(Command);
+console.log(Tip`123`);

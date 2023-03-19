@@ -2,7 +2,7 @@
  * McdJS 全局定义
  * @license GPL-3.0-or-later
  */
-declare module './global'
+declare module './global';
 declare global {
 	/**
 	 * McdJS 命令集
@@ -14,5 +14,10 @@ declare global {
 	 * @license GPL-3.0-or-later
 	 */
 	var chCommand: typeof McdJSTemp.chCommand;
+	namespace globalThis {
+		/**提供一个注释 */
+		var Tip: typeof McdJSTemp.Tip;
+	}
 }
-export {}
+
+import '.';

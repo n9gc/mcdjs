@@ -6,6 +6,7 @@
  */
 declare module '.';
 
+import '..';
 import { env } from '../config';
 import run, { out, RunInfos } from './hfile';
 

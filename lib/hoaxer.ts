@@ -12,8 +12,6 @@ declare global {
 	 */
 	namespace McdJSTemp {
 		var Imp: typeof Index;
-		namespace Command { }
-		namespace chCommand { }
 	}
 	/**
 	 * 合并全局临时对象
