@@ -33,7 +33,7 @@ snake(
 	exec('npm exec tsc'),
 	timeEnd(),
 	log('\nTS compiled in', time(), 'ms\n'),
-	judge(process.argv.at(-1) === '-prod'),
+	judge(process.argv[process.argv.length - 1] === '-prod'),
 	timeStart(),
 	async () => Object.keys(require('./build')).forEach(e => e != 'default' && mn.push(e)),
 	exec('npm exec webpack'),
