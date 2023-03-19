@@ -11,35 +11,33 @@ const {
 	comp,
 	goodReg,
 } = require('lethal-build')(__dirname);
+const fsp = require('fs/promises');
+require('promise-snake');
 
-const mn = [
-	'config',
-	'entry',
-	'errlib',
-	'glodef',
-	'mcdtemp',
-	'parser',
+const mn = [];
+const mv = [
+	'cli',
 ];
-// match().then(e => console.log(e));
 snake(
 	dels('build'),
 	exec('npm exec tsc'),
+	async () => Object.keys(require('./build')).forEach(e => e != 'default' && mn.push(e)),
 	exec('npm exec webpack'),
 	mkdir('temp'),
 	outFS([
 		[1, cmt('lib/index.ts')],
-		[1, '((exp,McdTemp)=>{'],
+		[1, '((exp)=>{'],
 		[0, 'build/packed.js'],
-		[1, '})(typeof module==="undefined"?false:module,{});']
+		[1, '})(typeof module==="undefined"?false:module);']
 	], 'temp/index.js'),
-	mvs([
-		['build/cli', 'temp/cli'],
-	]),
+	mvs(mv.map(e => [`build/${e}`, `temp/${e}`])),
 	dels([
 		RegExp(`^${goodReg(comp('build'))}.*js$`),
 		'build/exp.d.ts',
 	]),
 	mvs(['temp', 'build']),
-	...mn.map(m => outFS([[1, `module.exports=require('.').${m}`]], `build/${m}.js`)),
+	() => Promise.thens(mn.map(m =>
+		fsp.writeFile(`build/${m}.js`, `module.exports=require('.').${m};`)
+	)),
 	log('OK.')
 );

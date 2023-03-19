@@ -1,12 +1,12 @@
 /**
  * 全局解析器模块
  * @module mcdjs/lib/parser
- * @version 0.10.0
+ * @version 0.10.1
  * @license GPL-3.0-or-later
  */
 declare module './parser';
 
-import { chCommand } from './command';
+import { chCommand } from './cmdobj';
 import { Types } from './config';
 
 export default class Parser {

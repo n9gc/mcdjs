@@ -10,9 +10,10 @@ declare module '.';
 import * as Def from '.';
 export default Def;
 
+export * as appinf from './appinf';
+export * as cmdobj from './cmdobj';
 export * as config from './config';
-export * as entry from './entry';
 export * as errlib from './errlib';
 export * as glodef from './glodef';
-export * as mcdtemp from './mcdtemp';
+export * as hoaxer from './hoaxer';
 export * as parser from './parser';

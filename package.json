@@ -8,7 +8,7 @@
 		"build": "node dobuild"
 	},
 	"bin": {
-		"mcdjsc": "./bin/mcdjsc.js"
+		"mcdjsc": "./bin/mcdjsc"
 	},
 	"keywords": [
 		"minecraft",
@@ -31,10 +31,8 @@
 	"dependencies": {
 		"promise-snake": "^1.2.0"
 	},
-	"bundledDependencies": [
-		"you-can-too"
-	],
 	"devDependencies": {
+		"promise-snake": "^1.2.0",
 		"export-tester": "^1.0.2",
 		"lethal-build": "^1.3.0",
 		"typescript": "",
