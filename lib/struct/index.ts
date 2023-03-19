@@ -1,14 +1,21 @@
 /**
  * 程序结构工具模块
  * @module mcdjs/lib/struct
- * @version 1.0.0
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-import glo from '../hoaxer';
+import '../hoaxer';
 
 import './base';
+import './types';
 import './util';
+import Struct = globalThis.McdJSTemp.Struct;
+import Types = Struct.Types;
 
-export default glo.McdJSTemp.Struct;
+export default Struct;
+export {
+	Types
+};
+

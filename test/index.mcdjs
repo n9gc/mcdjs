@@ -4,4 +4,5 @@
 console.log(123);
 Command.say('890');
 Command.say('8&fh0');
-console.log(Tip`123`);
+Tip`0978`
+console.log(McdJSTemp.Struct.getTip());

@@ -1,12 +1,12 @@
 /**
  * 实用功能
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 void 0;
 
 namespace McdJSTemp {
-	McdJSTempMerge(McdJSTemp);
+	globalThis.McdJSTempMerge(McdJSTemp);
 	export namespace Struct {
 		export type ArgsJoin = [literals: { raw: readonly string[]; }, ...values: any[]];
 		function join(...args: ArgsJoin) {

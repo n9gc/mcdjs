@@ -1,13 +1,13 @@
 /**
  * 全局解析器模块
  * @module mcdjs/lib/parser
- * @version 0.10.1
+ * @version 0.10.2
  * @license GPL-3.0-or-later
  */
 declare module './parser';
 
 import { chCommand } from './cmdobj';
-import { Types } from './config';
+import { Types } from './struct';
 
 export default class Parser {
 	constructor(context: string, fileInfo: Types.FileParsed = {}) {
