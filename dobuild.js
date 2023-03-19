@@ -8,6 +8,7 @@ const {
 	outFS,
 	log,
 	match,
+	judge,
 	comp,
 	goodReg,
 } = require('lethal-build')(__dirname);
@@ -21,6 +22,7 @@ const mv = [
 snake(
 	dels('build'),
 	exec('npm exec tsc'),
+	judge(process.argv.at(-1) === '-prod'),
 	async () => Object.keys(require('./build')).forEach(e => e != 'default' && mn.push(e)),
 	exec('npm exec webpack'),
 	mkdir('temp'),
