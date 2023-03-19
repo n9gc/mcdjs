@@ -57,4 +57,4 @@ snake(
 	)),
 	timeEnd(),
 	log('\nBuilt in', time(), 'ms\n')
-);
+).then(() => process.exit(0));
