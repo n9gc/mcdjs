@@ -25,7 +25,7 @@ jobs:
 
     - name: Say
       run: |
-        test/run
+        npx mcdjsc test/index test/out.json
   test-prod:
     runs-on: ubuntu-latest
     strategy:
@@ -44,4 +44,4 @@ jobs:
 
     - name: Say
       run: |
-        test/run
+        npx mcdjsc test/index test/out.json
