@@ -53,7 +53,7 @@ snake(
 	]),
 	mvs(['temp', 'build']),
 	() => Promise.thens(mn.map(m =>
-		fsp.writeFile(`build/${m}.js`, `module.exports=require('.').${m};`)
+		() => fsp.writeFile(`build/${m}.js`, `module.exports=require('.').${m};`)
 	)),
 	timeEnd(),
 	log('\nBuilt in', time(), 'ms\n')
