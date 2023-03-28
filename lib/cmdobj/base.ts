@@ -7,8 +7,7 @@ void 0;
 
 namespace McdJSTemp {
 	globalThis.McdJSTempMerge(McdJSTemp);
-	type Parser = import('../parser').default;
-	const _parsers: Parser[] = [];
+	type Operm = import('../opnast').Operator;
 	const errlib = McdJSTemp.Imp.errlib;
 	function testIdx<T>(tracker: Error, n?: T) {
 		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);
@@ -23,14 +22,15 @@ namespace McdJSTemp {
 	}
 	/**命令集间接操作相关 */
 	export namespace chCommand {
-		export const parsers = _parsers;
-		export let parserNow = parsers[0];
-		export function come(parser: Parser) {
-			parsers.push(parserNow = parser);
+		let opering: Operm | null = null;
+		export function come(operm: Operm) {
+			opering = operm;
 		}
 		export function exit() {
-			testIdx(Error(), parsers.pop());
-			parserNow = parsers.at(-1)!;
+			opering = null;
+		}
+		export function getOperm(tracker: Error) {
+			return testIdx(tracker, opering);
 		}
 	}
 }

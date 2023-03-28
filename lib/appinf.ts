@@ -6,12 +6,14 @@
  */
 declare module './appinf';
 
-import Parser from "./parser";
 import globalify from './glodef';
+import { Operator } from './opnast'
 
 export async function parse(fn: () => void | PromiseLike<void>) {
-	const parser = new Parser('main');
+	const operm = new Operator('main');
 	globalify();
+	operm.come();
 	await fn();
-	return parser.fileInfo;
+	operm.exit();
+	return operm.ast;
 }

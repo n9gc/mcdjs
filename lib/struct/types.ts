@@ -23,12 +23,8 @@ namespace McdJSTemp {
 				timeout?: number;
 				note?: string;
 			}
-			export type Commands = Command[];
-			export interface FileParsed {
-				[group: string]: Commands;
-			}
 			export interface RoundParsed {
-				[file: string]: FileParsed;
+				[file: string]: import('../opnast').AST;
 			}
 			export type Mods =
 				| Exclude<keyof typeof import('..'), 'default'>

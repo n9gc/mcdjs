@@ -13,8 +13,8 @@ namespace McdJSTemp {
 		}
 		export function say(text: string) {
 			const cmd = `say ${text}`;
-			const parser = McdJSTemp.chCommand.parserNow;
-			parser.push(cmd);
+			const opering = McdJSTemp.chCommand.getOperm(Error());
+			opering.insert(cmd);
 		}
 	}
 }

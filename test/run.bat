@@ -1,0 +1,1 @@
+@bin/mcdjsc test/index test/out.json

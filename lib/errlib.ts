@@ -68,7 +68,7 @@ export function GetErr<T extends AllErr>(type: T['type'], ...pele: ArgGetErr<T>)
 		case EType.ErrNoParser: return { type, tracker } as T;
 		case EType.ErrNoSuchErr: return { type, throwTracker: args[0], tracker } as T;
 		case EType.ErrCannotBeImported: return { type, module: args[0], tracker } as T;
-		case EType.ErrUseBeforeDefine:
+		case EType.ErrUseBeforeDefine: return { type, varName: args[0], tracker } as T;
 		case EType.ErrCannotBeSeted: return { type, varName: args[0], tracker } as T;
 		default: return throwErr({ type: EType.ErrNoSuchErr, tracker, throwTracker: Error() });
 	}
