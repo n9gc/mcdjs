@@ -17,32 +17,56 @@ namespace McdJSTemp {
 			index;
 		}
 	}
-	class BranchDo {
-		constructor(expr: CommandRslt) {
-			this.expr = expr;
-		}
-		private expr: CommandRslt;
-		private tdos: Vcb[] = [];
-		private fdos: Vcb[] = [];
-		private clear(n: 'tdos' | 'fdos') {
-			return () => this[n].forEach(fn => fn());
-		}
-		private end() {
-			const opering = chCommand.getOperm(Error());
-			opering.api.If(this.expr.index, this.clear('tdos'), this.clear('fdos'));
-		}
-		/**若条件满足，则 */
-		Then(tdo: Vcb) {
-			this.tdos.push(tdo);
-			return this;
-		}
-		/**若条件不满足，则 */
-		Else(fdo: Vcb) {
-			this.fdos.push(fdo);
-			this.end();
-		}
-	}
 	export function If(expr: CommandRslt) {
-		return new BranchDo(expr);
+		return If.getBranchDo(expr);
+	}
+	export namespace If {
+		export type BranchAble = {
+			/**若条件满足，则 */
+			Then: BranchDo['Then'];
+			/**若条件不满足，则 */
+			Else: BranchDo['Else'];
+		};
+		type BranchDoFn = BranchAble & ((tdo: Vcb) => (fdo: Vcb) => void);
+		export function getBranchDo(expr: CommandRslt): BranchDoFn {
+			const proto = new BranchDo(expr);
+			const fn = (tdo: Vcb) => {
+				proto.Then(tdo);
+				return (fdo: Vcb) => proto.Else(fdo);
+			};
+			const Obj = {
+				Then(tdo: Vcb) {
+					proto.Then(tdo);
+					return Obj;
+				},
+				Else(fdo: Vcb) {
+					proto.Else(fdo);
+				}
+			};
+			return Object.assign(fn, Obj);
+		}
+		class BranchDo {
+			constructor(expr: CommandRslt) {
+				this.expr = expr;
+			}
+			expr: CommandRslt;
+			tdos: Vcb[] = [];
+			fdos: Vcb[] = [];
+			clear(n: 'tdos' | 'fdos') {
+				return () => this[n].forEach(fn => fn());
+			}
+			end() {
+				const opering = chCommand.getOperm(Error());
+				opering.api.If(this.expr.index, this.clear('tdos'), this.clear('fdos'));
+			}
+			Then(tdo: Vcb) {
+				this.tdos.push(tdo);
+				return this as BranchAble;
+			}
+			Else(fdo: Vcb) {
+				this.fdos.push(fdo);
+				this.end();
+			}
+		}
 	}
 }
