@@ -6,7 +6,7 @@
 void 0;
 
 namespace McdJSTemp {
-	globalThis.McdJSTempMerge(McdJSTemp);
+	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	/**程序结构工具 */
 	export namespace Struct {
 		/**类型定义 */

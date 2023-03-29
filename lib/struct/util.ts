@@ -6,7 +6,7 @@
 void 0;
 
 namespace McdJSTemp {
-	globalThis.McdJSTempMerge(McdJSTemp);
+	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	export namespace Struct {
 		export type ArgsJoin = [literals: { raw: readonly string[]; }, ...values: any[]];
 		function join(...args: ArgsJoin) {

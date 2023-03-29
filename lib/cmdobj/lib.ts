@@ -6,7 +6,7 @@
 void 0;
 
 namespace McdJSTemp {
-	globalThis.McdJSTempMerge(McdJSTemp);
+	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	import CommandRsltClass = Struct.CommandRsltClass;
 	export namespace Command {
 		export namespace Ver {

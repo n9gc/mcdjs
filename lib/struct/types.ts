@@ -6,7 +6,7 @@
 void 0;
 
 namespace McdJSTemp {
-	globalThis.McdJSTempMerge(McdJSTemp);
+	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	export namespace Struct {
 		export namespace Types {
 			export enum CbType {

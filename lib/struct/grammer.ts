@@ -6,7 +6,7 @@
 void 0;
 
 namespace McdJSTemp {
-	globalThis.McdJSTempMerge(McdJSTemp);
+	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	import CommandRslt = Struct.Types.CommandRslt;
 	import Vcb = Struct.Types.Vcb;
 	export namespace Struct {
@@ -28,7 +28,7 @@ namespace McdJSTemp {
 			return () => this[n].forEach(fn => fn());
 		}
 		private end() {
-			const opering = McdJSTemp.chCommand.getOperm(Error());
+			const opering = chCommand.getOperm(Error());
 			opering.api.If(this.expr.index, this.clear('tdos'), this.clear('fdos'));
 		}
 		/**若条件满足，则 */

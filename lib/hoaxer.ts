@@ -14,10 +14,10 @@ declare global {
 		var Imp: typeof Index;
 	}
 	/**
-	 * 合并全局临时对象
+	 * 得到真正全局临时对象
 	 * @license GPL-3.0-or-later
 	 */
-	function McdJSTempMerge(tempObj: typeof McdJSTemp): void;
+	function McdJSTempGet(): typeof McdJSTemp;
 }
 
 import * as Index from '.';
@@ -27,6 +27,4 @@ export default glo;
 glo.McdJSTemp = {
 	Imp: Index,
 } as typeof McdJSTemp;
-glo.McdJSTempMerge = (tempObj) => {
-	glo.McdJSTemp = Object.assign(tempObj, glo.McdJSTemp);
-};
+glo.McdJSTempGet = () => glo.McdJSTemp;
