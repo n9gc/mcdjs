@@ -10,10 +10,13 @@ declare module '.';
 import * as Def from '.';
 export default Def;
 
-export * as appinf from './appinf';
+/**全局加载 */
+export * as struct from './struct';
 export * as cmdobj from './cmdobj';
+
+/**模块加载 */
+export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
 export * as hoaxer from './hoaxer';
 export * as opnast from './opnast';
-export * as struct from './struct';

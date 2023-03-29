@@ -17,6 +17,8 @@ declare global {
 	namespace globalThis {
 		/**提供一个注释 */
 		var Tip: typeof McdJSTemp.Tip;
+		/**开启一个分支结构 */
+		var If: typeof McdJSTemp.If;
 	}
 }
 

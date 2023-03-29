@@ -7,7 +7,7 @@
 declare module './config';
 
 import { EType } from './errlib';
-import { NType } from './opnast';
+import { NType, NExprssionType } from './opnast';
 
 export const env = {
 	version: '0.9.2',
@@ -43,6 +43,7 @@ export namespace getEnumText {
 	export type EnumMap = {
 		NType: NType;
 		EType: EType;
+		NExprssionType: NExprssionType;
 	};
 	export type EnumName = keyof EnumMap;
 	type Text = {
@@ -61,6 +62,17 @@ export namespace getEnumText {
 			},
 			[NType.Command]: {
 				'zh-CN': '单命令',
+			},
+			[NType.Exprssion]: {
+				'zh-CN': '表达式',
+			},
+			[NType.Branch]: {
+				'zh-CN': '条件分支',
+			},
+		},
+		NExprssionType: {
+			[NExprssionType.Command]: {
+				'zh-CN': '有条件命令方块',
 			},
 		},
 		EType: {

@@ -8,13 +8,17 @@ declare module './opnast';
 
 import { chCommand } from './cmdobj';
 import { Types } from './struct';
+import Vcb = Types.Vcb;
 
 export enum NType {
 	CodeBlock,
 	Command,
+	Exprssion,
+	Branch,
 }
 export interface Node {
 	ntype: NType;
+	index: number;
 	tips?: string;
 }
 export interface NodeCodeBlock extends Node {
@@ -25,19 +29,66 @@ export interface NodeCommand extends Node {
 	ntype: NType.Command;
 	exec: string;
 }
-export type AllNode =
+export interface NodeExprssion extends Node {
+	ntype: NType.Exprssion;
+	netype: NExprssionType;
+}
+export enum NExprssionType {
+	Command,
+}
+export interface NodeExprssionCommand extends NodeExprssion {
+	netype: NExprssionType.Command;
+	pos: number;
+}
+export type AllNodeExprssion =
+	| NodeExprssionCommand;
+export interface NodeBranch extends Node {
+	ntype: NType.Branch;
+	expr: AllNodeExprssion;
+	tdo: NodeCodeBlock;
+	fdo: NodeCodeBlock;
+}
+export type AllFnNode =
 	| NodeCodeBlock
-	| NodeCommand
-	| Node;
+	| AllNodeExprssion
+	| NodeBranch
+	| NodeCommand;
+export type AllNode = AllFnNode | Node;
+export type SelNode<T extends NType> = AllFnNode & { ntype: T; };
 export type AST = NodeCodeBlock;
+
+export class OperAPI {
+	constructor(operm: Operator) {
+		this.operm = operm;
+	}
+	private operm: Operator;
+	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
+		const nbEx = this.operm.node(NType.Exprssion, {
+			netype: NExprssionType.Command,
+			pos: expr,
+		});
+		const tdo = this.operm.getBlock(tdoOri);
+		const fdo = this.operm.getBlock(fdoOri);
+		const nBranch = this.operm.node(NType.Branch, {
+			expr: nbEx,
+			tdo,
+			fdo,
+		});
+		this.operm.operingBlock.nodes.push(nBranch);
+	}
+}
 
 export class Operator {
 	constructor(tips: string) {
-		this.operingBlock = this.ast = {
-			ntype: NType.CodeBlock,
-			nodes: [],
-			tips,
-		};
+		this.nodeList = [
+			this.operingBlock = this.ast = {
+				ntype: NType.CodeBlock,
+				nodes: [],
+				tips,
+				index: 0,
+			},
+		];
+		this.api = new OperAPI(this);
 	}
 	come() {
 		chCommand.come(this);
@@ -47,10 +98,32 @@ export class Operator {
 		chCommand.exit();
 		return this;
 	}
+	node<T extends NType>(ntype: T, body: Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>) {
+		const rslt = body as SelNode<T>;
+		rslt.ntype = ntype;
+		rslt.index = this.nodeList.push(rslt) - 1;
+		return rslt;
+	}
 	insert(cmd: string) {
-		this.operingBlock.nodes.push({ ntype: NType.Command, exec: cmd });
+		const nCommand = this.node(NType.Command, {
+			exec: cmd,
+		});
+		this.operingBlock.nodes.push(nCommand);
+		return nCommand.index;
+	}
+	getBlock(cbOri: Vcb) {
+		const nBlk = this.node(NType.CodeBlock, {
+			nodes: [],
+		});
+		const dad = this.operingBlock;
+		this.operingBlock = nBlk;
+		cbOri();
+		this.operingBlock = dad;
+		return nBlk;
 	}
 	operingBlock: NodeCodeBlock;
 	ast: AST;
+	nodeList: AllNode[];
+	api: OperAPI;
 }
 

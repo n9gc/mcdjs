@@ -31,6 +31,10 @@ namespace McdJSTemp {
 				| 'exp'
 				| 'cli'
 				| 'index';
+			export interface CommandRslt {
+				index: number;
+			}
+			export type Vcb = () => void;
 		}
 	}
 }

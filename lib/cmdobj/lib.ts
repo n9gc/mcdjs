@@ -7,14 +7,15 @@ void 0;
 
 namespace McdJSTemp {
 	globalThis.McdJSTempMerge(McdJSTemp);
+	import CommandRsltClass = Struct.CommandRsltClass;
 	export namespace Command {
 		export namespace Ver {
 			export const lib = '0.1.1';
 		}
 		export function say(text: string) {
 			const cmd = `say ${text}`;
-			const opering = McdJSTemp.chCommand.getOperm(Error());
-			opering.insert(cmd);
+			const opering = chCommand.getOperm(Error());
+			return new CommandRsltClass(opering.insert(cmd));
 		}
 	}
 }
