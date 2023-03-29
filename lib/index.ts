@@ -14,7 +14,6 @@ export * as appinf from './appinf';
 export * as cmdobj from './cmdobj';
 export * as config from './config';
 export * as errlib from './errlib';
-export * as glodef from './glodef';
 export * as hoaxer from './hoaxer';
 export * as opnast from './opnast';
 export * as struct from './struct';
