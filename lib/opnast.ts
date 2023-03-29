@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作工具模块
  * @module mcdjs/lib/opnast
- * @version 0.1.0
+ * @version 0.1.1
  * @license GPL-3.0-or-later
  */
 declare module './opnast';
@@ -10,8 +10,8 @@ import { chCommand } from './cmdobj';
 import { Types } from './struct';
 
 export enum NType {
-	CodeBlock = 'CodeBlock',
-	Command = 'Command',
+	CodeBlock,
+	Command,
 }
 export interface Node {
 	ntype: NType;

@@ -1,19 +1,21 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 1.0.6
+ * @version 1.1.6
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
 
+import { getEnumText } from './config';
+
 export enum EType {
-	ErrNoSuchFile = '找不到文件',
-	ErrNoParser = '没有可用的解析器',
-	ErrNoSuchErr = '没有这种错误类型',
-	ErrCannotBeImported = '此模块不允许被引入',
+	ErrNoSuchFile,
+	ErrNoParser,
+	ErrNoSuchErr,
+	ErrCannotBeImported,
 	/**@deprecated */
-	ErrUseBeforeDefine = '变量在预定义完成前被引用',
-	ErrCannotBeSeted = '此变量无法被赋值',
+	ErrUseBeforeDefine,
+	ErrCannotBeSeted,
 }
 export interface Err {
 	type: EType;
@@ -77,12 +79,24 @@ export function trapErr<T extends AllErr>(rej: (err: T) => void, type: T['type']
 	return () => rej(GetErr(type, ...eles));
 }
 
+export interface ClearedErr {
+	type: string;
+	tracker: Error;
+}
+export function clearErr<T extends AllErr>(n: T): ClearedErr {
+	return {
+		...n,
+		type: getEnumText('EType', n.type),
+	};
+}
+
 export function throwErr<T extends AllErr>(type: T['type'], ...ele: ArgGetErr<T>): never;
 export function throwErr<T extends AllErr>(err: T): never;
 export function throwErr<T extends AllErr>(n: T['type'] | T, ...ele: [Error?, ...ArgGetErrList[T['type']]]): never {
-	if (typeof n === 'string') return throwErr(GetErr(n, ...(ele as ArgGetErr<T>)));
-	console.error('\n\x1b[37m\x1b[41m McdJS 错误 \x1b[0m', n);
-	if (typeof globalThis.process?.exit === 'function') process.exit();
-	else throw n;
+	if (typeof n === 'number') return throwErr(GetErr(n, ...(ele as ArgGetErr<T>)));
+	const c = clearErr(n);
+	console.error('\n\x1b[37m\x1b[41m McdJS 错误 \x1b[0m', c);
+	if (typeof globalThis.process?.exit === 'function') process.exit(n.type + 200);
+	else throw c;
 }
 export const errCatcher = (err: AllErr) => throwErr(err);
