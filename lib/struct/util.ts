@@ -8,6 +8,11 @@ void 0;
 namespace McdJSTemp {
 	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	export namespace Struct {
+	}
+	export function Tip(...args: Tip.ArgsJoin) {
+		Tip.setTip(...args);
+	}
+	export namespace Tip {
 		export type ArgsJoin = [literals: { raw: readonly string[]; }, ...values: any[]];
 		function join(...args: ArgsJoin) {
 			const [{ raw }, ...values] = args;
@@ -25,8 +30,5 @@ namespace McdJSTemp {
 			tipLast = '';
 			return tip;
 		};
-	}
-	export function Tip(...args: Struct.ArgsJoin) {
-		Struct.setTip(...args);
 	}
 }

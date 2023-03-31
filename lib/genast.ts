@@ -6,7 +6,7 @@
  */
 declare module './genast';
 
-import { chCommand, Types } from './alload';
+import Temp, { chCommand, Types } from './alload';
 import Vcb = Types.Vcb;
 
 export enum NType {
@@ -62,17 +62,13 @@ export class OperAPI {
 	) {
 	}
 	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
-		const nbEx = this.operm.node(NType.Exprssion, {
+		const nBranch = this.operm.node(NType.Branch);
+		nBranch.expr = this.operm.node(NType.Exprssion, {
 			netype: NExprssionType.Command,
 			pos: expr,
 		});
-		const tdo = this.operm.getBlock(tdoOri);
-		const fdo = this.operm.getBlock(fdoOri);
-		const nBranch = this.operm.node(NType.Branch, {
-			expr: nbEx,
-			tdo,
-			fdo,
-		});
+		nBranch.tdo = this.operm.getBlock(tdoOri);
+		nBranch.fdo = this.operm.getBlock(fdoOri);
 		this.operm.operingBlock.nodes.push(nBranch);
 		return nBranch.index;
 	}
@@ -98,9 +94,14 @@ export class Operator {
 		chCommand.exit();
 		return this;
 	}
-	node<T extends NType>(ntype: T, body: Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>) {
+	node<T extends NType>(
+		ntype: T,
+		body: Partial<Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>> = {},
+	) {
 		const rslt = body as SelNode<T>;
 		rslt.ntype = ntype;
+		const tips = Temp.Tip.getTip();
+		tips && (rslt.tips = tips);
 		rslt.index = this.nodeList.push(rslt) - 1;
 		return rslt;
 	}

@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /// <reference types="mcdjs/global" />
 
-console.log(123);
 Command.say('890');
-const say2 = Command.say('8&fh0');
-Tip`0978`;
-console.log(McdJSTemp.Struct.getTip());
 
+Tip`say some funny things`;
+const say2 = Command.say('8&fh0');
+
+Tip`test if say2 ran successfully`;
 const ifRslt = If(say2).Then(() => {
+	Tip`log success`;
 	Command.say('Success!');
 }).Else(() => {
 	Command.say('Failed!');
