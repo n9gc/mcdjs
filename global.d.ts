@@ -4,20 +4,15 @@
  */
 declare module './global';
 declare global {
-	/**
-	 * McdJS 命令集
-	 * @license GPL-3.0-or-later
-	 */
-	var Command: typeof McdJSTemp.Command;
-	/**
-	 * 命令集间接操作相关
-	 * @license GPL-3.0-or-later
-	 */
-	var chCommand: typeof McdJSTemp.chCommand;
 	namespace globalThis {
-		/**提供一个注释 */
-		var Tip: typeof McdJSTemp.Tip;
-		var If: typeof McdJSTemp.If;
+
+		// 结构
+		export import Command = McdJSTemp.Command;
+
+		// 实用工具
+		export import Tip = McdJSTemp.Tip;
+		export import If = McdJSTemp.If;
+
 	}
 }
 

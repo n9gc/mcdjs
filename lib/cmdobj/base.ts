@@ -13,7 +13,10 @@ namespace McdJSTemp {
 		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);
 		else return n;
 	}
-	/**McdJS 命令集 */
+	/**
+	 * McdJS 命令集
+	 * @license GPL-3.0-or-later
+	 */
 	export namespace Command {
 		/**版本信息 */
 		export namespace Ver {

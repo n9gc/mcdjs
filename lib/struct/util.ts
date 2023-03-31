@@ -7,8 +7,7 @@ void 0;
 
 namespace McdJSTemp {
 	(McdJSTemp as any) = globalThis.McdJSTempGet();
-	export namespace Struct {
-	}
+	/**提供一个注释 */
 	export function Tip(...args: Tip.ArgsJoin) {
 		Tip.setTip(...args);
 	}

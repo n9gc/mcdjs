@@ -6,14 +6,16 @@
  */
 declare module './appinf';
 
-import { Operator } from './genast'
+import { Operator } from './genast';
 
-const globalExcludeKeys = [
+const globalExcludeKeys: (keyof typeof McdJSTemp)[] = [
 	'Imp',
+	'chCommand',
+	'Struct',
 ];
 export function globalify() {
 	Object.keys(globalThis.McdJSTemp).forEach(key => {
-		if (globalExcludeKeys.includes(key)) return;
+		if ((globalExcludeKeys as string[]).includes(key)) return;
 		(globalThis as any)[key] = (globalThis.McdJSTemp as any)[key];
 	});
 }
