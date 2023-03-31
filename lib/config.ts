@@ -65,7 +65,7 @@ export namespace getEnumText {
 			[NType.Command]: {
 				'zh-CN': '单命令',
 			},
-			[NType.ExprssionCommand]: {
+			[NType.ExpressionCommand]: {
 				'zh-CN': '有条件命令方块',
 			},
 			[NType.Branch]: {
@@ -96,6 +96,6 @@ export namespace getEnumText {
 				'zh-CN': '此变量无法被赋值',
 				'en-US': 'The variable is not allowed to be assigned',
 			},
-		}
+		},
 	};
 }

@@ -13,7 +13,7 @@ export enum NType {
 	System,
 	CodeBlock,
 	Command,
-	ExprssionCommand,
+	ExpressionCommand,
 	Branch,
 }
 export interface Node {
@@ -34,20 +34,20 @@ export interface NodeCommand extends Node {
 	ntype: NType.Command;
 	exec: string;
 }
-export interface NodeExprssionCommand extends Node {
-	ntype: NType.ExprssionCommand;
+export interface NodeExpressionCommand extends Node {
+	ntype: NType.ExpressionCommand;
 	pos: number;
 }
 export interface NodeBranch extends Node {
 	ntype: NType.Branch;
-	expr: NodeExprssionCommand;
+	expr: NodeExpressionCommand;
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
 export type AllFnNode =
 	| NodeSystem
 	| NodeCodeBlock
-	| NodeExprssionCommand
+	| NodeExpressionCommand
 	| NodeBranch
 	| NodeCommand;
 export type AllNode = AllFnNode | Node;
@@ -61,7 +61,7 @@ export class OperAPI {
 	}
 	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
 		const nBranch = this.operm.node(NType.Branch);
-		nBranch.expr = this.operm.node(NType.ExprssionCommand, {
+		nBranch.expr = this.operm.node(NType.ExpressionCommand, {
 			pos: expr,
 		});
 		nBranch.tdo = this.operm.getBlock(tdoOri);
