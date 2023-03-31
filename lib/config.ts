@@ -96,6 +96,10 @@ export namespace getEnumText {
 				'zh-CN': '此变量无法被赋值',
 				'en-US': 'The variable is not allowed to be assigned',
 			},
+			[EType.ErrIllegalParameter]: {
+				'zh-CN': '非法的参数',
+				'en-US': 'Illegal Parameter given',
+			},
 		},
 	};
 }

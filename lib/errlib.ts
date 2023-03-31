@@ -16,6 +16,7 @@ export enum EType {
 	/**@deprecated */
 	ErrUseBeforeDefine,
 	ErrCannotBeSeted,
+	ErrIllegalParameter,
 }
 export interface Err {
 	type: EType;
@@ -45,25 +46,32 @@ export interface ErrCannotBeSeted extends Err {
 	type: EType.ErrCannotBeSeted;
 	varName: string;
 }
-export type AllErr =
+export interface ErrIllegalParameter extends Err {
+	type: EType.ErrIllegalParameter;
+	args: IArguments | readonly any[];
+}
+export type AllFnErr =
 	| ErrNoSuchFile
 	| ErrNoParser
 	| ErrNoSuchErr
 	| ErrCannotBeImported
 	| ErrUseBeforeDefine
 	| ErrCannotBeSeted
-	| Err;
+	| ErrIllegalParameter;
+export type SelErr<T extends EType> = AllFnErr & { type: T; };
+export type AllErr = AllFnErr | Err;
 
-export type ArgGetErr<T extends AllErr> = [tracker: Error, ...ele: ArgGetErrList[T['type']]];
+export type ArgGetErr<T extends EType> = [tracker: Error, ...ele: ArgGetErrList[T]];
 export type ArgGetErrList = {
-	[EType.ErrNoParser]: [files: string[]];
-	[EType.ErrNoSuchFile]: [];
+	[EType.ErrNoParser]: [];
+	[EType.ErrNoSuchFile]: [files: string[]];
 	[EType.ErrNoSuchErr]: [throwTracker: Error];
 	[EType.ErrCannotBeImported]: [module: string];
 	[EType.ErrUseBeforeDefine]: [varName: string];
 	[EType.ErrCannotBeSeted]: [varName: string];
+	[EType.ErrIllegalParameter]: [args: IArguments | readonly any[]];
 };
-export function GetErr<T extends AllErr>(type: T['type'], ...pele: ArgGetErr<T>) {
+export function GetErr<B extends EType, T = SelErr<B>>(type: B, ...pele: ArgGetErr<B>) {
 	const [tracker, ...args] = pele;
 	switch (type) {
 		case EType.ErrNoSuchFile: return { type, files: args[0], tracker } as T;
@@ -72,10 +80,11 @@ export function GetErr<T extends AllErr>(type: T['type'], ...pele: ArgGetErr<T>)
 		case EType.ErrCannotBeImported: return { type, module: args[0], tracker } as T;
 		case EType.ErrUseBeforeDefine: return { type, varName: args[0], tracker } as T;
 		case EType.ErrCannotBeSeted: return { type, varName: args[0], tracker } as T;
-		default: return throwErr({ type: EType.ErrNoSuchErr, tracker, throwTracker: Error() });
+		case EType.ErrIllegalParameter: return { type, args: args[0], tracker } as T;
+		default: return throwErr(EType.ErrNoSuchErr, tracker, Error());
 	}
 }
-export function trapErr<T extends AllErr>(rej: (err: T) => void, type: T['type'], ...eles: ArgGetErr<T>) {
+export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, type: T, ...eles: ArgGetErr<T>) {
 	return () => rej(GetErr(type, ...eles));
 }
 
@@ -90,9 +99,9 @@ export function clearErr<T extends AllErr>(n: T): ClearedErr {
 	};
 }
 
-export function throwErr<T extends AllErr>(type: T['type'], ...ele: ArgGetErr<T>): never;
-export function throwErr<T extends AllErr>(err: T): never;
-export function throwErr<T extends AllErr>(n: T['type'] | T, ...ele: [Error?, ...ArgGetErrList[T['type']]]): never {
+export function throwErr<T extends EType>(type: T, ...ele: ArgGetErr<T>): never;
+export function throwErr(err: AllErr): never;
+export function throwErr<T extends EType>(n: T | AllErr, ...ele: [Error?, ...ArgGetErrList[T]]): never {
 	if (typeof n === 'number') return throwErr(GetErr(n, ...(ele as ArgGetErr<T>)));
 	const c = clearErr(n);
 	console.error('\n\x1b[37m\x1b[41m McdJS 错误 \x1b[0m', c);

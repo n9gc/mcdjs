@@ -38,7 +38,7 @@ export async function resolve({ inputs }: RunInfos) {
 		.map(input => path.resolve(input))
 		.map(file => path.extname(file) ? file : assocList.map(ext => file + ext))
 		.map(file => (res, rej) => typeof file === 'string'
-			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, Error(), file)())
+			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, Error(), [file])())
 			: Promise.snake(file.map(may => (res, rej) =>
 				isExist(may).then(n => n ? rej(may) : res())
 			)).then(trapErr(rej, EType.ErrNoSuchFile, Error(), file), (sure) => (files.push(sure), res()))
