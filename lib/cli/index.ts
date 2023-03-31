@@ -14,7 +14,7 @@ export default async function handle() {
 	const input = process.argv.at(-2);
 	const outfile = process.argv.at(-1);
 	if (process.argv.length < 3) return console.log(`Version ${env.version}`);
-	const infos = new RunInfos({ inputs: [input!], outfile });
+	const infos = new RunInfos([input!], outfile);
 	await out(infos, await run(infos));
 	process.exit(0);
 }

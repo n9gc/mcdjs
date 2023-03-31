@@ -18,6 +18,7 @@ namespace McdJSTemp {
 		}
 	}
 	import CRClass = Struct.CommandRsltClass;
+	/**开启一个分支结构 */
 	export function If(expr: CommandRslt): If.BranchThen;
 	export function If(expr: CommandRslt, tdo: Vcb, fdo: Vcb): CommandRslt;
 	export function If(...args: [CommandRslt] | [CommandRslt, Vcb, Vcb]) {

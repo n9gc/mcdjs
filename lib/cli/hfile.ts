@@ -16,12 +16,10 @@ import { Types } from '../struct';
 
 export interface ParRunInfos extends Partial<RunInfos> { }
 export class RunInfos {
-	constructor({ inputs = [], outfile = '' }: ParRunInfos = {}) {
-		this.inputs = inputs;
-		this.outfile = outfile;
-	}
-	inputs: string[];
-	outfile: string;
+	constructor(
+		public inputs: string[] = [],
+		public outfile: string = '',
+	) { }
 }
 export const assocList = [
 	'',
