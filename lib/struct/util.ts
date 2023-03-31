@@ -8,10 +8,10 @@ void 0;
 namespace McdJSTemp {
 	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	/**提供一个注释 */
-	export function Tip(...args: Tip.ArgsJoin) {
-		Tip.setTip(...args);
+	export function tip(...args: tip.ArgsJoin) {
+		tip.setTip(...args);
 	}
-	export namespace Tip {
+	export namespace tip {
 		export type ArgsJoin = [literals: { raw: readonly string[]; }, ...values: any[]];
 		function join(...args: ArgsJoin) {
 			const [{ raw }, ...values] = args;

@@ -97,7 +97,7 @@ export class Operator {
 	) {
 		const rslt = body as SelNode<T>;
 		rslt.ntype = ntype;
-		const tips = Temp.Tip.getTip();
+		const tips = Temp.tip.getTip();
 		tips && (rslt.tips = tips);
 		rslt.index = this.nodeList.push(rslt) - 1;
 		return rslt;

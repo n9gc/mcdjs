@@ -7,6 +7,7 @@ void 0;
 
 namespace McdJSTemp {
 	(McdJSTemp as any) = globalThis.McdJSTempGet();
+	import CRClass = Struct.CommandRsltClass;
 	type Operm = import('../genast').Operator;
 	const errlib = Imp.errlib;
 	function testIdx<T>(tracker: Error, n?: T) {
@@ -34,6 +35,10 @@ namespace McdJSTemp {
 		}
 		export function getOperm(tracker: Error) {
 			return testIdx(tracker, opering);
+		}
+		export function insert(cmd: string, tracker: Error) {
+			const opering = getOperm(tracker);
+			return new CRClass(opering.insert(cmd));
 		}
 	}
 }

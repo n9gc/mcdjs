@@ -10,7 +10,7 @@ declare global {
 		export import Command = McdJSTemp.Command;
 
 		// 实用工具
-		export import Tip = McdJSTemp.Tip;
+		export import tip = McdJSTemp.tip;
 		export import If = McdJSTemp.If;
 
 	}
