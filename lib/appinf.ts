@@ -6,7 +6,7 @@
  */
 declare module './appinf';
 
-import { Operator } from './opnast'
+import { Operator } from './genast'
 
 const globalExcludeKeys = [
 	'Imp',

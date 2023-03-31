@@ -24,7 +24,7 @@ namespace McdJSTemp {
 				note?: string;
 			}
 			export interface RoundParsed {
-				[file: string]: import('../opnast').AST;
+				[file: string]: import('../genast').AST;
 			}
 			export type Mods =
 				| Exclude<keyof typeof import('..'), 'default'>

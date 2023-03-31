@@ -7,7 +7,7 @@ void 0;
 
 namespace McdJSTemp {
 	(McdJSTemp as any) = globalThis.McdJSTempGet();
-	type Operm = import('../opnast').Operator;
+	type Operm = import('../genast').Operator;
 	const errlib = Imp.errlib;
 	function testIdx<T>(tracker: Error, n?: T) {
 		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);

@@ -19,4 +19,4 @@ export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
 export * as hoaxer from './hoaxer';
-export * as opnast from './opnast';
+export * as genast from './genast';

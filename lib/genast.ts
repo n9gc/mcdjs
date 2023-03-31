@@ -1,10 +1,10 @@
 /**
  * 抽象语法树操作工具模块
- * @module mcdjs/lib/opnast
+ * @module mcdjs/lib/genast
  * @version 0.1.1
  * @license GPL-3.0-or-later
  */
-declare module './opnast';
+declare module './genast';
 
 import { chCommand } from './cmdobj';
 import { Types } from './struct';

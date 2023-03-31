@@ -7,7 +7,7 @@
 declare module './config';
 
 import { EType } from './errlib';
-import { NType, NExprssionType } from './opnast';
+import { NExprssionType, NType } from './genast';
 
 export const env = {
 	version: '0.9.2',
