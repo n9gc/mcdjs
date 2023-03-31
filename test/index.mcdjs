@@ -6,12 +6,12 @@ Command.say('890');
 tip`say some funny things`;
 const say2 = Command.say('8&fh0');
 
-Tip`test if say2 ran successfully`;
+tip`test if say2 ran successfully`;
 const ifRslt = If(say2).Then(() => {
-	Tip`log success`;
+	tip`log success`;
 	Command.say('Success!');
 }).Else(() => {
-	Command.say('Failed!');
+	Command.tag('@a', 'add', 'hh');
 });
 
 If(ifRslt, () => {
