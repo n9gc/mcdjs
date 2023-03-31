@@ -10,15 +10,21 @@ import Temp, { chCommand, Types } from './alload';
 import Vcb = Types.Vcb;
 
 export enum NType {
+	System,
 	CodeBlock,
 	Command,
-	Exprssion,
+	ExprssionCommand,
 	Branch,
 }
 export interface Node {
 	ntype: NType;
 	index: number;
 	tips?: string;
+}
+export interface NodeSystem extends Node {
+	ntype: NType.System;
+	tips: string;
+	nodes: AllNode[];
 }
 export interface NodeCodeBlock extends Node {
 	ntype: NType.CodeBlock;
@@ -28,33 +34,25 @@ export interface NodeCommand extends Node {
 	ntype: NType.Command;
 	exec: string;
 }
-export interface NodeExprssion extends Node {
-	ntype: NType.Exprssion;
-	netype: NExprssionType;
-}
-export enum NExprssionType {
-	Command,
-}
-export interface NodeExprssionCommand extends NodeExprssion {
-	netype: NExprssionType.Command;
+export interface NodeExprssionCommand extends Node {
+	ntype: NType.ExprssionCommand;
 	pos: number;
 }
-export type AllNodeExprssion =
-	| NodeExprssionCommand;
 export interface NodeBranch extends Node {
 	ntype: NType.Branch;
-	expr: AllNodeExprssion;
+	expr: NodeExprssionCommand;
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
 export type AllFnNode =
+	| NodeSystem
 	| NodeCodeBlock
-	| AllNodeExprssion
+	| NodeExprssionCommand
 	| NodeBranch
 	| NodeCommand;
 export type AllNode = AllFnNode | Node;
 export type SelNode<T extends NType> = AllFnNode & { ntype: T; };
-export type AST = NodeCodeBlock;
+export type AST = NodeSystem;
 
 export class OperAPI {
 	constructor(
@@ -63,8 +61,7 @@ export class OperAPI {
 	}
 	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
 		const nBranch = this.operm.node(NType.Branch);
-		nBranch.expr = this.operm.node(NType.Exprssion, {
-			netype: NExprssionType.Command,
+		nBranch.expr = this.operm.node(NType.ExprssionCommand, {
 			pos: expr,
 		});
 		nBranch.tdo = this.operm.getBlock(tdoOri);
@@ -78,7 +75,7 @@ export class Operator {
 	constructor(tips: string) {
 		this.nodeList = [
 			this.operingBlock = this.ast = {
-				ntype: NType.CodeBlock,
+				ntype: NType.System,
 				nodes: [],
 				tips,
 				index: 0,
@@ -122,7 +119,7 @@ export class Operator {
 		this.operingBlock = dad;
 		return nBlk;
 	}
-	operingBlock: NodeCodeBlock;
+	operingBlock: NodeCodeBlock | NodeSystem;
 	ast: AST;
 	nodeList: AllNode[];
 	api: OperAPI;

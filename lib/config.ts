@@ -7,7 +7,7 @@
 declare module './config';
 
 import { EType } from './errlib';
-import { NExprssionType, NType } from './genast';
+import { NType } from './genast';
 
 export const env = {
 	version: '0.9.2',
@@ -43,7 +43,6 @@ export namespace getEnumText {
 	export type EnumMap = {
 		NType: NType;
 		EType: EType;
-		NExprssionType: NExprssionType;
 	};
 	export type EnumName = keyof EnumMap;
 	type Text = {
@@ -57,22 +56,20 @@ export namespace getEnumText {
 	};
 	export const obj: Obj = {
 		NType: {
+			[NType.System]: {
+				'zh-CN': '指令系统',
+			},
 			[NType.CodeBlock]: {
 				'zh-CN': '代码块',
 			},
 			[NType.Command]: {
 				'zh-CN': '单命令',
 			},
-			[NType.Exprssion]: {
-				'zh-CN': '表达式',
+			[NType.ExprssionCommand]: {
+				'zh-CN': '有条件命令方块',
 			},
 			[NType.Branch]: {
 				'zh-CN': '条件分支',
-			},
-		},
-		NExprssionType: {
-			[NExprssionType.Command]: {
-				'zh-CN': '有条件命令方块',
 			},
 		},
 		EType: {

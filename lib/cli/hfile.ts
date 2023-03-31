@@ -47,9 +47,9 @@ export async function resolve({ inputs }: RunInfos) {
 	return files;
 }
 export async function compile(files: string[]) {
-	const commands: Types.RoundParsed = {};
+	const commands: Types.RoundParsed = [];
 	await Promise.thens(files.map(file => async () =>
-		commands[file] = await parse(() => import(file))
+		commands.push(await parse(file, () => import(file)))
 	));
 	return commands;
 }

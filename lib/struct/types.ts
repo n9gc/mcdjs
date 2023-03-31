@@ -17,14 +17,7 @@ namespace McdJSTemp {
 				Repeat = 4,
 				RepeatCon = 5,
 			}
-			export interface Command {
-				type: CbType;
-				code: string;
-				timeout?: number;
-				note?: string;
-			}
-			export interface RoundParsed {
-				[file: string]: import('../genast').AST;
+			export interface RoundParsed extends Array<import('../genast').AST> {
 			}
 			export type Mods =
 				| Exclude<keyof typeof import('..'), 'default'>
