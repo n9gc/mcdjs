@@ -11,7 +11,7 @@ declare global {
 	 * @license GPL-3.0-or-later
 	 */
 	namespace McdJSTemp {
-		var Imp: typeof Index;
+		export import Imp = Index;
 	}
 	/**
 	 * 得到真正全局临时对象
