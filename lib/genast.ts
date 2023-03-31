@@ -6,8 +6,7 @@
  */
 declare module './genast';
 
-import { chCommand } from './cmdobj';
-import { Types } from './struct';
+import { chCommand, Types } from './alload';
 import Vcb = Types.Vcb;
 
 export enum NType {

@@ -10,9 +10,9 @@ import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 import 'promise-snake';
+import { Types } from '../alload';
 import { parse } from "../appinf";
 import { errCatcher, EType, trapErr } from '../errlib';
-import { Types } from '../struct';
 
 export interface ParRunInfos extends Partial<RunInfos> { }
 export class RunInfos {
