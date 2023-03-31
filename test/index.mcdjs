@@ -4,11 +4,17 @@
 console.log(123);
 Command.say('890');
 const say2 = Command.say('8&fh0');
-Tip`0978`
+Tip`0978`;
 console.log(McdJSTemp.Struct.getTip());
 
-If(say2)(() => {
+const ifRslt = If(say2).Then(() => {
 	Command.say('Success!');
-})(() => {
+}).Else(() => {
+	Command.say('Failed!');
+});
+
+If(ifRslt, () => {
+	Command.say('Success!');
+}, () => {
 	Command.say('Failed!');
 });

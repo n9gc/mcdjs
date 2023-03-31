@@ -11,62 +11,33 @@ namespace McdJSTemp {
 	import Vcb = Struct.Types.Vcb;
 	export namespace Struct {
 		export class CommandRsltClass implements CommandRslt {
-			constructor(index: number) {
-				this.index = index;
+			constructor(
+				public index: number,
+			) {
 			}
-			index;
 		}
 	}
-	export function If(expr: CommandRslt) {
-		return If.getBranchDo(expr);
+	import CRClass = Struct.CommandRsltClass;
+	export function If(expr: CommandRslt): If.BranchThen;
+	export function If(expr: CommandRslt, tdo: Vcb, fdo: Vcb): CommandRslt;
+	export function If(...args: [CommandRslt] | [CommandRslt, Vcb, Vcb]) {
+		return args.length === 1 ? If.getObj(args[0]) : If.reg(...args);
 	}
 	export namespace If {
-		export type BranchAble = {
+		export interface BranchThen {
 			/**若条件满足，则 */
-			Then: BranchDo['Then'];
-			/**若条件不满足，则 */
-			Else: BranchDo['Else'];
-		};
-		type BranchDoFn = BranchAble & ((tdo: Vcb) => (fdo: Vcb) => void);
-		export function getBranchDo(expr: CommandRslt): BranchDoFn {
-			const proto = new BranchDo(expr);
-			const fn = (tdo: Vcb) => {
-				proto.Then(tdo);
-				return (fdo: Vcb) => proto.Else(fdo);
-			};
-			const Obj = {
-				Then(tdo: Vcb) {
-					proto.Then(tdo);
-					return Obj;
-				},
-				Else(fdo: Vcb) {
-					proto.Else(fdo);
-				}
-			};
-			return Object.assign(fn, Obj);
+			Then(tdo: Vcb): BranchElse;
 		}
-		class BranchDo {
-			constructor(expr: CommandRslt) {
-				this.expr = expr;
-			}
-			expr: CommandRslt;
-			tdos: Vcb[] = [];
-			fdos: Vcb[] = [];
-			clear(n: 'tdos' | 'fdos') {
-				return () => this[n].forEach(fn => fn());
-			}
-			end() {
-				const opering = chCommand.getOperm(Error());
-				opering.api.If(this.expr.index, this.clear('tdos'), this.clear('fdos'));
-			}
-			Then(tdo: Vcb) {
-				this.tdos.push(tdo);
-				return this as BranchAble;
-			}
-			Else(fdo: Vcb) {
-				this.fdos.push(fdo);
-				this.end();
-			}
+		interface BranchElse {
+			/**若条件不满足，则 */
+			Else(fdo: Vcb): CommandRslt;
+		}
+		export function reg(expr: CommandRslt, tdo: Vcb, fdo: Vcb) {
+			const opering = chCommand.getOperm(Error());
+			return new CRClass(opering.api.If(expr.index, tdo, fdo));
+		}
+		export function getObj(expr: CommandRslt): BranchThen {
+			return { Then: tdo => ({ Else: fdo => reg(expr, tdo, fdo) }) };
 		}
 	}
 }

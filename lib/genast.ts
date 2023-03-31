@@ -58,10 +58,10 @@ export type SelNode<T extends NType> = AllFnNode & { ntype: T; };
 export type AST = NodeCodeBlock;
 
 export class OperAPI {
-	constructor(operm: Operator) {
-		this.operm = operm;
+	constructor(
+		private operm: Operator,
+	) {
 	}
-	private operm: Operator;
 	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
 		const nbEx = this.operm.node(NType.Exprssion, {
 			netype: NExprssionType.Command,
@@ -75,6 +75,7 @@ export class OperAPI {
 			fdo,
 		});
 		this.operm.operingBlock.nodes.push(nBranch);
+		return nBranch.index;
 	}
 }
 
