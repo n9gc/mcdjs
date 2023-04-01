@@ -1,6 +1,6 @@
 require('export-tester')(
 	{
-		pack: 'mcdjs',
+		file: require('path').join(__dirname, '../build/index.js'),
 		sign: 'McdJS',
 	},
 	{
@@ -8,4 +8,7 @@ require('export-tester')(
 			console.log(McdJS);
 		}
 	}
-).then(() => process.exit(0));
+).then(
+	() => process.exit(0),
+	() => process.exit(-1),
+);
