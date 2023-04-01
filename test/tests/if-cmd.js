@@ -1,9 +1,5 @@
-#!/usr/bin/env node
 /// <reference types="mcdjs/global" />
 
-Command.say('890');
-
-tip`say some funny things`;
 const say2 = Command.say('8&fh0');
 
 tip`test if say2 ran successfully`;

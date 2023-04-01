@@ -45,14 +45,12 @@ export namespace getEnumText {
 		EType: EType;
 	};
 	export type EnumName = keyof EnumMap;
-	type Text = {
-		[I in Exclude<env.LangOption, typeof env.defaultLang>]?: string;
-	} & { [env.defaultLang]: string; };
-	type Texts<T extends EnumName> = {
-		[I in EnumMap[T]]: Text;
-	};
 	type Obj = {
-		[K in EnumName]: Texts<K>;
+		[K in EnumName]: {
+			[I in EnumMap[K]]:
+			& { [env.defaultLang]: string; }
+			& { [J in Exclude<env.LangOption, typeof env.defaultLang>]?: string };
+		};
 	};
 	export const obj: Obj = {
 		NType: {

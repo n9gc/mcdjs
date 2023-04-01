@@ -106,7 +106,7 @@ export function throwErr<T extends EType>(...args: [AllErr] | ArgGetErr<T>): nev
 	if (typeof err !== 'object') return throwErr(GetErr(...args as ArgGetErr<T>));
 	const c = clearErr(err);
 	console.error('\n\x1b[37m\x1b[41m McdJS 错误 \x1b[0m', c);
-	if (typeof globalThis.process?.exit === 'function') process.exit(err.type + 200);
+	if (typeof globalThis.process?.exit === 'function') process.exit(9);
 	else throw c;
 }
 export const errCatcher = (err: AllErr) => throwErr(err);

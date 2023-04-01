@@ -1,6 +1,4 @@
-const tester = require('export-tester');
-
-tester(
+require('export-tester')(
 	{
 		pack: 'mcdjs',
 		sign: 'McdJS',
@@ -10,4 +8,4 @@ tester(
 			console.log(McdJS);
 		}
 	}
-);
+).then(() => process.exit(0));

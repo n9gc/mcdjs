@@ -6,6 +6,8 @@
 	"types": "./build/index.d.ts",
 	"scripts": {
 		"build": "node dobuild -prod",
+		"test-all": "node test",
+		"test-import": "node test/import",
 		"devb": "node dobuild"
 	},
 	"bin": {

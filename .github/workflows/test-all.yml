@@ -23,9 +23,13 @@ jobs:
         npm install
         node dobuild
 
-    - name: Say
+    - name: Test - Import
       run: |
-        npx mcdjsc test/index test/out.json
+        npm run test-import
+    - name: Test - All
+      run: |
+        npm run test-all
+
   test-prod:
     runs-on: ubuntu-latest
     strategy:
@@ -42,6 +46,9 @@ jobs:
         npm install
         node dobuild -prod
 
-    - name: Say
+    - name: Test - Import
       run: |
-        npx mcdjsc test/index test/out.json
+        npm run test-import
+    - name: Test - All
+      run: |
+        npm run test-all
