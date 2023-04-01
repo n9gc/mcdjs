@@ -60,12 +60,8 @@ namespace McdJSTemp {
 		return throwErr(EType.ErrIllegalParameter, tracker, args);
 	}
 	/**开启一个分支结构 */
-	export function If(expr: CommandRslt): If.BranchThen;
-	export function If(expr: CommandRslt, tdo: Vcb, fdo: Vcb): CommandRslt;
-	export function If(expr: Selected): If.BranchThen;
-	export function If(expr: Selected, tdo: Vcb, fdo: Vcb): CommandRslt;
-	export function If(expr: Expression): If.BranchThen;
-	export function If(expr: Expression, tdo: Vcb, fdo: Vcb): CommandRslt;
+	export function If(expr: If.ArgStable): If.BranchThen;
+	export function If(expr: If.ArgStable, tdo: Vcb, fdo: Vcb): CommandRslt;
 	export function If(...args: If.Args) {
 		return If.ori(...args);
 	}
@@ -102,12 +98,8 @@ namespace McdJSTemp {
 		}
 	}
 	/**开启半个分支结构 */
-	export function When(expr: CommandRslt): When.BranchThen;
-	export function When(expr: CommandRslt, tdo: Vcb): CommandRslt;
-	export function When(expr: Selected): When.BranchThen;
-	export function When(expr: Selected, tdo: Vcb): CommandRslt;
-	export function When(expr: Expression): When.BranchThen;
-	export function When(expr: Expression, tdo: Vcb): CommandRslt;
+	export function When(expr: If.ArgStable): When.BranchThen;
+	export function When(expr: If.ArgStable, tdo: Vcb): CommandRslt;
 	export function When(...args: When.Args) {
 		return When.ori(...args);
 	}
