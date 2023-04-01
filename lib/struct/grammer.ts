@@ -47,7 +47,6 @@ namespace McdJSTemp {
 	import CRClass = Struct.CommandRsltClass;
 	import SEClass = Struct.SelectedClass;
 	import Vcb = Types.Vcb;
-	import errlib = Imp.errlib;
 	export import Tag = Struct.Tag;
 	export const AND = 'and';
 	export const OR = 'or';
@@ -57,7 +56,8 @@ namespace McdJSTemp {
 	export const XOR = 'xor';
 	export const XNOR = 'xnor';
 	function errParams(tracker: Error, args: IArguments | readonly any[]) {
-		return errlib.throwErr(errlib.EType.ErrIllegalParameter, tracker, args);
+		const { errlib: { throwErr, EType } } = Imp;
+		return throwErr(EType.ErrIllegalParameter, tracker, args);
 	}
 	/**开启一个分支结构 */
 	export function If(expr: CommandRslt): If.BranchThen;
