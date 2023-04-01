@@ -1,6 +1,6 @@
 /**
  * 类型定义
- * @version 1.1.0
+ * @version 1.1.2
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -76,6 +76,7 @@ namespace McdJSTemp {
 			}
 			export import Selected = Select.Obj;
 			export import SelectString = Select.At;
+			export type Condition = CommandRslt | Selected;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作工具模块
  * @module mcdjs/lib/genast
- * @version 0.1.2
+ * @version 0.1.3
  * @license GPL-3.0-or-later
  */
 declare module './genast';
@@ -67,7 +67,7 @@ export class OperAPI {
 		private operm: Operator,
 	) {
 	}
-	private ConditionSplit(expr: Temp.If.Condition) {
+	private ConditionSplit(expr: Types.Condition) {
 		switch (expr.tid) {
 			case TypeId.CommandRslt:
 				return this.operm.node(NType.ExpressionCommand, {
@@ -80,7 +80,7 @@ export class OperAPI {
 				});
 		}
 	}
-	If(expr: Temp.If.Condition, tdoOri: Vcb, fdoOri: Vcb) {
+	If(expr: Types.Condition, tdoOri: Vcb, fdoOri: Vcb) {
 		const nBranch = this.operm.node(NType.Branch);
 		nBranch.expr = this.ConditionSplit(expr);
 		nBranch.tdo = this.operm.getBlock(tdoOri);

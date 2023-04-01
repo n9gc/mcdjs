@@ -17,8 +17,9 @@ declare global {
 		export import NOR = McdJSTemp.NOR;
 		export import XOR = McdJSTemp.XOR;
 		export import XNOR = McdJSTemp.XNOR;
-		export import If = McdJSTemp.If;
 		export import Tag = McdJSTemp.Tag;
+		export import If = McdJSTemp.If;
+		export import When = McdJSTemp.When;
 		export import select = McdJSTemp.select;
 
 		// lib/struct/util

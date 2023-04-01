@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.0
+ * @version 1.2.2
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -43,6 +43,7 @@ namespace McdJSTemp {
 	import Expression = Types.Expression;
 	import SelectString = Types.SelectString;
 	import Selected = Types.Selected;
+	import Condition = Types.Condition;
 	import CRClass = Struct.CommandRsltClass;
 	import SEClass = Struct.SelectedClass;
 	import Vcb = Types.Vcb;
@@ -66,14 +67,10 @@ namespace McdJSTemp {
 	export function If(expr: Expression): If.BranchThen;
 	export function If(expr: Expression, tdo: Vcb, fdo: Vcb): CommandRslt;
 	export function If(...args: If.Args) {
-		const con = If.getCondition(args[0]);
-		if (args.length === 1) return If.getObj(con);
-		if (args.length === 3) return If.reg(con, args[1], args[2]);
-		return errParams(Error(), args);
+		return If.ori(...args);
 	}
 	export namespace If {
-		export type Condition = CommandRslt | Selected;
-		type ArgStable = Expression | Condition;
+		export type ArgStable = Expression | Condition;
 		export type Args = [ArgStable] | [ArgStable, Vcb, Vcb];
 		export function getCondition(n: ArgStable): Condition {
 			return (
@@ -90,12 +87,40 @@ namespace McdJSTemp {
 			/**若条件不满足，则 */
 			Else(fdo: Vcb): CommandRslt;
 		}
-		export function reg(expr: Condition, tdo: Vcb, fdo: Vcb) {
+		function reg(expr: Condition, tdo: Vcb, fdo: Vcb) {
 			const opering = chCommand.getOperm(Error());
 			return new CRClass(opering.api.If(expr, tdo, fdo));
 		}
-		export function getObj(expr: Condition): BranchThen {
+		function getObj(expr: Condition): BranchThen {
 			return { Then: tdo => ({ Else: fdo => reg(expr, tdo, fdo) }) };
+		}
+		export function ori(...args: Args) {
+			const con = getCondition(args[0]);
+			if (args.length === 1) return getObj(con);
+			if (args.length === 3) return reg(con, args[1], args[2]);
+			return errParams(Error(), args);
+		}
+	}
+	/**开启半个分支结构 */
+	export function When(expr: CommandRslt): When.BranchThen;
+	export function When(expr: CommandRslt, tdo: Vcb): CommandRslt;
+	export function When(expr: Selected): When.BranchThen;
+	export function When(expr: Selected, tdo: Vcb): CommandRslt;
+	export function When(expr: Expression): When.BranchThen;
+	export function When(expr: Expression, tdo: Vcb): CommandRslt;
+	export function When(...args: When.Args) {
+		return When.ori(...args);
+	}
+	export namespace When {
+		export type Args = [If.ArgStable] | [If.ArgStable, Vcb];
+		export interface BranchThen {
+			/**若条件满足，则 */
+			Then(tdo: Vcb): CommandRslt;
+		}
+		export function ori(...args: Args) {
+			if (args.length === 2) return If.ori(...args, () => { });
+			const con = If.getCondition(args[0]);
+			return { Then: (tdo: Vcb) => If.ori(con, tdo, () => { }) };
 		}
 	}
 	/**
