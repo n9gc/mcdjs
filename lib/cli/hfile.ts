@@ -28,6 +28,9 @@ export const assocList = [
 	'.txt',
 	'.mjs',
 	'.cjs',
+	'.ts',
+	'.tsx',
+	'.jsx',
 ];
 function isExist(file: string) {
 	return new Promise<boolean>(res => fs.access(file, fs.constants.F_OK, err => res(!err)));

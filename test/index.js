@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../build/alload');
+require('../build');
 const { default: run, out } = require('../build/cli/hfile');
 const fsp = require('fs/promises');
 

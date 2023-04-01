@@ -66,6 +66,9 @@ export namespace getEnumText {
 			[NType.ExpressionCommand]: {
 				'zh-CN': '有条件命令方块',
 			},
+			[NType.ExpressionSelect]: {
+				'zh-CN': '选择器',
+			},
 			[NType.Branch]: {
 				'zh-CN': '条件分支',
 			},

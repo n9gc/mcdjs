@@ -1,12 +1,11 @@
 /**
  * 实用功能
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
-void 0;
+(McdJSTemp as any) = globalThis.McdJSTempGet();
 
 namespace McdJSTemp {
-	(McdJSTemp as any) = globalThis.McdJSTempGet();
 	/**提供一个注释 */
 	export function tip(...args: tip.ArgsJoin) {
 		tip.setTip(...args);

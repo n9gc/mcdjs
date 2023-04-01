@@ -1,19 +1,21 @@
 /**
  * 抽象语法树操作工具模块
  * @module mcdjs/lib/genast
- * @version 0.1.1
+ * @version 0.1.2
  * @license GPL-3.0-or-later
  */
 declare module './genast';
 
 import Temp, { chCommand, Types } from './alload';
 import Vcb = Types.Vcb;
+import TypeId = Types.TypeId;
 
 export enum NType {
 	System,
 	CodeBlock,
 	Command,
 	ExpressionCommand,
+	ExpressionSelect,
 	Branch,
 }
 export interface Node {
@@ -38,9 +40,14 @@ export interface NodeExpressionCommand extends Node {
 	ntype: NType.ExpressionCommand;
 	pos: number;
 }
+export interface NodeExpressionSelect extends Node {
+	ntype: NType.ExpressionSelect;
+	range: Types.Select.At;
+	expr: Types.Expression;
+}
 export interface NodeBranch extends Node {
 	ntype: NType.Branch;
-	expr: NodeExpressionCommand;
+	expr: NodeExpressionCommand | NodeExpressionSelect;
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
@@ -48,6 +55,7 @@ export type AllFnNode =
 	| NodeSystem
 	| NodeCodeBlock
 	| NodeExpressionCommand
+	| NodeExpressionSelect
 	| NodeBranch
 	| NodeCommand;
 export type AllNode = AllFnNode | Node;
@@ -59,11 +67,22 @@ export class OperAPI {
 		private operm: Operator,
 	) {
 	}
-	If(expr: number, tdoOri: Vcb, fdoOri: Vcb) {
+	private ConditionSplit(expr: Temp.If.Condition) {
+		switch (expr.tid) {
+			case TypeId.CommandRslt:
+				return this.operm.node(NType.ExpressionCommand, {
+					pos: expr.index,
+				});
+			case TypeId.Selected:
+				return this.operm.node(NType.ExpressionSelect, {
+					expr: expr.expr,
+					range: expr.range,
+				});
+		}
+	}
+	If(expr: Temp.If.Condition, tdoOri: Vcb, fdoOri: Vcb) {
 		const nBranch = this.operm.node(NType.Branch);
-		nBranch.expr = this.operm.node(NType.ExpressionCommand, {
-			pos: expr,
-		});
+		nBranch.expr = this.ConditionSplit(expr);
 		nBranch.tdo = this.operm.getBlock(tdoOri);
 		nBranch.fdo = this.operm.getBlock(fdoOri);
 		this.operm.operingBlock.nodes.push(nBranch);
@@ -91,11 +110,18 @@ export class Operator {
 		chCommand.exit();
 		return this;
 	}
+	node<T extends NType>(ntype: T): SelNode<T>;
 	node<T extends NType>(
 		ntype: T,
-		body: Partial<Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>> = {},
-	) {
-		const rslt = body as SelNode<T>;
+		body: Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>,
+	): SelNode<T>;
+	node<T extends NType>(
+		ntype: T,
+		body: Partial<Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>>,
+		init: true,
+	): SelNode<T>;
+	node(ntype: NType, body = {}) {
+		const rslt = body as AllNode;
 		rslt.ntype = ntype;
 		const tips = Temp.tip.getTip();
 		tips && (rslt.tips = tips);

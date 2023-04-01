@@ -6,12 +6,23 @@ declare module './global';
 declare global {
 	namespace globalThis {
 
-		// 结构
+		// lib/cmdobj
 		export import Command = McdJSTemp.Command;
 
-		// 实用工具
-		export import tip = McdJSTemp.tip;
+		// lib/struct/grammer
+		export import AND = McdJSTemp.AND;
+		export import OR = McdJSTemp.OR;
+		export import NOT = McdJSTemp.NOT;
+		export import NAND = McdJSTemp.NAND;
+		export import NOR = McdJSTemp.NOR;
+		export import XOR = McdJSTemp.XOR;
+		export import XNOR = McdJSTemp.XNOR;
 		export import If = McdJSTemp.If;
+		export import Tag = McdJSTemp.Tag;
+		export import select = McdJSTemp.select;
+
+		// lib/struct/util
+		export import tip = McdJSTemp.tip;
 
 	}
 }
