@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 1.1.6
+ * @version 1.2.0
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
@@ -61,51 +61,52 @@ export type AllFnErr =
 export type SelErr<T extends EType> = AllFnErr & { type: T; };
 export type AllErr = AllFnErr | Err;
 
-export type ArgGetErr<T extends EType> = [tracker: Error, ...ele: ArgGetErrList[T]];
-export type ArgGetErrList = {
-	[EType.ErrNoParser]: [];
-	[EType.ErrNoSuchFile]: [files: string[]];
-	[EType.ErrNoSuchErr]: [throwTracker: Error];
-	[EType.ErrCannotBeImported]: [module: string];
-	[EType.ErrUseBeforeDefine]: [varName: string];
-	[EType.ErrCannotBeSeted]: [varName: string];
-	[EType.ErrIllegalParameter]: [args: IArguments | readonly any[]];
-};
-export function GetErr<B extends EType, T = SelErr<B>>(type: B, ...pele: ArgGetErr<B>) {
-	const [tracker, ...args] = pele;
-	switch (type) {
-		case EType.ErrNoSuchFile: return { type, files: args[0], tracker } as T;
-		case EType.ErrNoParser: return { type, tracker } as T;
-		case EType.ErrNoSuchErr: return { type, throwTracker: args[0], tracker } as T;
-		case EType.ErrCannotBeImported: return { type, module: args[0], tracker } as T;
-		case EType.ErrUseBeforeDefine: return { type, varName: args[0], tracker } as T;
-		case EType.ErrCannotBeSeted: return { type, varName: args[0], tracker } as T;
-		case EType.ErrIllegalParameter: return { type, args: args[0], tracker } as T;
-		default: return throwErr(EType.ErrNoSuchErr, tracker, Error());
-	}
+export type ArgGetErr<T extends EType> = [type: T, tracker: Error, ...ele: ArgGetErrList[T]];
+export type ArgGetErrList = [
+	[files: string[]],
+	[],
+	[throwTracker: Error],
+	[module: string],
+	[varName: string],
+	[varName: string],
+	[args: IArguments | readonly any[]],
+];
+export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
+	(type, tracker, files) => ({ type, files, tracker }),
+	(type, tracker) => ({ type, tracker }),
+	(type, tracker, throwTracker) => ({ type, throwTracker, tracker }),
+	(type, tracker, module) => ({ type, module, tracker }),
+	(type, tracker, varName) => ({ type, varName, tracker }),
+	(type, tracker, varName) => ({ type, varName, tracker }),
+	(type, tracker, args) => ({ type, args, tracker }),
+];
+export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
+	const [type] = pele;
+	if (type in GetErrFns) return GetErrFns[type](...pele);
+	return throwErr(EType.ErrNoSuchErr, pele[1], Error());
 }
-export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, type: T, ...eles: ArgGetErr<T>) {
-	return () => rej(GetErr(type, ...eles));
+export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, ...eles: ArgGetErr<T>) {
+	return () => rej(GetErr(...eles));
 }
 
 export interface ClearedErr {
 	type: string;
 	tracker: Error;
 }
-export function clearErr<T extends AllErr>(n: T): ClearedErr {
-	return {
-		...n,
+export function clearErr(n: AllErr): ClearedErr {
+	return Object.assign(n, {
 		type: getEnumText('EType', n.type),
-	};
+	});
 }
 
-export function throwErr<T extends EType>(type: T, ...ele: ArgGetErr<T>): never;
+export function throwErr<T extends EType>(...ele: ArgGetErr<T>): never;
 export function throwErr(err: AllErr): never;
-export function throwErr<T extends EType>(n: T | AllErr, ...ele: [Error?, ...ArgGetErrList[T]]): never {
-	if (typeof n === 'number') return throwErr(GetErr(n, ...(ele as ArgGetErr<T>)));
-	const c = clearErr(n);
+export function throwErr<T extends EType>(...args: [AllErr] | ArgGetErr<T>): never {
+	const [err] = args;
+	if (typeof err !== 'object') return throwErr(GetErr(...args as ArgGetErr<T>));
+	const c = clearErr(err);
 	console.error('\n\x1b[37m\x1b[41m McdJS 错误 \x1b[0m', c);
-	if (typeof globalThis.process?.exit === 'function') process.exit(n.type + 200);
+	if (typeof globalThis.process?.exit === 'function') process.exit(err.type + 200);
 	else throw c;
 }
 export const errCatcher = (err: AllErr) => throwErr(err);
