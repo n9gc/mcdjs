@@ -19,10 +19,39 @@ export enum NType {
 	Branch,
 }
 export interface Node {
-	ntype: NType;
-	index: number;
 	tips?: string;
 }
+export class Node {
+	constructor(
+		public ntype: NType,
+		operm: Operator,
+		dadNode: Node,
+		n: Partial<AllNode> | null = null,
+		tips: string | null = null,
+	) {
+		Object.assign(this, n);
+		this.#operm = operm;
+		this.index = operm.nodeList.push(this) - 1;
+		tips && (this.tips = tips);
+		this.setDad(dadNode);
+	}
+	setDad(dadNode: Node) {
+		this.#dad = dadNode;
+		this.#operm.rel[this.index] = this.#dad;
+	}
+	getDad() {
+		return this.#dad;
+	}
+	index: number;
+	#dad!: Node;
+	#operm: Operator;
+}
+export type InitedNodeAttr =
+	| 'setDad'
+	| 'getDad'
+	| 'dad'
+	| 'index'
+	| 'ntype';
 export interface NodeSystem extends Node {
 	ntype: NType.System;
 	tips: string;
@@ -51,15 +80,14 @@ export interface NodeBranch extends Node {
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
-export type AllFnNode =
+export type AllNode =
 	| NodeSystem
 	| NodeCodeBlock
 	| NodeExpressionCommand
 	| NodeExpressionSelect
 	| NodeBranch
 	| NodeCommand;
-export type AllNode = AllFnNode | Node;
-export type SelNode<T extends NType> = AllFnNode & { ntype: T; };
+export type SelNode<T extends NType> = AllNode & { ntype: T; };
 export type AST = NodeSystem;
 
 export class OperAPI {
@@ -67,41 +95,44 @@ export class OperAPI {
 		private operm: Operator,
 	) {
 	}
-	private ConditionSplit(expr: Types.Condition) {
+	private ConditionSplit(expr: Types.Condition, dadNode: Node) {
 		switch (expr.tid) {
 			case TypeId.CommandRslt:
-				return this.operm.node(NType.ExpressionCommand, {
+				return this.operm.node(NType.ExpressionCommand, dadNode, {
 					pos: expr.index,
 				});
 			case TypeId.Selected:
-				return this.operm.node(NType.ExpressionSelect, {
+				return this.operm.node(NType.ExpressionSelect, dadNode, {
 					expr: expr.expr,
 					range: expr.range,
 				});
 		}
 	}
 	If(expr: Types.Condition, tdoOri: Vcb, fdoOri: Vcb) {
-		const nBranch = this.operm.node(NType.Branch);
-		nBranch.expr = this.ConditionSplit(expr);
-		nBranch.tdo = this.operm.getBlock(tdoOri);
-		nBranch.fdo = this.operm.getBlock(fdoOri);
-		this.operm.operingBlock.nodes.push(nBranch);
+		const { operm, operm: { opering } } = this;
+		const nBranch = operm.node(NType.Branch, opering);
+		nBranch.expr = this.ConditionSplit(expr, nBranch);
+		nBranch.tdo = operm.getBlock(tdoOri, nBranch);
+		nBranch.fdo = operm.getBlock(fdoOri, nBranch);
+		opering.nodes.push(nBranch);
 		return nBranch.index;
 	}
 }
 
 export class Operator {
 	constructor(tips: string) {
-		this.nodeList = [
-			this.operingBlock = this.ast = {
-				ntype: NType.System,
-				nodes: [],
-				tips,
-				index: 0,
-			},
-		];
+		this.nodeList.push(this.opering = this.ast = this.node(
+			NType.System,
+			null as any,
+			{ nodes: [], tips },
+		));
 		this.api = new OperAPI(this);
 	}
+	opering: NodeCodeBlock | NodeSystem;
+	ast: AST;
+	api: OperAPI;
+	nodeList: Node[] = [];
+	rel: { [index: number]: Node; } = {};
 	come() {
 		chCommand.come(this);
 		return this;
@@ -110,44 +141,34 @@ export class Operator {
 		chCommand.exit();
 		return this;
 	}
-	node<T extends NType>(ntype: T): SelNode<T>;
-	node<T extends NType>(
-		ntype: T,
-		body: Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>,
-	): SelNode<T>;
-	node<T extends NType>(
-		ntype: T,
-		body: Partial<Omit<SelNode<T>, 'index' | 'tips' | 'ntype'>>,
-		init: true,
-	): SelNode<T>;
-	node(ntype: NType, body = {}) {
-		const rslt = body as AllNode;
-		rslt.ntype = ntype;
-		const tips = Temp.tip.getTip();
-		tips && (rslt.tips = tips);
-		rslt.index = this.nodeList.push(rslt) - 1;
-		return rslt;
+	node<T extends NType>(ntype: T, dadNode: Node): SelNode<T>;
+	node<T extends NType>(ntype: T, dadNode: Node, body: Omit<SelNode<T>, InitedNodeAttr>): SelNode<T>;
+	node<T extends NType>(ntype: T, dadNode: Node, body: Partial<Omit<SelNode<T>, InitedNodeAttr>>, init: true): SelNode<T>;
+	node(ntype: NType, dadNode: Node, body: any = null) {
+		return new Node(
+			ntype,
+			this,
+			dadNode,
+			body,
+			Temp.tip.getTip(),
+		);
 	}
 	insert(cmd: string) {
-		const nCommand = this.node(NType.Command, {
+		const nCommand = this.node(NType.Command, this.opering, {
 			exec: cmd,
 		});
-		this.operingBlock.nodes.push(nCommand);
+		this.opering.nodes.push(nCommand);
 		return nCommand.index;
 	}
-	getBlock(cbOri: Vcb) {
-		const nBlk = this.node(NType.CodeBlock, {
+	getBlock(cbOri: Vcb, dadNode: Node = this.opering) {
+		const nBlk = this.node(NType.CodeBlock, dadNode, {
 			nodes: [],
 		});
-		const dad = this.operingBlock;
-		this.operingBlock = nBlk;
+		const dad = this.opering;
+		this.opering = nBlk;
 		cbOri();
-		this.operingBlock = dad;
+		this.opering = dad;
 		return nBlk;
 	}
-	operingBlock: NodeCodeBlock | NodeSystem;
-	ast: AST;
-	nodeList: AllNode[];
-	api: OperAPI;
 }
 

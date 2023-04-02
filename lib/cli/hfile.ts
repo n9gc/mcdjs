@@ -57,7 +57,7 @@ export async function compile(files: string[]) {
 	return commands;
 }
 export async function out(infos: RunInfos, commands: Types.RoundParsed) {
-	await fsp.writeFile(path.resolve(infos.outfile), JSON.stringify(commands));
+	await fsp.writeFile(path.resolve(infos.outfile), JSON.stringify(commands, null, '  '));
 }
 export default async function run(infos: RunInfos) {
 	const files = await resolve(infos);
