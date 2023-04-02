@@ -1,6 +1,6 @@
 /**
  * 类型定义
- * @version 1.1.2
+ * @version 1.1.3
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -25,8 +25,10 @@ namespace McdJSTemp {
 			}
 			export type Mods =
 				| Exclude<keyof typeof import('..'), 'default'>
-				| 'exp'
 				| 'cli'
+				| 'cmdobj'
+				| 'struct'
+				| 'exp'
 				| 'index';
 			export interface CommandRslt {
 				index: number;

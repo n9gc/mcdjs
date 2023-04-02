@@ -1,12 +1,12 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.0.0
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-import { AllNode, NType, Operator, SelNode } from '../genast';
+import { AllNode, NType, isNType, eachNType, Operator, SelNode } from '../genast';
 import cond from './cond';
 import { PathInfo, TransfModule, Vistor, VistorFn, VistorObj } from './types';
 
@@ -21,20 +21,19 @@ class VistorFns {
 		exit && this.entrys.push(exit);
 	}
 }
-function isEnum(n: string): n is keyof typeof NType {
-	return typeof NType[n as any] === 'number';
-}
 export class StdedModule {
 	constructor(mod: TransfModule) {
 		for (const i in mod) {
 			const now = (mod as any)[i] as Vistor;
 			const obj = typeof now === 'function' ? { entry: now } : now;
-			i.split('|').forEach(n => isEnum(n) &&
-				(this.map[NType[n]] || (this.map[NType[n]] = new VistorFns())).add(obj)
-			);
+			if (i === 'all') eachNType(n => this.addMap(n, obj));
+			else i.split('|').forEach(n => isNType(n) && this.addMap(NType[n], obj));
 		}
 	}
 	protected map: { [I in NType]?: VistorFns } = {};
+	protected addMap(n: NType, obj: VistorObj) {
+		(this.map[n] || (this.map[n] = new VistorFns())).add(obj);
+	}
 	entry(n: NType, pathInfo: PathInfo) {
 		this.map[n]?.entrys?.forEach(fn => fn(pathInfo));
 	}

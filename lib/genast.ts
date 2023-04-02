@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作工具模块
  * @module mcdjs/lib/genast
- * @version 0.1.3
+ * @version 0.1.5
  * @license GPL-3.0-or-later
  */
 declare module './genast';
@@ -18,8 +18,18 @@ export enum NType {
 	ExpressionSelect,
 	Branch,
 }
+export type NTypeKey = keyof typeof NType;
 export interface Node {
 	tips?: string;
+}
+export function isNType(n: string): n is NTypeKey {
+	return typeof NType[n as any] === 'number';
+}
+export function eachNType<T>(cb: (value: number, key: NTypeKey) => T): T[] {
+	const rslt = [];
+	let i = 0;
+	while(i in NType) rslt.push(cb(i, NType[i++] as NTypeKey));
+	return rslt;
 }
 export class Node {
 	constructor(
