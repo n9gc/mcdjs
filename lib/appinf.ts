@@ -7,6 +7,7 @@
 declare module './appinf';
 
 import { Operator } from './genast';
+import transform from './transf';
 
 const globalExcludeKeys: (keyof typeof McdJSTemp)[] = [
 	'Imp',
@@ -26,5 +27,6 @@ export async function parse(tips: string, fn: () => void | PromiseLike<void>) {
 	operm.come();
 	await fn();
 	operm.exit();
+	transform(operm);
 	return operm.ast;
 }

@@ -15,3 +15,4 @@ export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
 export * as genast from './genast';
+export * as transf from './transf';
