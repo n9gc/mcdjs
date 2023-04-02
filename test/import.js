@@ -22,6 +22,5 @@ require('export-tester')(
 		}
 	}
 ).then(
-	() => process.exit(0),
-	() => process.exit(-1),
+	({err}) => process.exit(err),
 );
