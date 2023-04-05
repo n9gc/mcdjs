@@ -47,12 +47,9 @@ namespace McdJSTemp {
 				SimTag,
 			}
 			export enum CbType {
-				Impulse = 0,
-				ImpulseCon = 1,
-				Chain = 2,
-				ChainCon = 3,
-				Repeat = 4,
-				RepeatCon = 5,
+				Impulse,
+				Chain,
+				Repeat,
 			}
 			export interface RoundParsed extends Array<import('../genast').AST> {
 			}

@@ -6,8 +6,9 @@
 	"types": "./build/index.d.ts",
 	"scripts": {
 		"build": "node dobuild -prod",
-		"test-all": "node test",
-		"test-import": "node test/import",
+		"test-all": "node --enable-source-maps test",
+		"test-import": "node --enable-source-maps test/import",
+		"test-sig": "node --enable-source-maps test/sig",
 		"devb": "node dobuild"
 	},
 	"bin": {

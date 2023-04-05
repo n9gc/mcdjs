@@ -7,10 +7,15 @@
 declare module './internal-cmd2cb';
 
 import { TransfModule } from './types';
+import { Types } from '../alload';
+import { NType } from '../genast';
 
 const mod: TransfModule = {
 	'Command'(path) {
-		console.log(path);
+		path.replace(path.getNode(NType.Block, Object.assign(path.node, {
+			cbtype: Types.CbType.Chain,
+			con: false,
+		})));
 	}
 };
 export default mod;

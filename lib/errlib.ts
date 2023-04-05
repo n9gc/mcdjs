@@ -136,5 +136,12 @@ export function holdErr<T extends EType>(...args: ArgGetErr<T>) {
 	const timer = setTimeout(cb);
 	const index = holdeds.push(cb);
 	let unend = true;
-	return () => unend && (delete holdeds[index], clearTimeout(timer), unend = false);
+	return function (this: Node) {
+		if (unend) {
+			delete holdeds[index];
+			clearTimeout(timer);
+			delete this.endTimer;
+			unend = false;
+		};
+	}
 }

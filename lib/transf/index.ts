@@ -66,6 +66,9 @@ export class TraverseObj implements TraverseObjType {
 	) {
 		this.do(operm.ast);
 	}
+	[-1](node: SelNode<NType.SystemDad>) {
+		this.do(node.system);
+	}
 	[0](node: SelNode<NType.System>) {
 		this.dos(node.nodes);
 	};
@@ -80,6 +83,7 @@ export class TraverseObj implements TraverseObjType {
 		this.do(node.tdo);
 		this.do(node.fdo);
 	}
+	[6](node: SelNode<NType.Block>) { };
 	protected do<T extends NType>(node: SelNode<T>) {
 		const type: T = node.ntype;
 		const pathInfo = this.operm.paths[node.index];

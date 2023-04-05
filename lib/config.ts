@@ -37,6 +37,9 @@ env as env.Env;
 export function getEnumText<T extends getEnumText.EnumName>(type: T, name: getEnumText.EnumMap[T]) {
 	const nameObj = (getEnumText.obj || (getEnumText.obj = {
 		NType: {
+			[NType.SystemDad]: {
+				'zh-CN': '指令系统的父节点',
+			},
 			[NType.System]: {
 				'zh-CN': '指令系统',
 			},
@@ -54,6 +57,9 @@ export function getEnumText<T extends getEnumText.EnumName>(type: T, name: getEn
 			},
 			[NType.Branch]: {
 				'zh-CN': '条件分支',
+			},
+			[NType.Block]: {
+				'zh-CN': '命令方块',
 			},
 		},
 		EType: {

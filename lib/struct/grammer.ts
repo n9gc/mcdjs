@@ -116,10 +116,14 @@ namespace McdJSTemp {
 		}
 	}
 	/**
-	 * 选择实体
+	 * 有条件地选择实体
 	 * @param range 范围，默认为"@e"
 	 */
 	export function select(expr: Expression, range?: SelectString): Selected;
+	/**
+	 * 选择实体
+	 * @param range 范围，默认为"@e"
+	 */
 	export function select(range?: SelectString): Selected;
 	export function select(...args: select.Args) {
 		const [expr, range] = select.getArgs(args);
