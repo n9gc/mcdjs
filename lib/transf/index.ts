@@ -19,35 +19,35 @@ import internalCmd2cb from './internal-cmd2cb';
 import internalCond from './internal-cond';
 import {
 	TransfModule,
-	Vistor,
-	VistorFn,
-	VistorObj,
+	Visitor,
+	VisitorFn,
+	VisitorObj,
+	getNodesVisited,
 } from './types';
 
 export const modules = [
 	internalCmd2cb,
 	internalCond,
 ];
-class VistorFns {
-	entrys: VistorFn[] = [];
-	exits: VistorFn[] = [];
-	add({ entry, exit }: VistorObj) {
+class VisitorFns {
+	entrys: VisitorFn[] = [];
+	exits: VisitorFn[] = [];
+	add({ entry, exit }: VisitorObj) {
 		entry && this.entrys.push(entry);
 		exit && this.entrys.push(exit);
 	}
 }
 export class StdedModule {
 	constructor(mod: TransfModule) {
-		for (const i in mod) {
-			const now = (mod as any)[i] as Vistor;
+		for (const name in mod) {
+			const now = (mod as any)[name] as Visitor;
 			const obj = typeof now === 'function' ? { entry: now } : now;
-			if (i === 'all') eachNType(n => this.addMap(n, obj));
-			else i.split('|').forEach(n => isNType(n) && this.addMap(NType[n], obj));
+			getNodesVisited(name).forEach(n => this.addMap(n, obj));
 		}
 	}
-	protected map: { [I in NType]?: VistorFns } = {};
-	protected addMap(n: NType, obj: VistorObj) {
-		(this.map[n] || (this.map[n] = new VistorFns())).add(obj);
+	protected map: { [I in NType]?: VisitorFns } = {};
+	protected addMap(n: NType, obj: VisitorObj) {
+		(this.map[n] || (this.map[n] = new VisitorFns())).add(obj);
 	}
 	entry(n: NType, pathInfo: PathInfo) {
 		this.map[n]?.entrys?.forEach(fn => fn(pathInfo));

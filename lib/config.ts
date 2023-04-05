@@ -94,6 +94,10 @@ export function getEnumText<T extends getEnumText.EnumName>(type: T, name: getEn
 				'zh-CN': '初始化节点时未注册路径信息',
 				'en-US': 'Forget to regist PathInfo when initialize a Node',
 			},
+			[EType.ErrIllegalVisitorName]: {
+				'zh-CN': '错误的访问器名称',
+				'en-US': 'Illegal vistor name',
+			},
 		},
 	}))[type][name];
 	return nameObj[env.config.lang] ?? nameObj[env.defaultLang];

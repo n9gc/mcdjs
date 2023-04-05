@@ -19,6 +19,7 @@ export enum EType {
 	ErrCannotBeSeted,
 	ErrIllegalParameter,
 	ErrForgetPathInfo,
+	ErrIllegalVisitorName,
 }
 export interface Err {
 	type: EType;
@@ -56,6 +57,10 @@ export interface ErrForgetPathInfo extends Err {
 	type: EType.ErrForgetPathInfo;
 	node: Node;
 }
+export interface ErrIllegalVisitorName extends Err {
+	type: EType.ErrIllegalVisitorName;
+	name: string;
+}
 export type AllFnErr =
 	| ErrNoSuchFile
 	| ErrNoParser
@@ -65,6 +70,7 @@ export type AllFnErr =
 	| ErrCannotBeSeted
 	| ErrIllegalParameter
 	| ErrForgetPathInfo
+	| ErrIllegalVisitorName
 	| never;
 export type SelErr<T extends EType> = AllFnErr & { type: T; };
 export type AllErr = AllFnErr | Err;
@@ -79,6 +85,7 @@ export type ArgGetErrList = [
 	[varName: string],
 	[args: IArguments | readonly any[]],
 	[node: Node],
+	[name: string],
 ];
 export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
 	(type, tracker, files) => ({ type, files, tracker }),
@@ -89,6 +96,7 @@ export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } =
 	(type, tracker, varName) => ({ type, varName, tracker }),
 	(type, tracker, args) => ({ type, args, tracker }),
 	(type, tracker, node) => ({ type, node, tracker }),
+	(type, tracker, name) => ({ type, name, tracker }),
 ];
 export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
 	const [type] = pele;

@@ -31,6 +31,8 @@ export function eachNType<T>(cb: (value: number, key: NTypeKey) => T): T[] {
 	while (i in NType) rslt.push(cb(i, NType[i++] as NTypeKey));
 	return rslt;
 }
+export const keyNType = eachNType((_, k) => k) as Types.AnyArr<NTypeKey>;
+export const valueNType = eachNType((v => v)) as readonly NType[];
 export interface Node {
 	ntype: NType;
 	index: number;
