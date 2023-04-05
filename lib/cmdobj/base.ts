@@ -7,7 +7,7 @@
 
 namespace McdJSTemp {
 	import CRClass = Struct.CommandRsltClass;
-	type Operm = import('../genast').Operator;
+	import Operm = Imp.magast.Operator;
 	const errlib = Imp.errlib;
 	function testIdx<T>(tracker: Error, n?: T) {
 		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);

@@ -7,7 +7,7 @@
 declare module './internal-cond';
 
 import { Struct } from '../alload';
-import { NType } from '../genast';
+import { NType } from '../magast';
 import { TransfModule } from './types';
 import Tag = Struct.Tag;
 

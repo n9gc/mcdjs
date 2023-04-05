@@ -8,7 +8,7 @@ declare module './internal-cmd2cb';
 
 import { TransfModule } from './types';
 import { Types } from '../alload';
-import { NType } from '../genast';
+import { NType } from '../magast';
 
 const mod: TransfModule = {
 	'Command'(path) {

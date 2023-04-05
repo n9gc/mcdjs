@@ -7,7 +7,7 @@
 declare module './types';
 
 import { Types } from '../alload';
-import { NTypeKey, PathInfo } from '../genast';
+import { NTypeKey, PathInfo } from '../magast';
 import EachOfUnion = Types.EachOfUnion;
 import UniqueItems = Types.UniqueItems;
 

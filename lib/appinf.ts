@@ -6,7 +6,7 @@
  */
 declare module './appinf';
 
-import { Operator } from './genast';
+import { Operator } from './magast';
 import transform from './transf';
 
 const globalExcludeKeys: (keyof typeof McdJSTemp)[] = [

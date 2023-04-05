@@ -7,7 +7,7 @@
 declare module './config';
 
 import { EType } from './errlib';
-import { NType } from './genast';
+import { NType } from './magast';
 
 export const env = {
 	version: '0.9.2',

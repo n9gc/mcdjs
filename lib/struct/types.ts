@@ -51,10 +51,10 @@ namespace McdJSTemp {
 				Chain,
 				Repeat,
 			}
-			export interface RoundParsed extends Array<import('../genast').AST> {
+			export interface RoundParsed extends Array<Imp.magast.AST> {
 			}
 			export type Mods =
-				| Exclude<keyof typeof import('..'), 'default'>
+				| Exclude<keyof typeof Imp, 'default'>
 				| 'cli'
 				| 'cmdobj'
 				| 'struct'

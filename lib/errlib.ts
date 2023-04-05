@@ -7,7 +7,7 @@
 declare module './errlib';
 
 import { getEnumText } from './config';
-import { Node } from './genast';
+import { Node } from './magast';
 
 export enum EType {
 	ErrNoSuchFile,

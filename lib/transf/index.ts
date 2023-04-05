@@ -14,7 +14,7 @@ import {
 	SelNode,
 	eachNType,
 	isNType,
-} from '../genast';
+} from '../magast';
 import internalCmd2cb from './internal-cmd2cb';
 import internalCond from './internal-cond';
 import {

@@ -1,10 +1,10 @@
 /**
  * 抽象语法树操作工具模块
- * @module mcdjs/lib/genast
+ * @module mcdjs/lib/magast
  * @version 0.1.5
  * @license GPL-3.0-or-later
  */
-declare module './genast';
+declare module './magast';
 
 import Temp, { chCommand, Types } from './alload';
 import { EType, holdErr } from './errlib';
