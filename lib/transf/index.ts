@@ -6,12 +6,27 @@
  */
 declare module '.';
 
-import { AllNode, NType, isNType, eachNType, Operator, SelNode } from '../genast';
-import cond from './cond';
-import { PathInfo, TransfModule, Vistor, VistorFn, VistorObj } from './types';
+import {
+	AllNode,
+	NType,
+	Operator,
+	PathInfo,
+	SelNode,
+	eachNType,
+	isNType,
+} from '../genast';
+import internalCmd2cb from './internal-cmd2cb';
+import internalCond from './internal-cond';
+import {
+	TransfModule,
+	Vistor,
+	VistorFn,
+	VistorObj,
+} from './types';
 
 export const modules = [
-	cond,
+	internalCmd2cb,
+	internalCond,
 ];
 class VistorFns {
 	entrys: VistorFn[] = [];
@@ -67,7 +82,7 @@ export class TraverseObj implements TraverseObjType {
 	}
 	protected do<T extends NType>(node: SelNode<T>) {
 		const type: T = node.ntype;
-		const pathInfo = new PathInfo(node.getDad(), node);
+		const pathInfo = this.operm.paths[node.index];
 		this.mod.entry(type, pathInfo);
 		(this as TraverseObjType)[type](node);
 		this.mod.exit(type, pathInfo);

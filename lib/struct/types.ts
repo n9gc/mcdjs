@@ -8,6 +8,39 @@
 namespace McdJSTemp {
 	export namespace Struct {
 		export namespace Types {
+			export type AnyArr<T = any> = readonly T[];
+			export type WideNum = number | bigint;
+			export type MayNum = WideNum | string;
+			export type Tostrable = boolean | MayNum | null | undefined;
+			export type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
+			export type InterOfUnion<N> = (N extends N ? (n: N) => 0 : 0) extends (n: infer K) => 0 ? K : never;
+			type OneOfUnion<N> = InterOfUnion<N extends N ? () => N : 0> extends () => infer K ? K : N;
+			export type EachOfUnion<
+				N,
+				R extends any[] = []>
+				= ([N] extends [never]
+					? R
+					: (OneOfUnion<N> extends infer K
+						? EachOfUnion<Exclude<N, K>, [...R, K]>
+						: []
+					)
+				);
+			export type UniqueItems<
+				L extends any[],
+				R extends any[] = []>
+				= (L extends [infer S, ...infer K]
+					? [S, ...UniqueItems<[...R, ...K]>] | UniqueItems<K, [S, ...R]>
+					: []
+				);
+			export type Joined<
+				S extends Tostrable[],
+				F extends Tostrable,
+				R extends string = ''>
+				= (S extends [infer I extends Tostrable, ...infer S extends [any, ...any[]]]
+					? Joined<S, F, `${R}${I}${F}`>
+					: `${R}${S[0]}`
+				);
+			export type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
 			export enum TypeId {
 				CommandRslt,
 				Selected,

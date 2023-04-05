@@ -7,6 +7,7 @@
 declare module './errlib';
 
 import { getEnumText } from './config';
+import { Node } from './genast';
 
 export enum EType {
 	ErrNoSuchFile,
@@ -17,6 +18,7 @@ export enum EType {
 	ErrUseBeforeDefine,
 	ErrCannotBeSeted,
 	ErrIllegalParameter,
+	ErrForgetPathInfo,
 }
 export interface Err {
 	type: EType;
@@ -50,6 +52,10 @@ export interface ErrIllegalParameter extends Err {
 	type: EType.ErrIllegalParameter;
 	args: IArguments | readonly any[];
 }
+export interface ErrForgetPathInfo extends Err {
+	type: EType.ErrForgetPathInfo;
+	node: Node;
+}
 export type AllFnErr =
 	| ErrNoSuchFile
 	| ErrNoParser
@@ -57,7 +63,9 @@ export type AllFnErr =
 	| ErrCannotBeImported
 	| ErrUseBeforeDefine
 	| ErrCannotBeSeted
-	| ErrIllegalParameter;
+	| ErrIllegalParameter
+	| ErrForgetPathInfo
+	| never;
 export type SelErr<T extends EType> = AllFnErr & { type: T; };
 export type AllErr = AllFnErr | Err;
 
@@ -70,6 +78,7 @@ export type ArgGetErrList = [
 	[varName: string],
 	[varName: string],
 	[args: IArguments | readonly any[]],
+	[node: Node],
 ];
 export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
 	(type, tracker, files) => ({ type, files, tracker }),
@@ -79,14 +88,12 @@ export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } =
 	(type, tracker, varName) => ({ type, varName, tracker }),
 	(type, tracker, varName) => ({ type, varName, tracker }),
 	(type, tracker, args) => ({ type, args, tracker }),
+	(type, tracker, node) => ({ type, node, tracker }),
 ];
 export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
 	const [type] = pele;
 	if (type in GetErrFns) return GetErrFns[type](...pele);
 	return throwErr(EType.ErrNoSuchErr, pele[1], Error());
-}
-export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, ...eles: ArgGetErr<T>) {
-	return () => rej(GetErr(...eles));
 }
 
 export interface ClearedErr {
@@ -109,4 +116,25 @@ export function throwErr<T extends EType>(...args: [AllErr] | ArgGetErr<T>): nev
 	if (typeof globalThis.process?.exit === 'function') process.exit(9);
 	else throw c;
 }
+
 export const errCatcher = (err: AllErr) => throwErr(err);
+
+export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, ...eles: ArgGetErr<T>) {
+	return () => rej(GetErr(...eles));
+}
+
+const holdeds: ((() => never) | void)[] = [];
+export function checkHolded() {
+	let fn: (() => never) | void;
+	while (fn = holdeds.pop(), holdeds.length) fn?.();
+}
+export function holdErr<T extends EType>(...args: ArgGetErr<T>) {
+	const cb = () => {
+		clearTimeout(timer);
+		throwErr(...args);
+	};
+	const timer = setTimeout(cb);
+	const index = holdeds.push(cb);
+	let unend = true;
+	return () => unend && (delete holdeds[index], clearTimeout(timer), unend = false);
+}

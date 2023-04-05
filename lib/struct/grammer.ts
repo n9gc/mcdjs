@@ -85,7 +85,7 @@ namespace McdJSTemp {
 		}
 		function reg(expr: Condition, tdo: Vcb, fdo: Vcb) {
 			const opering = chCommand.getOperm(Error());
-			return new CRClass(opering.api.If(expr, tdo, fdo));
+			return new CRClass(opering.If(expr, tdo, fdo));
 		}
 		function getObj(expr: Condition): BranchThen {
 			return { Then: tdo => ({ Else: fdo => reg(expr, tdo, fdo) }) };

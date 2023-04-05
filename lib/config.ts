@@ -34,25 +34,8 @@ export namespace env {
 /**检查 {@link env|`env`} 类型是否正确 */
 env as env.Env;
 
-
 export function getEnumText<T extends getEnumText.EnumName>(type: T, name: getEnumText.EnumMap[T]) {
-	const nameObj = getEnumText.obj[type][name];
-	return nameObj[env.config.lang] ?? nameObj[env.defaultLang];
-}
-export namespace getEnumText {
-	export type EnumMap = {
-		NType: NType;
-		EType: EType;
-	};
-	export type EnumName = keyof EnumMap;
-	type Obj = {
-		[K in EnumName]: {
-			[I in EnumMap[K]]:
-			& { [env.defaultLang]: string; }
-			& { [J in Exclude<env.LangOption, typeof env.defaultLang>]?: string };
-		};
-	};
-	export const obj: Obj = {
+	const nameObj = (getEnumText.obj || (getEnumText.obj = {
 		NType: {
 			[NType.System]: {
 				'zh-CN': '指令系统',
@@ -101,6 +84,26 @@ export namespace getEnumText {
 				'zh-CN': '非法的参数',
 				'en-US': 'Illegal Parameter given',
 			},
+			[EType.ErrForgetPathInfo]: {
+				'zh-CN': '初始化节点时未注册路径信息',
+				'en-US': 'Forget to regist PathInfo when initialize a Node',
+			},
 		},
+	}))[type][name];
+	return nameObj[env.config.lang] ?? nameObj[env.defaultLang];
+}
+export namespace getEnumText {
+	export type EnumMap = {
+		NType: NType;
+		EType: EType;
 	};
+	export type EnumName = keyof EnumMap;
+	type Obj = {
+		[K in EnumName]: {
+			[I in EnumMap[K]]:
+			& { [env.defaultLang]: string; }
+			& { [J in Exclude<env.LangOption, typeof env.defaultLang>]?: string };
+		};
+	};
+	export let obj: Obj;
 }

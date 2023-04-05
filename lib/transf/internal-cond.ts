@@ -1,10 +1,10 @@
 /**
- * 条件判断运算转译模块
- * @module mcdjs/lib/transf/cond
+ * 条件判断运算插件
+ * @module mcdjs/lib/transf/internal-cond
  * @version 0.1.1
  * @license GPL-3.0-or-later
  */
-declare module './cond';
+declare module './internal-cond';
 
 import { Struct } from '../alload';
 import { NType } from '../genast';
@@ -13,7 +13,7 @@ import Tag = Struct.Tag;
 
 const mod: TransfModule = {
 	'all'(path) {
-		console.log(path);
+		// console.log(path);
 	}
 };
 export default mod;
