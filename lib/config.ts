@@ -15,21 +15,25 @@ export const env = {
 	defaultLang: 'zh-CN',
 	config: {
 		lang: 'zh-CN',
+		track: false,
 	} as env.Config,
 	setConfig(conf: env.Config) {
 		return Object.assign(env.config, conf);
 	},
 } as const;
 export namespace env {
-	export type LangOption =
+	export type Lang =
 		| 'en-US'
 		| 'zh-CN';
+	export type DefaultLang = typeof env.defaultLang;
+	export type OptionalLang = Exclude<Lang, DefaultLang>;
 	export interface Config {
-		lang: LangOption;
+		lang: Lang;
+		track: boolean;
 	}
 	export interface Env {
 		version: string;
-		defaultLang: LangOption;
+		defaultLang: Lang;
 		config: Config;
 		setConfig(conf: Config): void;
 	}
@@ -40,7 +44,7 @@ let envTest: env.Env = env;
 export namespace Text {
 	export type Obj =
 		& { [env.defaultLang]: string; }
-		& { [J in Exclude<env.LangOption, typeof env.defaultLang>]?: string };
+		& { [J in env.OptionalLang]?: string };
 	export type EnumTypeMap = {
 		NType: typeof NType;
 		EType: typeof EType;
@@ -53,8 +57,8 @@ export namespace Text {
 		return n;
 	}
 	export const some = initText({
-		trackerDefault: {
-			'zh-CN': '',
+		tracker: {
+			'zh-CN': `以下追踪信息仅供参考`,
 		},
 	});
 	type EnumObj = { [K in EnumName]: { [I in EnumValueMap[K]]: Obj } };

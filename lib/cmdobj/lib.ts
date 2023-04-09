@@ -14,7 +14,7 @@ namespace McdJSTemp {
 		}
 		export function say(text: string) {
 			const cmd = `say ${text}`;
-			return insert(cmd, Error());
+			return insert(cmd);
 		}
 		type TagMethod = {
 			add: [name: string];
@@ -24,7 +24,7 @@ namespace McdJSTemp {
 		export function tag<T extends keyof TagMethod>(targets: string, method: T, ...args: TagMethod[T]): CRClass;
 		export function tag<T extends keyof TagMethod>(targets: string, method: T, arg = '') {
 			const cmd = `tag ${targets} ${method} ${arg}`;
-			return insert(cmd, Error());
+			return insert(cmd);
 		}
 	}
 }

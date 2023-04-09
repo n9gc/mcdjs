@@ -6,7 +6,7 @@
  */
 declare module './errlib';
 
-import { Text } from './config';
+import { Text, env } from './config';
 import { Node } from './magast';
 
 export enum EType {
@@ -151,6 +151,17 @@ export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
 	const [type] = pele;
 	if (type in GetErrFns) return GetErrFns[type](...pele);
 	return throwErr(EType.ErrNoSuchErr, pele[1], Error());
+}
+
+let trackerMap: { [env.defaultLang]: Error; } & { [I in env.OptionalLang]?: Error };
+function getTrackerDefault() {
+	if (trackerMap) return trackerMap;
+	trackerMap = { 'zh-CN': Error() };
+	for (const i in Text.some.tracker) (trackerMap as any)[i] = Error((Text.some.tracker as any)[i]);
+	return trackerMap;
+}
+export function getTracker() {
+	return env.config.track ? Error() : getTrackerDefault()[env.config.lang] ?? trackerMap[env.defaultLang];
 }
 
 export interface ClearedErr {

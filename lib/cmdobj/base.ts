@@ -9,8 +9,8 @@ namespace McdJSTemp {
 	import CRClass = Struct.CommandRsltClass;
 	import Operm = Imp.magast.Operator;
 	const errlib = Imp.errlib;
-	function testIdx<T>(tracker: Error, n?: T) {
-		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, tracker);
+	function testIdx<T>(n?: T) {
+		if (!n) return errlib.throwErr(errlib.EType.ErrNoParser, Error());
 		else return n;
 	}
 	/**
@@ -32,11 +32,11 @@ namespace McdJSTemp {
 		export function exit() {
 			opering = null;
 		}
-		export function getOperm(tracker: Error) {
-			return testIdx(tracker, opering);
+		export function getOperm() {
+			return testIdx(opering);
 		}
-		export function insert(cmd: string, tracker: Error) {
-			const opering = getOperm(tracker);
+		export function insert(cmd: string) {
+			const opering = getOperm();
 			return new CRClass(opering.insert(cmd));
 		}
 	}

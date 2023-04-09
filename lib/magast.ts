@@ -8,7 +8,7 @@ declare module './magast';
 
 import Temp, { chCommand, Types } from './alload';
 import { Text } from './config';
-import { EType, holdErr } from './errlib';
+import { EType, getTracker, holdErr } from './errlib';
 import Vcb = Types.Vcb;
 import TypeId = Types.TypeId;
 
@@ -158,7 +158,7 @@ export class PathInfo<T extends NType = any, D extends NType = any> {
 	getNode(ntype: NType, body: any = {}) {
 		const node = body as GotSelNode;
 		node.ntype = ntype;
-		node.endTimer = holdErr(EType.ErrForgetPathInfo, Error(), node);
+		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node);
 		return node;
 	}
 }
@@ -193,7 +193,7 @@ export class Operator {
 		const node = body as Node;
 		node.ntype = ntype;
 		node.index = this.nodeNum++;
-		node.endTimer = holdErr(EType.ErrForgetPathInfo, Error(), node);
+		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node);
 		const tips = Temp.tip.getTip();
 		tips && (node.tips = tips);
 		return node;

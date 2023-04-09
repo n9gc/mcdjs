@@ -21,7 +21,7 @@ export const aliasVisitorName = {
 	'expression': [NType.ExpressionCommand, NType.ExpressionSelect]
 } as const;
 /**检查 {@link aliasVisitorName|`aliasName`} 类型是否正确 */
-aliasVisitorName as { [alias: string]: readonly NType[]; };
+let aliasVisitorNameTest: { [alias: string]: readonly NType[]; } = aliasVisitorName;
 export type VisitorName = NTypeKey | 'all' | keyof typeof aliasVisitorName;
 export type TransfModule = {
 	[I in VisitorName]?: Visitor;

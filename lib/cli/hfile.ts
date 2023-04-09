@@ -12,7 +12,7 @@ import * as path from 'path';
 import 'promise-snake';
 import { Types } from '../alload';
 import { parse } from "../appinf";
-import { errCatcher, EType, trapErr } from '../errlib';
+import { EType, errCatcher, getTracker, trapErr } from '../errlib';
 
 export interface ParRunInfos extends Partial<RunInfos> { }
 export class RunInfos {
@@ -41,10 +41,10 @@ export async function resolve({ inputs }: RunInfos) {
 		.map(input => path.resolve(input))
 		.map(file => path.extname(file) ? file : assocList.map(ext => file + ext))
 		.map(file => (res, rej) => typeof file === 'string'
-			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, Error(), [file])())
+			? isExist(file).then(n => n ? (files.push(file), res()) : trapErr(rej, EType.ErrNoSuchFile, getTracker(), [file])())
 			: Promise.snake(file.map(may => (res, rej) =>
 				isExist(may).then(n => n ? rej(may) : res())
-			)).then(trapErr(rej, EType.ErrNoSuchFile, Error(), file), (sure) => (files.push(sure), res()))
+			)).then(trapErr(rej, EType.ErrNoSuchFile, getTracker(), file), (sure) => (files.push(sure), res()))
 		)
 	).catch(errCatcher);
 	return files;

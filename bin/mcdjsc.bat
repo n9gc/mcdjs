@@ -1,1 +1,1 @@
-@node %~dp0mcdjsc %*
+@node --enable-source-maps %~dp0mcdjsc %*
