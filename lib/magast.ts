@@ -7,6 +7,7 @@
 declare module './magast';
 
 import Temp, { chCommand, Types } from './alload';
+import { Text } from './config';
 import { EType, holdErr } from './errlib';
 import Vcb = Types.Vcb;
 import TypeId = Types.TypeId;
@@ -21,6 +22,32 @@ export enum NType {
 	Branch,
 	Block,
 }
+Text.regEnum('NType', {
+	[NType.SystemDad]: {
+		'zh-CN': '指令系统的父节点',
+	},
+	[NType.System]: {
+		'zh-CN': '指令系统',
+	},
+	[NType.CodeBlock]: {
+		'zh-CN': '代码块',
+	},
+	[NType.Command]: {
+		'zh-CN': '单命令',
+	},
+	[NType.ExpressionCommand]: {
+		'zh-CN': '有条件命令方块',
+	},
+	[NType.ExpressionSelect]: {
+		'zh-CN': '选择器',
+	},
+	[NType.Branch]: {
+		'zh-CN': '条件分支',
+	},
+	[NType.Block]: {
+		'zh-CN': '命令方块',
+	},
+});
 export type NTypeKey = keyof typeof NType;
 export function isNType(n: string): n is NTypeKey {
 	return typeof NType[n as any] === 'number';
