@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作工具模块
  * @module mcdjs/lib/magast
- * @version 0.1.5
+ * @version 0.1.7
  * @license GPL-3.0-or-later
  */
 declare module './magast';

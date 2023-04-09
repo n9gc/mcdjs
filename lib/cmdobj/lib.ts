@@ -1,6 +1,6 @@
 /**
  * 命令集通用库
- * @version 0.1.3
+ * @version 0.1.4
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();

@@ -1,7 +1,7 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -9,12 +9,10 @@ declare module '.';
 import {
 	AllNode,
 	NType,
+	NodeExpression,
 	Operator,
 	PathInfo,
 	SelNode,
-	eachNType,
-	isNType,
-	NodeExpression,
 } from '../magast';
 import internalCmd2cb from './internal-cmd2cb';
 import internalCond from './internal-cond';

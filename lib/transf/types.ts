@@ -1,7 +1,7 @@
 /**
  * 转译相关定义模块
  * @module mcdjs/lib/transf/types
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './types';

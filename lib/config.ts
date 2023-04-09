@@ -1,7 +1,7 @@
 /**
  * 配置相关
  * @module mcdjs/lib/config
- * @version 4.0.0
+ * @version 5.0.0
  * @license GPL-3.0-or-later
  */
 declare module './config';

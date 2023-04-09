@@ -1,6 +1,6 @@
 /**
  * 命令集初始化
- * @version 0.1.3
+ * @version 0.1.5
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
