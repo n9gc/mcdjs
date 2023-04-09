@@ -2,9 +2,9 @@ name: Auto build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "dev-prototype" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "dev-prototype" ]
 
 jobs:
   build:
