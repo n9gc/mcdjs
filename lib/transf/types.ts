@@ -6,8 +6,8 @@
  */
 declare module './types';
 
-import { NTypeKey, PathInfo, NType, valueNType, isNType } from '../magast';
-import { throwErr, EType } from '../errlib';
+import { EType, throwErr } from '../errlib';
+import { NType, NTypeKey, PathInfo, isNType, valueNType } from '../magast';
 
 export interface VisitorFn {
 	(pathInfo: PathInfo): void;
@@ -18,7 +18,7 @@ export interface VisitorObj {
 }
 export type Visitor = VisitorObj | VisitorFn;
 export const aliasVisitorName = {
-	'expression': [NType.ExpressionCommand, NType.ExpressionSelect]
+	'condition': [NType.ConditionCommand, NType.ConditionSelector],
 } as const;
 /**检查 {@link aliasVisitorName|`aliasName`} 类型是否正确 */
 let aliasVisitorNameTest: { [alias: string]: readonly NType[]; } = aliasVisitorName;

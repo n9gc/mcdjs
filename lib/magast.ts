@@ -17,10 +17,17 @@ export enum NType {
 	System,
 	CodeBlock,
 	Command,
-	ExpressionCommand,
-	ExpressionSelect,
+	ConditionCommand,
+	ConditionSelector,
 	Branch,
 	Block,
+	ExpressionAnd,
+	ExpressionOr,
+	ExpressionNot,
+	ExpressionNand,
+	ExpressionNor,
+	ExpressionXor,
+	ExpressionXnor,
 }
 Text.regEnum('NType', {
 	[NType.SystemDad]: {
@@ -35,10 +42,10 @@ Text.regEnum('NType', {
 	[NType.Command]: {
 		'zh-CN': '单命令',
 	},
-	[NType.ExpressionCommand]: {
+	[NType.ConditionCommand]: {
 		'zh-CN': '有条件命令方块',
 	},
-	[NType.ExpressionSelect]: {
+	[NType.ConditionSelector]: {
 		'zh-CN': '选择器',
 	},
 	[NType.Branch]: {
@@ -46,6 +53,27 @@ Text.regEnum('NType', {
 	},
 	[NType.Block]: {
 		'zh-CN': '命令方块',
+	},
+	[NType.ExpressionAnd]: {
+		'zh-CN': '与表达式',
+	},
+	[NType.ExpressionOr]: {
+		'zh-CN': '或表达式',
+	},
+	[NType.ExpressionNot]: {
+		'zh-CN': '非表达式',
+	},
+	[NType.ExpressionNand]: {
+		'zh-CN': '与非表达式',
+	},
+	[NType.ExpressionNor]: {
+		'zh-CN': '或非表达式',
+	},
+	[NType.ExpressionXor]: {
+		'zh-CN': '异或表达式',
+	},
+	[NType.ExpressionXnor]: {
+		'zh-CN': '同或表达式',
 	},
 });
 export type NTypeKey = keyof typeof NType;
@@ -87,18 +115,18 @@ export interface NodeCommand extends Node {
 	ntype: NType.Command;
 	exec: string;
 }
-export interface NodeExpressionCommand extends Node {
-	ntype: NType.ExpressionCommand;
+export interface NodeConditionCommand extends Node {
+	ntype: NType.ConditionCommand;
 	pos: number;
 }
-export interface NodeExpressionSelect extends Node {
-	ntype: NType.ExpressionSelect;
+export interface NodeConditionSelector extends Node {
+	ntype: NType.ConditionSelector;
 	range: Types.Select.At;
 	expr: Types.Expression;
 }
 export interface NodeBranch extends Node {
 	ntype: NType.Branch;
-	expr: NodeExpressionCommand | NodeExpressionSelect;
+	expr: NodeConditionCommand | NodeConditionSelector;
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
@@ -107,14 +135,57 @@ export interface NodeBlock extends Node {
 	con: boolean;
 	cbtype: Types.CbType;
 }
+export type NodeExpression =
+	| NodeExpressionAnd
+	| NodeExpressionOr
+	| NodeExpressionNot
+	| NodeExpressionNand
+	| NodeExpressionNor
+	| NodeExpressionXor
+	| NodeExpressionXnor;
+export interface NodeExpressionAnd extends Node {
+	ntype: NType.ExpressionAnd;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionOr extends Node {
+	ntype: NType.ExpressionOr;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionNot extends Node {
+	ntype: NType.ExpressionNot;
+	oFirst: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionNand extends Node {
+	ntype: NType.ExpressionNand;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionNor extends Node {
+	ntype: NType.ExpressionNor;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionXor extends Node {
+	ntype: NType.ExpressionXor;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
+export interface NodeExpressionXnor extends Node {
+	ntype: NType.ExpressionXnor;
+	oFirst: Types.SimTag | NodeExpression;
+	oSecond: Types.SimTag | NodeExpression;
+}
 export type AllNode =
 	| NodeSystemDad
 	| NodeSystem
 	| NodeCodeBlock
-	| NodeExpressionCommand
-	| NodeExpressionSelect
+	| NodeConditionCommand
+	| NodeConditionSelector
 	| NodeBranch
 	| NodeBlock
+	| NodeExpression
 	| NodeCommand;
 export type SelNode<T extends NType> = AllNode & { ntype: T; };
 export type AST = NodeSystem;
@@ -215,11 +286,11 @@ export class Operator {
 	condition(expr: Types.Condition) {
 		switch (expr.tid) {
 			case TypeId.CommandRslt:
-				return this.node(NType.ExpressionCommand, {
+				return this.node(NType.ConditionCommand, {
 					pos: expr.index,
 				});
 			case TypeId.Selected:
-				return this.node(NType.ExpressionSelect, {
+				return this.node(NType.ConditionSelector, {
 					expr: expr.expr,
 					range: expr.range,
 				});

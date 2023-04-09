@@ -14,6 +14,7 @@ import {
 	SelNode,
 	eachNType,
 	isNType,
+	NodeExpression,
 } from '../magast';
 import internalCmd2cb from './internal-cmd2cb';
 import internalCond from './internal-cond';
@@ -66,24 +67,35 @@ export class TraverseObj implements TraverseObjType {
 	) {
 		this.do(operm.ast);
 	}
-	[-1](node: SelNode<NType.SystemDad>) {
+	[NType.SystemDad](node: SelNode<NType.SystemDad>) {
 		this.do(node.system);
 	}
-	[0](node: SelNode<NType.System>) {
+	[NType.System](node: SelNode<NType.System>) {
 		this.dos(node.nodes);
 	};
-	[1](node: SelNode<NType.CodeBlock>) {
+	[NType.CodeBlock](node: SelNode<NType.CodeBlock>) {
 		this.dos(node.nodes);
 	};
-	[2](node: SelNode<NType.Command>) { };
-	[3](node: SelNode<NType.ExpressionCommand>) { };
-	[4](node: SelNode<NType.ExpressionSelect>) { };
-	[5](node: SelNode<NType.Branch>) {
+	[NType.Command](node: SelNode<NType.Command>) { };
+	[NType.ConditionCommand](node: SelNode<NType.ConditionCommand>) { };
+	[NType.ConditionSelector](node: SelNode<NType.ConditionSelector>) { };
+	[NType.Branch](node: SelNode<NType.Branch>) {
 		this.do(node.expr);
 		this.do(node.tdo);
 		this.do(node.fdo);
 	}
-	[6](node: SelNode<NType.Block>) { };
+	[NType.Block](node: SelNode<NType.Block>) { };
+	Expression(node: NodeExpression) {
+		if ('ntype' in node.oFirst) this.do(node.oFirst);
+		if ('oSecond' in node && 'ntype' in node.oSecond) this.do(node.oSecond);
+	}
+	[NType.ExpressionAnd] = this.Expression;
+	[NType.ExpressionOr] = this.Expression;
+	[NType.ExpressionNot] = this.Expression;
+	[NType.ExpressionNand] = this.Expression;
+	[NType.ExpressionNor] = this.Expression;
+	[NType.ExpressionXor] = this.Expression;
+	[NType.ExpressionXnor] = this.Expression;
 	protected do<T extends NType>(node: SelNode<T>) {
 		const type: T = node.ntype;
 		const pathInfo = this.operm.paths[node.index];
