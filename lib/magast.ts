@@ -13,7 +13,7 @@ import Vcb = Types.Vcb;
 import TypeId = Types.TypeId;
 
 export enum NType {
-	SystemDad = -1,
+	SystemDad,
 	System,
 	CodeBlock,
 	Command,
@@ -30,51 +30,21 @@ export enum NType {
 	ExpressionXnor,
 }
 Text.regEnum('NType', {
-	[NType.SystemDad]: {
-		'zh-CN': '指令系统的父节点',
-	},
-	[NType.System]: {
-		'zh-CN': '指令系统',
-	},
-	[NType.CodeBlock]: {
-		'zh-CN': '代码块',
-	},
-	[NType.Command]: {
-		'zh-CN': '单命令',
-	},
-	[NType.ConditionCommand]: {
-		'zh-CN': '有条件命令方块',
-	},
-	[NType.ConditionSelector]: {
-		'zh-CN': '选择器',
-	},
-	[NType.Branch]: {
-		'zh-CN': '条件分支',
-	},
-	[NType.Block]: {
-		'zh-CN': '命令方块',
-	},
-	[NType.ExpressionAnd]: {
-		'zh-CN': '与表达式',
-	},
-	[NType.ExpressionOr]: {
-		'zh-CN': '或表达式',
-	},
-	[NType.ExpressionNot]: {
-		'zh-CN': '非表达式',
-	},
-	[NType.ExpressionNand]: {
-		'zh-CN': '与非表达式',
-	},
-	[NType.ExpressionNor]: {
-		'zh-CN': '或非表达式',
-	},
-	[NType.ExpressionXor]: {
-		'zh-CN': '异或表达式',
-	},
-	[NType.ExpressionXnor]: {
-		'zh-CN': '同或表达式',
-	},
+	[NType.SystemDad]: '指令系统的父节点',
+	[NType.System]: '指令系统',
+	[NType.CodeBlock]: '代码块',
+	[NType.Command]: '单命令',
+	[NType.ConditionCommand]: '有条件命令方块',
+	[NType.ConditionSelector]: '选择器',
+	[NType.Branch]: '条件分支',
+	[NType.Block]: '命令方块',
+	[NType.ExpressionAnd]: '与表达式',
+	[NType.ExpressionOr]: '或表达式',
+	[NType.ExpressionNot]: '非表达式',
+	[NType.ExpressionNand]: '与非表达式',
+	[NType.ExpressionNor]: '或非表达式',
+	[NType.ExpressionXor]: '异或表达式',
+	[NType.ExpressionXnor]: '同或表达式',
 });
 export type NTypeKey = keyof typeof NType;
 export function isNType(n: string): n is NTypeKey {

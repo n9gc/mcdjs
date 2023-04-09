@@ -61,10 +61,13 @@ export namespace Text {
 			'zh-CN': `以下追踪信息仅供参考`,
 		},
 	});
-	type EnumObj = { [K in EnumName]: { [I in EnumValueMap[K]]: Obj } };
+	type EnumObjTypes<K extends EnumName> = { [I in EnumValueMap[K]]: Obj };
+	type EnumObj = { [K in EnumName]: EnumObjTypes<K> };
 	let enumObj: Partial<EnumObj> = {};
-	export function regEnum<T extends EnumName>(which: T, obj: EnumObj[T]) {
-		enumObj[which] = obj;
+	export function regEnum<T extends EnumName>(which: T, obj: { [I in keyof EnumObj[T]]: EnumObj[T][I] | string }) {
+		for (const i in obj) if (typeof obj[i] === 'string') (obj as any)[i] = { [env.defaultLang]: obj[i] };
+		console.log(obj);
+		enumObj[which] = (obj as EnumObj[T]);
 	}
 	export function getEnum<T extends Text.EnumName>(type: T, name: Text.EnumValueMap[T]) {
 		const nameObj = enumObj[type]?.[name] ?? Temp.Imp.errlib.throwErr(Temp.Imp.errlib.EType.ErrNoEnumText, Error(), type, name);

@@ -39,9 +39,7 @@ Text.regEnum('EType', {
 		'zh-CN': '此模块不允许被引入',
 		'en-US': 'The module is not allowed to be imported',
 	},
-	[EType.ErrUseBeforeDefine]: {
-		'zh-CN': '变量在预定义完成前被引用',
-	},
+	[EType.ErrUseBeforeDefine]: '变量在预定义完成前被引用',
 	[EType.ErrCannotBeSeted]: {
 		'zh-CN': '此变量无法被赋值',
 		'en-US': 'The variable is not allowed to be assigned',
@@ -58,9 +56,7 @@ Text.regEnum('EType', {
 		'zh-CN': '错误的访问器名称',
 		'en-US': 'Illegal vistor name',
 	},
-	[EType.ErrNoEnumText]: {
-		'zh-CN': '找不到枚举对应的文本',
-	},
+	[EType.ErrNoEnumText]: '找不到枚举对应的文本',
 });
 export interface Err {
 	type: EType;
