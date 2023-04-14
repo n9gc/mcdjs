@@ -1,13 +1,13 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 1.2.0
+ * @version 1.2.1
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
 
 import { Text, env } from './config';
-import { Node } from './magast';
+import { Node } from './magast/nodes';
 
 export enum EType {
 	ErrNoSuchFile,

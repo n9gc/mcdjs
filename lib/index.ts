@@ -7,9 +7,7 @@
  */
 declare module '.';
 
-import * as Def from '.';
-export default Def;
-
+export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';
 export * as config from './config';

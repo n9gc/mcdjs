@@ -1,14 +1,14 @@
 /**
  * 配置相关
  * @module mcdjs/lib/config
- * @version 4.0.0
+ * @version 4.0.1
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
 import Temp from './alload';
-import type { EType, throwErr } from './errlib';
-import type { NType } from './magast';
+import type { EType } from './errlib';
+import type { NType } from './magast/nodes';
 
 export const env = {
 	version: '0.9.2',
@@ -66,7 +66,6 @@ export namespace Text {
 	let enumObj: Partial<EnumObj> = {};
 	export function regEnum<T extends EnumName>(which: T, obj: { [I in keyof EnumObj[T]]: EnumObj[T][I] | string }) {
 		for (const i in obj) if (typeof obj[i] === 'string') (obj as any)[i] = { [env.defaultLang]: obj[i] };
-		console.log(obj);
 		enumObj[which] = (obj as EnumObj[T]);
 	}
 	export function getEnum<T extends Text.EnumName>(type: T, name: Text.EnumValueMap[T]) {
