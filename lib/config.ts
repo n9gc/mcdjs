@@ -6,6 +6,7 @@
  */
 declare module './config';
 
+import type { Types } from './alload';
 import Temp from './alload';
 import type { EType } from './errlib';
 import type { NType } from './magast/nodes';
@@ -42,17 +43,6 @@ export namespace env {
 let envTest: env.Env = env;
 
 export namespace Text {
-	export type Obj =
-		& { [env.defaultLang]: string; }
-		& { [J in env.OptionalLang]?: string };
-	export type EnumTypeMap = {
-		NType: typeof NType;
-		EType: typeof EType;
-	};
-	export type EnumKeyMap = { [I in keyof EnumTypeMap]: keyof EnumTypeMap[I] };
-	export type EnumValueMap = { [I in keyof EnumTypeMap]: EnumTypeMap[I][EnumKeyMap[I]] };
-	export type EnumKeys = EnumKeyMap[keyof EnumKeyMap];
-	export type EnumName = keyof EnumValueMap;
 	function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
 		return n;
 	}
@@ -61,14 +51,53 @@ export namespace Text {
 			'zh-CN': `以下追踪信息仅供参考`,
 		},
 	});
-	type EnumObjTypes<K extends EnumName> = { [I in EnumValueMap[K]]: Obj };
-	type EnumObj = { [K in EnumName]: EnumObjTypes<K> };
-	let enumObj: Partial<EnumObj> = {};
-	export function regEnum<T extends EnumName>(which: T, obj: { [I in keyof EnumObj[T]]: EnumObj[T][I] | string }) {
-		for (const i in obj) if (typeof obj[i] === 'string') (obj as any)[i] = { [env.defaultLang]: obj[i] };
-		enumObj[which] = (obj as EnumObj[T]);
+	export type Obj =
+		& { [env.defaultLang]: string; }
+		& { [J in env.OptionalLang]?: string };
+	type EnumTypeMap = {
+		NType: typeof NType;
+		EType: typeof EType;
+		TypeId: typeof Temp.Struct.Types.TypeId;
+		CbType: typeof Temp.Struct.Types.CbType;
+	};
+	let enumNameMap: Map<EnumTypes, EnumName>;
+	function initEnumNameMap<T extends EnumName>(which: EnumTypeMap[T]) {
+		return (enumNameMap || (enumNameMap = new Map<EnumTypes, EnumName>([
+			[Temp.Imp.errlib.EType, 'EType'],
+			[Temp.Imp.magast.nodes.NType, 'NType'],
+			[Temp.Struct.Types.CbType, 'CbType'],
+			[Temp.Struct.Types.TypeId, 'TypeId'],
+		]))).get(which) as T;
 	}
-	export function getEnum<T extends Text.EnumName>(type: T, name: Text.EnumValueMap[T]) {
+	export type EnumTypes = EnumTypeMap[EnumName];
+	export type EnumNameOf<
+		B extends EnumTypes,
+		N = Types.EachOfUnion<EnumName>>
+		= (N extends [infer I extends EnumName, ...infer N]
+			? (Types.EqualTo<B, EnumTypeMap[I]> extends true
+				? I
+				: EnumNameOf<B, N>
+			)
+			: never
+		);
+	export type EnumName = keyof EnumTypeMap;
+	export type EnumKey<I extends EnumName> = I extends I ? keyof EnumTypeMap[I] : never;
+	export type EnumValue<I extends EnumName> = I extends I ? EnumTypeMap[I][EnumKey<I>] : never;
+	export type EnumKeys = EnumKey<EnumName>;
+	type EnumObjTypes<K extends EnumName> = { [I in EnumValue<K>]?: Obj };
+	type EnumObj = { [K in EnumName]?: EnumObjTypes<K> };
+	let enumObj: EnumObj = {};
+	export function regEnum<B extends EnumTypes, T extends EnumName = EnumNameOf<B>>(which: B, obj: { [I in EnumKey<T>]: Obj | string }) {
+		let finObj: EnumObjTypes<T> = {};
+		let i: keyof typeof obj;
+		for (i in obj) {
+			const k = which[i as keyof B] as EnumValue<T>;
+			const ele: Obj | string = obj[i];
+			finObj[k] = typeof ele === 'string' ? { [env.defaultLang]: ele } : ele;
+		}
+		enumObj[initEnumNameMap(which)] = finObj;
+	}
+	export function getEnum<T extends Text.EnumName>(type: T, name: Text.EnumValue<T>) {
 		const nameObj = enumObj[type]?.[name] ?? Temp.Imp.errlib.throwErr(Temp.Imp.errlib.EType.ErrNoEnumText, Error(), type, name);
 		return nameObj[env.config.lang] ?? nameObj[env.defaultLang];
 	}

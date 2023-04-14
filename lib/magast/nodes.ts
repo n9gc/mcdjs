@@ -27,22 +27,22 @@ export enum NType {
 	ExpressionXor,
 	ExpressionXnor,
 }
-Text.regEnum('NType', {
-	[NType.SystemDad]: '指令系统的父节点',
-	[NType.System]: '指令系统',
-	[NType.CodeBlock]: '代码块',
-	[NType.Command]: '单命令',
-	[NType.ConditionCommand]: '有条件命令方块',
-	[NType.ConditionSelector]: '选择器',
-	[NType.Branch]: '条件分支',
-	[NType.Block]: '命令方块',
-	[NType.ExpressionAnd]: '与表达式',
-	[NType.ExpressionOr]: '或表达式',
-	[NType.ExpressionNot]: '非表达式',
-	[NType.ExpressionNand]: '与非表达式',
-	[NType.ExpressionNor]: '或非表达式',
-	[NType.ExpressionXor]: '异或表达式',
-	[NType.ExpressionXnor]: '同或表达式',
+Text.regEnum(NType, {
+	SystemDad: '指令系统的父节点',
+	System: '指令系统',
+	CodeBlock: '代码块',
+	Command: '单命令',
+	ConditionCommand: '有条件命令方块',
+	ConditionSelector: '选择器',
+	Branch: '条件分支',
+	Block: '命令方块',
+	ExpressionAnd: '与表达式',
+	ExpressionOr: '或表达式',
+	ExpressionNot: '非表达式',
+	ExpressionNand: '与非表达式',
+	ExpressionNor: '或非表达式',
+	ExpressionXor: '异或表达式',
+	ExpressionXnor: '同或表达式',
 });
 export type NTypeKey = keyof typeof NType;
 export function isNType(n: string): n is NTypeKey {

@@ -22,41 +22,41 @@ export enum EType {
 	ErrIllegalVisitorName,
 	ErrNoEnumText,
 }
-Text.regEnum('EType', {
-	[EType.ErrNoSuchFile]: {
+Text.regEnum(EType, {
+	ErrNoSuchFile: {
 		'zh-CN': '找不到文件',
 		'en-US': 'Cannot find such file',
 	},
-	[EType.ErrNoParser]: {
+	ErrNoParser: {
 		'zh-CN': '没有可用的解析器',
 		'en-US': 'No available parser',
 	},
-	[EType.ErrNoSuchErr]: {
+	ErrNoSuchErr: {
 		'zh-CN': '没有这种错误类型',
 		'en-US': 'Wrong error type',
 	},
-	[EType.ErrCannotBeImported]: {
+	ErrCannotBeImported: {
 		'zh-CN': '此模块不允许被引入',
 		'en-US': 'The module is not allowed to be imported',
 	},
-	[EType.ErrUseBeforeDefine]: '变量在预定义完成前被引用',
-	[EType.ErrCannotBeSeted]: {
+	ErrUseBeforeDefine: '变量在预定义完成前被引用',
+	ErrCannotBeSeted: {
 		'zh-CN': '此变量无法被赋值',
 		'en-US': 'The variable is not allowed to be assigned',
 	},
-	[EType.ErrIllegalParameter]: {
+	ErrIllegalParameter: {
 		'zh-CN': '非法的参数',
 		'en-US': 'Illegal Parameter given',
 	},
-	[EType.ErrForgetPathInfo]: {
+	ErrForgetPathInfo: {
 		'zh-CN': '初始化节点时未注册路径信息',
 		'en-US': 'Forget to regist PathInfo when initialize a Node',
 	},
-	[EType.ErrIllegalVisitorName]: {
+	ErrIllegalVisitorName: {
 		'zh-CN': '错误的访问器名称',
 		'en-US': 'Illegal vistor name',
 	},
-	[EType.ErrNoEnumText]: '找不到枚举对应的文本',
+	ErrNoEnumText: '找不到枚举对应的文本',
 });
 export interface Err {
 	type: EType;

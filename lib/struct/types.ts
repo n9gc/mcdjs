@@ -46,11 +46,21 @@ namespace McdJSTemp {
 				Selected,
 				SimTag,
 			}
+			Imp.config.Text.regEnum(TypeId, {
+				CommandRslt: '命令结果表示',
+				Selected: '选择器表示',
+				SimTag: '标签表示',
+			});
 			export enum CbType {
 				Impulse,
 				Chain,
 				Repeat,
 			}
+			Imp.config.Text.regEnum(CbType, {
+				Impulse: '脉冲',
+				Chain: '链式',
+				Repeat: '重复',
+			});
 			export interface RoundParsed extends Array<Imp.magast.nodes.AST> {
 			}
 			export type Mods =

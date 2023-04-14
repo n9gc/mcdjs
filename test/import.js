@@ -2,6 +2,7 @@ const path = require('path');
 const root = path.join(__dirname, '../');
 const file = path.join(root, 'build/index.js');
 const tsc = require('../tsconfig.json').compilerOptions;
+/**@type {(keyof typeof tsc)[]} */
 const skipKey = [
 	'outDir',
 	'noImplicitAny',
@@ -22,5 +23,5 @@ require('export-tester')(
 		}
 	}
 ).then(
-	({err}) => process.exit(err),
+	({ err }) => process.exit(err),
 );
