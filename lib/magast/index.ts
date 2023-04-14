@@ -6,6 +6,9 @@
  */
 declare module '.';
 
+import { reger0 } from '..';
+
+export const reger1 = reger0('magast', exports);
 export * as nodes from './nodes';
 export { default as Operator } from './operator';
 export { default as PathInfo } from './pathinfo';

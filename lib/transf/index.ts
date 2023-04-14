@@ -24,6 +24,8 @@ import {
 	getNodesVisited,
 } from './types';
 
+export * as types from './types';
+
 export const modules = [
 	internalCmd2cb,
 	internalCond,

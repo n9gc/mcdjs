@@ -6,8 +6,11 @@
  */
 declare module './errlib';
 
+import { reger0 } from '.';
 import { Text, env } from './config';
 import { Node } from './magast/nodes';
+
+reger0('errlib', exports);
 
 export enum EType {
 	ErrNoSuchFile,

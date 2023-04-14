@@ -6,10 +6,12 @@
  */
 declare module './config';
 
-import type { Types } from './alload';
-import Temp from './alload';
+import Imp, { reger0 } from '.';
+import Temp, { Types } from './alload';
 import type { EType } from './errlib';
 import type { NType } from './magast/nodes';
+
+reger0('config', exports);
 
 export const env = {
 	version: '0.9.2',
@@ -60,14 +62,15 @@ export namespace Text {
 		TypeId: typeof Temp.Struct.Types.TypeId;
 		CbType: typeof Temp.Struct.Types.CbType;
 	};
-	let enumNameMap: Map<EnumTypes, EnumName>;
 	function initEnumNameMap<T extends EnumName>(which: EnumTypeMap[T]) {
-		return (enumNameMap || (enumNameMap = new Map<EnumTypes, EnumName>([
-			[Temp.Imp.errlib.EType, 'EType'],
-			[Temp.Imp.magast.nodes.NType, 'NType'],
-			[Temp.Struct.Types.CbType, 'CbType'],
-			[Temp.Struct.Types.TypeId, 'TypeId'],
-		]))).get(which) as T;
+		switch (which) {
+			case Imp?.errlib?.EType: return 'EType' as T;
+			case Imp?.magast?.nodes?.NType: return 'NType' as T;
+			case Temp?.Struct?.Types?.CbType: return 'CbType' as T;
+			case Temp?.Struct?.Types?.TypeId: return 'TypeId' as T;
+		}
+		console.log(which);
+		throw Error();
 	}
 	export type EnumTypes = EnumTypeMap[EnumName];
 	export type EnumNameOf<
@@ -98,7 +101,7 @@ export namespace Text {
 		enumObj[initEnumNameMap(which)] = finObj;
 	}
 	export function getEnum<T extends Text.EnumName>(type: T, name: Text.EnumValue<T>) {
-		const nameObj = enumObj[type]?.[name] ?? Temp.Imp.errlib.throwErr(Temp.Imp.errlib.EType.ErrNoEnumText, Error(), type, name);
+		const nameObj = enumObj[type]?.[name] ?? Imp.errlib.throwErr(Imp.errlib.EType.ErrNoEnumText, Error(), type, name);
 		return nameObj[env.config.lang] ?? nameObj[env.defaultLang];
 	}
 }

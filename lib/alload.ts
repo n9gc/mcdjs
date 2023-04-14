@@ -28,10 +28,12 @@ glo.McdJSTemp = {
 } as typeof McdJSTemp;
 glo.McdJSTempGet = () => glo.McdJSTemp;
 
+export default McdJSTemp;
+
+import './config';
 import './struct';
 import './cmdobj';
 
-export default McdJSTemp;
 export import Command = McdJSTemp.Command;
 export import Struct = McdJSTemp.Struct;
 export import chCommand = McdJSTemp.chCommand;

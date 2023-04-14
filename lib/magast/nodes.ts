@@ -6,9 +6,12 @@
  */
 declare module './nodes';
 
+import { reger1 } from '.';
 import { Types } from '../alload';
 import { Text } from '../config';
 import { holdErr } from '../errlib';
+
+reger1('nodes', exports);
 
 export enum NType {
 	SystemDad,
