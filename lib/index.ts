@@ -7,16 +7,7 @@
  */
 declare module '.';
 
-function regerIniter<N>(dad: N) {
-	return <K extends keyof D, D = N>(modName: K, mod: D[K]) => {
-		(dad as any)[modName] = mod;
-		return regerIniter(mod);
-	};
-}
-
-import * as Imp from '.';
-export const reger0 = regerIniter(Imp);
-export default Imp;
+export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';
 export * as config from './config';

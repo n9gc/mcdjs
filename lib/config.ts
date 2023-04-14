@@ -1,13 +1,13 @@
 /**
  * 配置相关
  * @module mcdjs/lib/config
- * @version 5.0.1
+ * @version 5.1.0
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
-import Imp, { reger0 } from '.';
-import Temp, { Types } from './alload';
+import Imp from '.';
+import Temp, { Types, reger0 } from './alload';
 import type { EType } from './errlib';
 import type { NType } from './magast/nodes';
 

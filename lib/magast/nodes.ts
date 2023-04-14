@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
