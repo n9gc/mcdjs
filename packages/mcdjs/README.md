@@ -1,14 +1,12 @@
-# McdJS
-
-[English](./README-en.md) | **简体中文**
-
-<img width="60" height="60" align="left" alt="McdJS" style="margin-right:10px" src="https://github.com/n9gc/mcdjs/raw/master/lib/logo.svg">
+# ![McdJS](https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs/lib/banner.svg)
 
 > 像写指令一样写 JS
 >
 > ——或者说，像写 JS 一样写指令 。
 
-*McdJS* 全称 *JavaScript minecraft command generator with the idea of Minecraft Command Design* 也就是“《MC指令设计》配套 JS 命令生成工具”。
+[English](https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs/README-en.md) | **简体中文**
+
+*McdJS* 全称 *JavaScript minecraft command generator with the idea of the Minecraft Command Design* 也就是“《MC指令设计》配套 JS 命令生成工具”。
 
 通常来讲，使用这种工具的方法是作为一个库引入 JS 来使用。
 不过更方便的方法是把你的 JS 应用代码放到后缀名为 `mcdjs` 的文件中，然后你的这些 JS 代码就变成了 “McdJS” 代码！

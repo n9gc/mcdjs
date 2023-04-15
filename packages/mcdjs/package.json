@@ -19,11 +19,9 @@
 	},
 	"files": [
 		"dist",
-		"lib/logo.svg",
 		"global.d.ts",
 		"LICENSE",
-		"README.md",
-		"README-en.md"
+		"README.md"
 	],
 	"keywords": [
 		"minecraft",

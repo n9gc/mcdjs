@@ -1,6 +1,6 @@
 # McdJS 配套命令行工具
 
-[English](./README-en.md) | **简体中文**
+[English](https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs-cli/README-en.md) | **简体中文**
 
 众所周知， *McdJS* 作为一个兼容性很好的项目，既可以运行在本地 Node.js 环境，也可以运行在浏览器。
 

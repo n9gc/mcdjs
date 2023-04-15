@@ -24,8 +24,7 @@
 		"bin",
 		"dist",
 		"LICENSE",
-		"README.md",
-		"README-en.md"
+		"README.md"
 	],
 	"keywords": [
 		"minecraft",
