@@ -21,6 +21,8 @@ jobs:
       - name: Init enviroument
         run: |
           npm i pnpm -g
+          rm -rf package-lock.json
+          pnpm i
           pnpm i
 
       - name: Development test
@@ -29,4 +31,4 @@ jobs:
 
       - name: Production test
         run: |
-          npm turbo prod-test-all
+          pnpm turbo prod-test-all

@@ -25,6 +25,8 @@ jobs:
       - name: Init enviroument
         run: |
           npm i pnpm -g
+          rm -rf package-lock.json
+          pnpm i
           pnpm i
 
       - name: Development build
