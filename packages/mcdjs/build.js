@@ -12,8 +12,6 @@ const {
 	dels,
 	outFS,
 	log,
-	match,
-	judge,
 	comp,
 	goodReg,
 	time,
@@ -28,13 +26,14 @@ const mv = [
 	'cli',
 ];
 const prod = process.argv[process.argv.length - 1] === '-prod';
-snake(
+if (!prod) snake(
 	timeStart(),
 	dels('dist'),
-	exec(`npx tsc ${prod ? `--sourceMap false` : ''}`),
+	exec(`npx tsc`),
 	timeEnd(),
 	log('\nTS compiled in', time(), 'ms\n'),
-	judge(prod),
+);
+else snake(
 	timeStart(),
 	async () => Object.keys(require('./dist')).forEach(e => e != 'default' && mn.push(e)),
 	exec('npx webpack'),
@@ -49,7 +48,7 @@ snake(
 	log('\nwebpack compiled in', time(), 'ms\n'),
 	mvs(mv.map(e => [`dist/${e}`, `temp/${e}`])),
 	dels([
-		RegExp(`^${goodReg(comp('dist'))}.*js$`),
+		RegExp(`^${goodReg(comp('dist'))}.*(js|js.map)$`),
 		'dist/exp.d.ts',
 	]),
 	mvs(['temp', 'dist']),

@@ -4,7 +4,15 @@
 		"dev": {
 			"persistent": true
 		},
+		"devb": {
+			"outputs": [
+				"dist/**"
+			]
+		},
 		"build": {
+			"dependsOn": [
+				"devb"
+			],
 			"outputs": [
 				"dist/**"
 			]
