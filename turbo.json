@@ -12,6 +12,24 @@
 				"dist/**"
 			]
 		},
+		"test-all": {
+			"dependsOn": [
+				"devb",
+				"^test-all"
+			],
+			"outputs": [
+				"test/**"
+			]
+		},
+		"prod-test-all": {
+			"dependsOn": [
+				"build",
+				"^prod-test-all"
+			],
+			"outputs": [
+				"test/**"
+			]
+		},
 		"build": {
 			"dependsOn": [
 				"devb"

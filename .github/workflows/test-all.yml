@@ -2,53 +2,31 @@ name: All test
 
 on:
   push:
-    branches: [ "master", "dev-prototype" ]
+    branches: ["master", "dev-prototype"]
   pull_request:
-    branches: [ "master", "dev-prototype" ]
+    branches: ["master", "dev-prototype"]
 
 jobs:
-  test-dev:
+  test-all:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Build
-      run: |
-        npm install
-        node dobuild
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Init enviroument
+        run: |
+          npm i pnpm -g
+          pnpm i
 
-    - name: Test - Import
-      run: |
-        npm run test-import
-    - name: Test - All
-      run: |
-        npm run test-all
+      - name: Development test
+        run: |
+          pnpm turbo test-all
 
-  test-prod:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Build
-      run: |
-        npm install
-        node dobuild -prod
-
-    - name: Test - Import
-      run: |
-        npm run test-import
-    - name: Test - All
-      run: |
-        npm run test-all
+      - name: Production test
+        run: |
+          npm turbo prod-test-all

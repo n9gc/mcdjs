@@ -6,6 +6,7 @@
  */
 declare module '.';
 
+import 'mcdjs/dist/index';
 import { env } from 'mcdjs/dist/config';
 import run, { out, RunInfos } from './hfile';
 

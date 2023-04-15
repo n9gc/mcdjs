@@ -13,9 +13,8 @@
 	"scripts": {
 		"build": "node build -prod",
 		"dev": "npx tsc -w",
-		"test-all": "node --enable-source-maps test",
-		"test-import": "node --enable-source-maps test/import",
-		"test-sig": "node --enable-source-maps test/sig",
+		"test-all": "node test/all",
+		"prod-test-all": "node test/all",
 		"devb": "node build"
 	},
 	"files": [
@@ -47,6 +46,13 @@
 	},
 	"dependencies": {
 		"@types/node": ""
+	},
+	"devDependencies": {
+		"lethal-build": "^1.3.2",
+		"typescript": "",
+		"webpack": "",
+		"export-tester": "^1.0.7",
+		"webpack-cli": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }

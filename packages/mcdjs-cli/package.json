@@ -13,6 +13,8 @@
 	"scripts": {
 		"build": "",
 		"dev": "npx tsc -w",
+		"test-all": "node test/all",
+		"prod-test-all": "node test/all",
 		"devb": "npx tsc"
 	},
 	"bin": {
@@ -46,6 +48,10 @@
 		"@types/node": "",
 		"promise-snake": "^1.2.0",
 		"mcdjs": "workspace:*"
+	},
+	"devDependencies": {
+		"export-tester": "^1.0.7",
+		"typescript": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }

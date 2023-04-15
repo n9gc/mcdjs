@@ -1,25 +1,28 @@
-const path = require('path');
-const root = path.join(__dirname, '../');
-const file = path.join(root, 'build/index.js');
 const tsc = require('../tsconfig.json').compilerOptions;
-/**@type {(keyof typeof tsc)[]} */
+const tester = require('export-tester');
+const path = require('path');
 const skipKey = [
-	'outDir',
 	'noImplicitAny',
 	'strict',
 ];
 const cmd = ['', ...Object.keys(tsc)].reduce((p, k) =>
+	//@ts-ignore
 	skipKey.includes(k) ? p : `${p} --${k} ${tsc[k] === true ? '' : tsc[k]}`
 );
-require('export-tester')(
+module.exports = (
+	/**@type {Parameters<typeof tester>[0]['cfg']} */
+	cfg,
+	/**@type {string[]} */
+	...dirs
+) => tester(
 	{
-		file,
-		sign: 'McdJS',
-		cfg: { ts: { cmd } },
+		file: path.join(...dirs),
+		sign: 'cmd',
+		cfg: { ...cfg, ts: { cmd, ...cfg?.ts } },
 	},
 	{
 		import() {
-			console.log(McdJS);
+			console.log(cmd);
 		}
 	}
 ).then(
