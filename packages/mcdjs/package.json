@@ -50,6 +50,7 @@
 		"typescript": "",
 		"webpack": "",
 		"export-tester": "^1.0.7",
+		"promise-snake": "^1.2.2",
 		"webpack-cli": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
