@@ -25,7 +25,7 @@ const mn = [];
 const prod = process.argv[process.argv.length - 1] === '-prod';
 if (!prod) snake(
 	timeStart(),
-	dels('dist'),
+	dels(['dist', 'tsconfig.tsbuildinfo']),
 	exec(`npx tsc`),
 	timeEnd(),
 	log('\nTS compiled in', time(), 'ms\n'),

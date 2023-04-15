@@ -46,8 +46,7 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
-		"@types/node": "",
-		"promise-snake": "^1.2.0"
+		"@types/node": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }
