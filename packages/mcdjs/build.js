@@ -22,9 +22,6 @@ const fsp = require('fs/promises');
 require('promise-snake');
 
 const mn = [];
-const mv = [
-	'cli',
-];
 const prod = process.argv[process.argv.length - 1] === '-prod';
 if (!prod) snake(
 	timeStart(),
@@ -46,7 +43,6 @@ else snake(
 	], 'temp/index.js'),
 	timeEnd(),
 	log('\nwebpack compiled in', time(), 'ms\n'),
-	mvs(mv.map(e => [`dist/${e}`, `temp/${e}`])),
 	dels([
 		RegExp(`^${goodReg(comp('dist'))}.*(js|js.map)$`),
 		'dist/exp.d.ts',

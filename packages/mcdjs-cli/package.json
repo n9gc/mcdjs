@@ -1,6 +1,6 @@
 {
 	"name": "mcdjs-cli",
-	"version": "0.1.1",
+	"version": "1.0.4",
 	"description": "Cli for McdJS",
 	"main": "./lib/index.ts",
 	"module": "./lib/index.ts",

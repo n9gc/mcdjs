@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.3
+ * @version 1.2.4
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -112,7 +112,7 @@ namespace McdJSTemp {
 		export function ori(...args: Args) {
 			if (args.length === 2) return If.ori(...args, () => { });
 			const con = If.getCondition(args[0]);
-			return { Then: (tdo: Vcb) => If.ori(con, tdo, () => { }) };
+			return { Then: (tdo: Vcb) => { If.ori(con, tdo, () => { }); } };
 		}
 	}
 	/**
