@@ -12,9 +12,10 @@
 				"dist/**"
 			],
 			"inputs": [
+				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**",
+				"lib/**/*.ts",
 				"node_modules/**"
 			]
 		},
@@ -23,12 +24,10 @@
 				"devb",
 				"^test-all"
 			],
-			"outputs": [
-				"test/**"
-			],
 			"inputs": [
 				"dist/**",
-				"test/**"
+				"test/**/*.js",
+				"node_modules/**"
 			]
 		},
 		"prod-test-all": {
@@ -36,12 +35,10 @@
 				"build",
 				"^prod-test-all"
 			],
-			"outputs": [
-				"test/**"
-			],
 			"inputs": [
 				"dist/**",
-				"test/**"
+				"test/**/*.js",
+				"node_modules/**"
 			]
 		},
 		"build": {
@@ -52,9 +49,10 @@
 				"dist/**"
 			],
 			"inputs": [
+				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**",
+				"lib/**/*.ts",
 				"node_modules/**"
 			]
 		}

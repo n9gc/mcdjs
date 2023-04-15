@@ -1,5 +1,4 @@
-require('../build');
-const { default: run, out, RunInfos } = require('../build/cli/hfile');
+const { default: run, out, RunInfos } = require('../dist/hfile');
 const fsp = require('fs/promises');
 
 (async () => {
