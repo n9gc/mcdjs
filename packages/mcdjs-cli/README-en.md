@@ -1,6 +1,6 @@
 # CLI for McdJS
 
-**English** | [简体中文](README.md)
+**English** | [简体中文](./README.md)
 
 As we all know, *McdJS*, which has very strong compatibility, can not only run in local with Node.js, but also run in browser.
 

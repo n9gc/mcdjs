@@ -1,6 +1,6 @@
 # McdJS
 
-**English** | [简体中文](README.md)
+**English** | [简体中文](./README.md)
 
 *McdJS*, whose full name is *JavaScript minecraft command generator with the idea of Minecraft Command Design*, is a generator of Minecraft command.
 

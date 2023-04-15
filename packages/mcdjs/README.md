@@ -1,6 +1,6 @@
 # McdJS
 
-[English](README-en.md) | **简体中文**
+[English](./README-en.md) | **简体中文**
 
 <img width="60" height="60" align="left" alt="McdJS" style="margin-right:10px" src="https://github.com/n9gc/mcdjs/raw/master/lib/logo.svg">
 
