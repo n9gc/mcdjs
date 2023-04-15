@@ -1,7 +1,4 @@
 {
-	"include": [
-		"./lib"
-	],
 	"compilerOptions": {
 		"module": "CommonJS",
 		"moduleResolution": "Node",
@@ -16,7 +13,5 @@
 		"alwaysStrict": true,
 		"noImplicitThis": true,
 		"declaration": true,
-		"sourceMap": true,
-		"outDir": "./build"
 	}
 }

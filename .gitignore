@@ -1,5 +1,7 @@
-build
+dist
 package-lock.json
 node_modules
 out.json
 pnpm-lock.yaml
+.turbo
+* copy
