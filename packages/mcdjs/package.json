@@ -2,10 +2,16 @@
 	"name": "mcdjs",
 	"version": "0.9.2",
 	"description": "Using JS to program Minecraft commands",
-	"main": "./build/index.js",
-	"types": "./build/index.d.ts",
+	"main": "./lib/index.ts",
+	"module": "./lib/index.ts",
+	"types": "./lib/index.ts",
+	"publishConfig": {
+		"main": "./dist/index.js",
+		"module": "./dist/index.js",
+		"types": "./dist/index.d.ts"
+	},
 	"scripts": {
-		"build": "node dobuild -prod",
+		"build": "node build -prod",
 		"test-all": "node --enable-source-maps test",
 		"test-import": "node --enable-source-maps test/import",
 		"test-sig": "node --enable-source-maps test/sig",
@@ -16,7 +22,7 @@
 	},
 	"files": [
 		"bin",
-		"build",
+		"dist",
 		"lib/logo.svg",
 		"global.d.ts",
 		"LICENSE",
@@ -30,6 +36,7 @@
 		"language",
 		"development",
 		"parser",
+		"complier",
 		"mcdjs"
 	],
 	"author": "e0selmy4v",
@@ -44,15 +51,6 @@
 	"dependencies": {
 		"@types/node": "",
 		"promise-snake": "^1.2.0"
-	},
-	"devDependencies": {
-		"promise-snake": "^1.2.0",
-		"export-tester": "^1.0.7",
-		"lethal-build": "^1.3.2",
-		"typescript": "",
-		"webpack": "",
-		"you-can-too": "^1.0.0",
-		"webpack-cli": "^5.0.1"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }

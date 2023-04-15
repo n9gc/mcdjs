@@ -2,6 +2,10 @@
 	"private": true,
 	"devDependencies": {
 		"turbo": "^1.9.1",
-		"typescript": "^5.0.4"
+		"webpack": "",
+		"webpack-cli": "",
+		"lethal-build": "^1.3.2",
+		"typescript": "",
+		"export-tester": "^1.0.7"
 	}
 }
