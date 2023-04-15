@@ -13,5 +13,6 @@
 		"alwaysStrict": true,
 		"noImplicitThis": true,
 		"declaration": true,
+		"sourceMap": true,
 	}
 }

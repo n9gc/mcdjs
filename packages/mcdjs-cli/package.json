@@ -1,7 +1,7 @@
 {
-	"name": "mcdjs",
-	"version": "0.9.2",
-	"description": "Using JS to program Minecraft commands",
+	"name": "mcdjs-cli",
+	"version": "0.1.0",
+	"description": "Cli for McdJS",
 	"main": "./lib/index.ts",
 	"module": "./lib/index.ts",
 	"types": "./lib/index.ts",
@@ -11,17 +11,16 @@
 		"types": "./dist/index.d.ts"
 	},
 	"scripts": {
-		"build": "node build -prod",
+		"build": "",
 		"dev": "npx tsc -w",
-		"test-all": "node --enable-source-maps test",
-		"test-import": "node --enable-source-maps test/import",
-		"test-sig": "node --enable-source-maps test/sig",
-		"devb": "node build"
+		"devb": "npx tsc"
+	},
+	"bin": {
+		"mcdjsc": "./bin/mcdjsc"
 	},
 	"files": [
+		"bin",
 		"dist",
-		"lib/logo.svg",
-		"global.d.ts",
 		"LICENSE",
 		"README.md",
 		"README-en.md"
@@ -30,9 +29,7 @@
 		"minecraft",
 		"command",
 		"generator",
-		"language",
-		"development",
-		"parser",
+		"cli",
 		"complier",
 		"mcdjs"
 	],
@@ -47,7 +44,8 @@
 	},
 	"dependencies": {
 		"@types/node": "",
-		"promise-snake": "^1.2.0"
+		"promise-snake": "^1.2.0",
+		"mcdjs": "workspace:*"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }
