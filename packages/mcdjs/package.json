@@ -12,7 +12,7 @@
 	},
 	"scripts": {
 		"build": "node build -prod",
-		"dev": "npx tsc -w",
+		"dev": "pnpm tsc -w",
 		"test-all": "node test/all",
 		"prod-test-all": "node test/all",
 		"devb": "node build"

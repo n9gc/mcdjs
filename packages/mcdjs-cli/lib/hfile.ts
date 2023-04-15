@@ -6,6 +6,7 @@
  */
 declare module './hfile';
 
+import 'mcdjs/dist/index';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import { Types } from 'mcdjs/dist/alload';

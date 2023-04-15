@@ -1,1 +1,3 @@
-require('../../../test/all')(__dirname);
+require('../../../test/all')(__dirname, [
+	'import',
+]);

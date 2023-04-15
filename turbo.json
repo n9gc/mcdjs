@@ -10,6 +10,12 @@
 			],
 			"outputs": [
 				"dist/**"
+			],
+			"inputs": [
+				"package.json",
+				"tsconfig.json",
+				"lib/**",
+				"node_modules/**"
 			]
 		},
 		"test-all": {
@@ -18,6 +24,10 @@
 				"^test-all"
 			],
 			"outputs": [
+				"test/**"
+			],
+			"inputs": [
+				"dist/**",
 				"test/**"
 			]
 		},
@@ -28,6 +38,10 @@
 			],
 			"outputs": [
 				"test/**"
+			],
+			"inputs": [
+				"dist/**",
+				"test/**"
 			]
 		},
 		"build": {
@@ -36,6 +50,12 @@
 			],
 			"outputs": [
 				"dist/**"
+			],
+			"inputs": [
+				"package.json",
+				"tsconfig.json",
+				"lib/**",
+				"node_modules/**"
 			]
 		}
 	}

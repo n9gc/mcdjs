@@ -12,10 +12,10 @@
 	},
 	"scripts": {
 		"build": "",
-		"dev": "npx tsc -w",
+		"dev": "pnpm tsc -w",
 		"test-all": "node test/all",
 		"prod-test-all": "node test/all",
-		"devb": "npx tsc"
+		"devb": "pnpm tsc"
 	},
 	"bin": {
 		"mcdjsc": "./bin/mcdjsc"

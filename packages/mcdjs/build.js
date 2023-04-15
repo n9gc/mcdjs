@@ -26,14 +26,14 @@ const prod = process.argv[process.argv.length - 1] === '-prod';
 if (!prod) snake(
 	timeStart(),
 	dels(['dist', 'tsconfig.tsbuildinfo']),
-	exec(`npx tsc`),
+	exec(`pnpm tsc`),
 	timeEnd(),
 	log('\nTS compiled in', time(), 'ms\n'),
 );
 else snake(
 	timeStart(),
 	async () => Object.keys(require('./dist')).forEach(e => e != 'default' && mn.push(e)),
-	exec('npx webpack'),
+	exec('pnpm webpack'),
 	mkdir('temp'),
 	outFS([
 		[1, cmt('lib/index.ts')],
