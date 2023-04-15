@@ -1,6 +1,6 @@
 {
 	"name": "mcdjs",
-	"version": "0.9.3",
+	"version": "0.9.4",
 	"description": "Using JS to program Minecraft commands",
 	"main": "./lib/index.ts",
 	"module": "./lib/index.ts",
