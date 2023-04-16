@@ -1,7 +1,7 @@
 /**
  * 文件解析处理模块
  * @module mcdjs-cli/lib/hfile
- * @version 1.0.7
+ * @version 1.0.8
  * @license GPL-3.0-or-later
  */
 declare module './hfile';
@@ -9,7 +9,7 @@ declare module './hfile';
 import 'mcdjs/dist/index';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
-import { Types } from 'mcdjs/dist/alload';
+import { RoundParsed } from 'mcdjs/dist/types';
 import { parse } from "mcdjs/dist/appinf";
 import { EType, errCatcher, getTracker, trapErr } from 'mcdjs/dist/errlib';
 import * as path from 'path';
@@ -51,13 +51,13 @@ export async function resolve({ inputs }: RunInfos) {
 	return files;
 }
 export async function compile(files: string[]) {
-	const commands: Types.RoundParsed = [];
+	const commands: RoundParsed = [];
 	await Promise.thens(files.map(file => async () =>
 		commands.push(await parse(file, () => import(file)))
 	));
 	return commands;
 }
-export async function out(infos: RunInfos, commands: Types.RoundParsed) {
+export async function out(infos: RunInfos, commands: RoundParsed) {
 	await fsp.writeFile(path.resolve(infos.outfile), JSON.stringify(commands, null, '  '));
 }
 export default async function run(infos: RunInfos) {

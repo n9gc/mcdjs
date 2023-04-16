@@ -13,8 +13,8 @@
 	"scripts": {
 		"build": "",
 		"dev": "pnpm tsc -w",
-		"test": "node test/all",
-		"prod-test": "node test/all",
+		"test": "node --enable-source-maps test/all",
+		"prod-test": "node --enable-source-maps test/all",
 		"devb": "pnpm tsc"
 	},
 	"bin": {

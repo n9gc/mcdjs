@@ -1,7 +1,7 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-3.0-or-later
  */
 declare module './appinf';
@@ -11,6 +11,7 @@ import transform from './transf';
 
 const globalExcludeKeys: (keyof typeof McdJSTemp)[] = [
 	'Imp',
+	'Types',
 	'chCommand',
 	'Struct',
 ];

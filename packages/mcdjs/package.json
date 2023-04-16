@@ -13,8 +13,9 @@
 	"scripts": {
 		"build": "node build -prod",
 		"dev": "pnpm tsc -w",
-		"test": "node test/all",
+		"test": "node --enable-source-maps test/all",
 		"prod-test": "node test/all",
+		"run": "node --enable-source-maps test/run",
 		"devb": "node build"
 	},
 	"files": [

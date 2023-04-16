@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 2.2.0
+ * @version 2.2.2
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -12,6 +12,7 @@ declare global {
 	 */
 	namespace McdJSTemp {
 		export import Imp = Index;
+		export import Types = Imp.types;
 	}
 	/**
 	 * 得到真正全局临时对象
@@ -42,6 +43,8 @@ export const reger0 = registrarIniter(Index);
 
 export default McdJSTemp;
 
+import * as Types from './types';
+glo.McdJSTemp.Types = Types;
 import './config';
 import './struct';
 import './cmdobj';

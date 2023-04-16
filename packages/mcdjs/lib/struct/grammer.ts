@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.5
+ * @version 1.2.6
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -37,7 +37,6 @@ namespace McdJSTemp {
 			}
 		}
 	}
-	import Types = Imp.types;
 	import TypeId = Types.TypeId;
 	import CommandRslt = Types.CommandRslt;
 	import Expression = Types.Expression;
