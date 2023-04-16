@@ -8,17 +8,18 @@ declare module './appinf';
 
 import { Operator } from './magast';
 import transform from './transf';
+import { Temp } from './cmdobj';
 
-const globalExcludeKeys: (keyof typeof McdJSTemp)[] = [
+const globalExcludeKeys: (keyof typeof Temp)[] = [
 	'Imp',
 	'Types',
 	'chCommand',
 	'Struct',
 ];
 export function globalify() {
-	Object.keys(globalThis.McdJSTemp).forEach(key => {
+	Object.keys(Temp).forEach(key => {
 		if ((globalExcludeKeys as string[]).includes(key)) return;
-		(globalThis as any)[key] = (globalThis.McdJSTemp as any)[key];
+		(globalThis as any)[key] = (Temp as any)[key];
 	});
 }
 

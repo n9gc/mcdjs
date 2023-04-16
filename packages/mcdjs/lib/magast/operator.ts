@@ -1,12 +1,13 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.0.2
+ * @version 1.0.3
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
-import Temp, { chCommand } from '../alload';
+import { Temp } from '../struct';
+import { chCommand } from '../cmdobj';
 import { EType, getTracker, holdErr } from '../errlib';
 import { Condition, Shifted, TypeId, Vcb } from '../types';
 import {

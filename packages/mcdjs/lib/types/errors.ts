@@ -1,7 +1,7 @@
 /**
  * 错误类型定义模块
  * @module mcdjs/lib/types/errors
- * @version 1.3.4
+ * @version 1.3.6
  * @license GPL-3.0-or-later
  */
 declare module './errors';
@@ -15,7 +15,6 @@ export enum EType {
 	ErrNoParser,
 	ErrNoSuchErr,
 	ErrCannotBeImported,
-	/**@deprecated */
 	ErrUseBeforeDefine,
 	ErrCannotBeSeted,
 	ErrIllegalParameter,
@@ -80,7 +79,6 @@ export interface ErrCannotBeImported extends Err {
 	type: EType.ErrCannotBeImported;
 	module: string;
 }
-/**@deprecated */
 export interface ErrUseBeforeDefine extends Err {
 	type: EType.ErrUseBeforeDefine;
 	varName: string;
