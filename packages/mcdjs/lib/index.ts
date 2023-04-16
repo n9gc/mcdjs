@@ -14,3 +14,4 @@ export * as config from './config';
 export * as errlib from './errlib';
 export * as magast from './magast';
 export * as transf from './transf';
+export * as types from './types';

@@ -1,19 +1,19 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.1.1
+ * @version 1.1.2
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
+import Operator from '../magast/operator';
+import PathInfo from '../magast/pathinfo';
 import {
 	AllNode,
 	NType,
 	NodeExpression,
 	SelNode
-} from '../magast/nodes';
-import Operator from '../magast/operator';
-import PathInfo from '../magast/pathinfo';
+} from '../types/nodes';
 import internalCmd2cb from './internal-cmd2cb';
 import internalCond from './internal-cond';
 import {

@@ -1,17 +1,14 @@
 /**
- * 抽象语法树节点定义模块
+ * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
-import { reger1 } from '.';
-import { Types } from '../alload';
+import type { Types } from '../alload';
 import { Text } from '../config';
 import { holdErr } from '../errlib';
-
-reger1('nodes', exports);
 
 export enum NType {
 	SystemDad,

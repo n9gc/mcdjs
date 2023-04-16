@@ -1,14 +1,13 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 2.0.0
+ * @version 2.0.2
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
 
 import { reger0 } from './alload';
 import { Text, env } from './config';
-import { Node } from './magast/nodes';
 import {
 	AllErr,
 	ArgGetErr,
@@ -17,8 +16,11 @@ import {
 	SelErr,
 	tranumEType,
 } from './types/errors';
+import type { Node } from './types/nodes';
 
 reger0('errlib', exports);
+
+export { EType };
 
 let trackerMap: { [env.defaultLang]: Error; } & { [I in env.OptionalLang]?: Error };
 function getTrackerDefault() {

@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './operator';
@@ -16,7 +16,7 @@ import {
 	NodeSystem,
 	NType,
 	SelNode
-} from './nodes';
+} from '../types/nodes';
 import PathInfo from './pathinfo';
 import Vcb = Types.Vcb;
 import TypeId = Types.TypeId;

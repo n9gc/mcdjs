@@ -1,6 +1,6 @@
 /**
  * 类型定义
- * @version 1.1.4
+ * @version 1.1.5
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -65,7 +65,7 @@ namespace McdJSTemp {
 				Chain: '链式',
 				Repeat: '重复',
 			});
-			export interface RoundParsed extends Array<Imp.magast.nodes.AST> {
+			export interface RoundParsed extends Array<Imp.types.nodes.AST> {
 			}
 			export type Mods =
 				| Exclude<keyof typeof Imp, 'default'>

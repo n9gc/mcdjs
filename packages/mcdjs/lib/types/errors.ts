@@ -1,14 +1,14 @@
 /**
  * 错误类型定义模块
  * @module mcdjs/lib/types/errors
- * @version 1.3.3
+ * @version 1.3.4
  * @license GPL-3.0-or-later
  */
 declare module './errors';
 
 import { Text } from '../config';
-import { Node } from '../magast/nodes';
 import { throwErr } from '../errlib';
+import type { Node } from './nodes';
 
 export enum EType {
 	ErrNoSuchFile,
