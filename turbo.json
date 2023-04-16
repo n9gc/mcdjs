@@ -15,8 +15,7 @@
 				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**/*.ts",
-				"node_modules/**"
+				"lib/**/*.ts"
 			]
 		},
 		"test-all": {
@@ -52,8 +51,7 @@
 				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**/*.ts",
-				"node_modules/**"
+				"lib/**/*.ts"
 			]
 		}
 	}

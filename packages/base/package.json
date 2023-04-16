@@ -1,0 +1,48 @@
+{
+	"name": "@mcdjs/base",
+	"version": "0.9.0",
+	"description": "Base libraries for McdJS",
+	"main": "./lib/index.ts",
+	"module": "./lib/index.ts",
+	"types": "./lib/index.ts",
+	"publishConfig": {
+		"main": "./dist/index.js",
+		"module": "./dist/index.js",
+		"types": "./dist/index.d.ts"
+	},
+	"scripts": {
+		"build": "",
+		"test-all": "node test/all",
+		"prod-test-all": "node test/all",
+		"dev": "pnpm tsc -w",
+		"devb": "pnpm tsc"
+	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
+	"keywords": [
+		"error-handler",
+		"data",
+		"mcdjs"
+	],
+	"author": "e0selmy4v",
+	"license": "GPL-3.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/n9gc/mcdjs.git"
+	},
+	"bugs": {
+		"url": "https://github.com/n9gc/mcdjs/issues"
+	},
+	"dependencies": {
+		"@types/node": ""
+	},
+	"devDependencies": {
+		"export-tester": "^1.0.7",
+		"webpack": "",
+		"typescript": ""
+	},
+	"homepage": "https://github.com/n9gc/mcdjs#readme"
+}
