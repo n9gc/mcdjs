@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 2.2.2
+ * @version 2.3.0
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -28,18 +28,6 @@ glo.McdJSTemp = {
 	Imp: Index,
 } as typeof McdJSTemp;
 glo.McdJSTempGet = () => glo.McdJSTemp;
-
-export interface Registrar<T> {
-	<K extends keyof T>(modName: K, mod: T[K]): Registrar<T[K]>
-}
-function registrarIniter<N>(dad: N): Registrar<N> {
-	return <K extends keyof N>(modName: K, mod: N[K]) => {
-		dad[modName] = mod;
-		return registrarIniter(mod);
-	};
-}
-
-export const reger0 = registrarIniter(Index);
 
 export default McdJSTemp;
 

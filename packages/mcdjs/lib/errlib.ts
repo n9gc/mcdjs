@@ -1,12 +1,11 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 2.0.2
+ * @version 2.0.3
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
 
-import { reger0 } from './alload';
 import { Text, env } from './config';
 import {
 	AllErr,
@@ -17,8 +16,6 @@ import {
 	tranumEType,
 } from './types/errors';
 import type { Node } from './types/nodes';
-
-reger0('errlib', exports);
 
 export { EType };
 

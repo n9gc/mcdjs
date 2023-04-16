@@ -1,16 +1,13 @@
 /**
  * 配置相关
  * @module mcdjs/lib/config
- * @version 5.1.1
+ * @version 5.1.2
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
 import Imp from '.';
-import { reger0 } from './alload';
 import type { Ased, BInT } from './types';
-
-reger0('config', exports);
 
 export const env = {
 	version: '0.9.2',
