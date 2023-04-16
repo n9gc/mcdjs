@@ -1,14 +1,14 @@
 /**
  * 转译相关定义模块
- * @module mcdjs/lib/transf/types
- * @version 1.0.3
+ * @module mcdjs/lib/types/transf
+ * @version 1.0.4
  * @license GPL-3.0-or-later
  */
-declare module './types';
+declare module './transf';
 
 import { EType, throwErr } from '../errlib';
 import { PathInfo } from '../magast';
-import { NType, NTypeKey, isNType, valueNType } from '../types/nodes';
+import { NType, NTypeKey, isNType, valueNType } from './nodes';
 
 export interface VisitorFn {
 	(pathInfo: PathInfo): void;

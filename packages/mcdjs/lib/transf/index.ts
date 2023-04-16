@@ -1,7 +1,7 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.1.2
+ * @version 1.2.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -14,17 +14,15 @@ import {
 	NodeExpression,
 	SelNode
 } from '../types/nodes';
-import internalCmd2cb from './internal-cmd2cb';
-import internalCond from './internal-cond';
 import {
 	TransfModule,
 	Visitor,
 	VisitorFn,
 	VisitorObj,
 	getNodesVisited,
-} from './types';
-
-export * as types from './types';
+} from '../types/transf';
+import internalCmd2cb from './internal-cmd2cb';
+import internalCond from './internal-cond';
 
 export const modules = [
 	internalCmd2cb,

@@ -1,7 +1,7 @@
 /**
  * 类型定义模块
  * @module mcdjs/lib/types
- * @version 1.2.0
+ * @version 1.3.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -11,6 +11,7 @@ import { AST } from './nodes';
 
 export * as errors from './errors';
 export * as nodes from './nodes';
+export * as transf from './transf';
 
 export type BInT<T, B> = T extends B ? T : never;
 export type Exted<C extends D, D> = C;
