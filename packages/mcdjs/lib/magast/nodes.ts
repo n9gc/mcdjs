@@ -30,7 +30,7 @@ export enum NType {
 	ExpressionXor,
 	ExpressionXnor,
 }
-Text.regEnum(NType, {
+export const tranumNType = Text.regEnum('NType', NType, {
 	SystemDad: '指令系统的父节点',
 	System: '指令系统',
 	CodeBlock: '代码块',
@@ -67,7 +67,8 @@ export interface Node {
 }
 export type InitedNodeAttr =
 	| 'index'
-	| 'ntype';
+	| 'ntype'
+	;
 export interface NodeSystemDad extends Node {
 	ntype: NType.SystemDad;
 	index: -1;
@@ -95,9 +96,13 @@ export interface NodeConditionSelector extends Node {
 	range: Types.Select.At;
 	expr: Types.Expression;
 }
+export type NodeCondition =
+	| NodeConditionCommand
+	| NodeConditionSelector
+	;
 export interface NodeBranch extends Node {
 	ntype: NType.Branch;
-	expr: NodeConditionCommand | NodeConditionSelector;
+	expr: NodeCondition;
 	tdo: NodeCodeBlock;
 	fdo: NodeCodeBlock;
 }
@@ -106,6 +111,40 @@ export interface NodeBlock extends Node {
 	con: boolean;
 	cbtype: Types.CbType;
 }
+export interface NodeExpressionAnd extends Node {
+	ntype: NType.ExpressionAnd;
+	oFirst: Expression;
+	oSecond: Expression;
+}
+export interface NodeExpressionOr extends Node {
+	ntype: NType.ExpressionOr;
+	oFirst: Expression;
+	oSecond: Expression;
+}
+export interface NodeExpressionNot extends Node {
+	ntype: NType.ExpressionNot;
+	oFirst: Expression;
+}
+export interface NodeExpressionNand extends Node {
+	ntype: NType.ExpressionNand;
+	oFirst: Expression;
+	oSecond: Expression;
+}
+export interface NodeExpressionNor extends Node {
+	ntype: NType.ExpressionNor;
+	oFirst: Expression;
+	oSecond: Expression;
+}
+export interface NodeExpressionXor extends Node {
+	ntype: NType.ExpressionXor;
+	oFirst: Expression;
+	oSecond: Expression;
+}
+export interface NodeExpressionXnor extends Node {
+	ntype: NType.ExpressionXnor;
+	oFirst: Expression;
+	oSecond: Expression;
+}
 export type NodeExpression =
 	| NodeExpressionAnd
 	| NodeExpressionOr
@@ -113,54 +152,26 @@ export type NodeExpression =
 	| NodeExpressionNand
 	| NodeExpressionNor
 	| NodeExpressionXor
-	| NodeExpressionXnor;
-export interface NodeExpressionAnd extends Node {
-	ntype: NType.ExpressionAnd;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionOr extends Node {
-	ntype: NType.ExpressionOr;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionNot extends Node {
-	ntype: NType.ExpressionNot;
-	oFirst: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionNand extends Node {
-	ntype: NType.ExpressionNand;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionNor extends Node {
-	ntype: NType.ExpressionNor;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionXor extends Node {
-	ntype: NType.ExpressionXor;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
-export interface NodeExpressionXnor extends Node {
-	ntype: NType.ExpressionXnor;
-	oFirst: Types.SimTag | NodeExpression;
-	oSecond: Types.SimTag | NodeExpression;
-}
+	| NodeExpressionXnor
+	;
+export type Expression =
+	| NodeExpression
+	| Types.SimTag
+	;
 export type AllNode =
 	| NodeSystemDad
 	| NodeSystem
 	| NodeCodeBlock
-	| NodeConditionCommand
-	| NodeConditionSelector
+	| NodeCondition
 	| NodeBranch
 	| NodeBlock
 	| NodeExpression
-	| NodeCommand;
+	| NodeCommand
+	;
 
 export type SelNode<T extends NType> = AllNode & { ntype: T; };
 export type AST = NodeSystem;
 export type GotSelNode<T extends NType = NType> =
 	& Exclude<SelNode<T>, 'index'>
-	& { endTimer: Node['endTimer'] & {}; };
+	& { endTimer: Node['endTimer'] & {}; }
+	;

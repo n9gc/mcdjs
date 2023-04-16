@@ -24,8 +24,9 @@ export enum EType {
 	ErrForgetPathInfo,
 	ErrIllegalVisitorName,
 	ErrNoEnumText,
+	ErrUnregisteredEnum,
 }
-Text.regEnum(EType, {
+export const tranumEType = Text.regEnum('EType', EType, {
 	ErrNoSuchFile: {
 		'zh-CN': '找不到文件',
 		'en-US': 'Cannot find such file',
@@ -60,6 +61,7 @@ Text.regEnum(EType, {
 		'en-US': 'Illegal vistor name',
 	},
 	ErrNoEnumText: '找不到枚举对应的文本',
+	ErrUnregisteredEnum: '使用了未被注册的枚举',
 });
 export interface Err {
 	type: EType;
@@ -103,8 +105,12 @@ export interface ErrIllegalVisitorName extends Err {
 }
 export interface ErrNoEnumText extends Err {
 	type: EType.ErrNoEnumText;
-	enumDomain: Text.EnumName;
+	enumDomain: string;
 	enumNumber: number;
+}
+export interface ErrUnregisteredEnum extends Err {
+	type: EType.ErrUnregisteredEnum;
+	enumObj: Text.Enum;
 }
 export type AllFnErr =
 	| ErrNoSuchFile
@@ -117,7 +123,8 @@ export type AllFnErr =
 	| ErrForgetPathInfo
 	| ErrIllegalVisitorName
 	| ErrNoEnumText
-	| never;
+	| ErrUnregisteredEnum
+	;
 export type SelErr<T extends EType> = AllFnErr & { type: T; };
 export type AllErr = AllFnErr | Err;
 
@@ -132,7 +139,8 @@ export type ArgGetErrList = [
 	[args: IArguments | readonly any[]],
 	[node: Node],
 	[name: string],
-	[enumDomain: Text.EnumName, enumNumber: number]
+	[enumDomain: string, enumNumber: number],
+	[enumObj: Text.Enum],
 ];
 export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
 	(type, tracker, files) => ({ type, files, tracker }),
@@ -145,6 +153,7 @@ export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } =
 	(type, tracker, node) => ({ type, node, tracker }),
 	(type, tracker, name) => ({ type, name, tracker }),
 	(type, tracker, enumDomain, enumNumber) => ({ type, enumDomain, enumNumber, tracker }),
+	(type, tracker, enumObj) => ({ type, enumObj, tracker }),
 ];
 export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
 	const [type] = pele;
@@ -169,7 +178,7 @@ export interface ClearedErr {
 }
 export function clearErr(n: AllErr): ClearedErr {
 	return Object.assign(n, {
-		type: Text.getEnum('EType', n.type),
+		type: tranumEType(n.type),
 	});
 }
 

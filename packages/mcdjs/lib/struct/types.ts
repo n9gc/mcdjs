@@ -8,6 +8,9 @@
 namespace McdJSTemp {
 	export namespace Struct {
 		export namespace Types {
+			export type BInT<T, B> = T extends B ? T : never;
+			export type Exted<C extends D, D> = C;
+			export type Ased<N, T> = T extends Exted<infer T, N> ? T : never;
 			export type AnyArr<T = any> = readonly T[];
 			export type WideNum = number | bigint;
 			export type MayNum = WideNum | string;
@@ -41,12 +44,13 @@ namespace McdJSTemp {
 					: `${R}${S[0]}`
 				);
 			export type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
+			import Text = Imp.config.Text;
 			export enum TypeId {
 				CommandRslt,
 				Selected,
 				SimTag,
 			}
-			Imp.config.Text.regEnum(TypeId, {
+			export const tranumTypeId = Text.regEnum('TypeId', TypeId, {
 				CommandRslt: '命令结果表示',
 				Selected: '选择器表示',
 				SimTag: '标签表示',
@@ -56,7 +60,7 @@ namespace McdJSTemp {
 				Chain,
 				Repeat,
 			}
-			Imp.config.Text.regEnum(CbType, {
+			export const tranumCbType = Text.regEnum('CbType', CbType, {
 				Impulse: '脉冲',
 				Chain: '链式',
 				Repeat: '重复',
@@ -69,7 +73,8 @@ namespace McdJSTemp {
 				| 'cmdobj'
 				| 'struct'
 				| 'exp'
-				| 'index';
+				| 'index'
+				;
 			export interface CommandRslt {
 				index: number;
 				tid: TypeId.CommandRslt;
@@ -88,23 +93,33 @@ namespace McdJSTemp {
 			export import SimTag = Sim.Tag;
 			export namespace Expression {
 				export type OperatorSig =
-					| '!' | 'not';
+					| '!'
+					| 'not'
+					;
 				export type OperatorBin =
-					| '&' | 'and'
-					| '|' | 'or'
+					| '&'
+					| 'and'
+					| '|'
+					| 'or'
 					| 'nand'
 					| 'nor'
 					| 'xor'
-					| 'xnor';
+					| 'xnor'
+					;
 				export type Operator =
 					| OperatorBin
-					| OperatorSig;
-				export type Calcable = SimTag | Sub;
+					| OperatorSig
+					;
+				export type Calcable =
+					| Sub
+					| SimTag
+					;
 				export type SubSig = [OperatorSig, Calcable];
 				export type SubBin = [Calcable, OperatorBin, Calcable];
 				export type Sub =
 					| SubSig
-					| SubBin;
+					| SubBin
+					;
 				export type Any = null | Calcable;
 			}
 			export import Expression = Expression.Any;
@@ -114,7 +129,13 @@ namespace McdJSTemp {
 					range: At;
 					tid: TypeId.Selected;
 				}
-				export type At = '@r' | '@a' | '@p' | '@s' | '@e';
+				export type At =
+					| '@r'
+					| '@a'
+					| '@p'
+					| '@s'
+					| '@e'
+					;
 			}
 			export import Selected = Select.Obj;
 			export import SelectString = Select.At;

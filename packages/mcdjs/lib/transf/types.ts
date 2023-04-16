@@ -19,11 +19,27 @@ export interface VisitorObj {
 }
 export type Visitor = VisitorObj | VisitorFn;
 export const aliasVisitorName = {
-	'condition': [NType.ConditionCommand, NType.ConditionSelector],
+	'condition': [
+		NType.ConditionCommand,
+		NType.ConditionSelector,
+	],
+	'expression': [
+		NType.ExpressionAnd,
+		NType.ExpressionNand,
+		NType.ExpressionNor,
+		NType.ExpressionNot,
+		NType.ExpressionOr,
+		NType.ExpressionXnor,
+		NType.ExpressionXor,
+	],
 } as const;
 /**检查 {@link aliasVisitorName|`aliasName`} 类型是否正确 */
 let aliasVisitorNameTest: { [alias: string]: readonly NType[]; } = aliasVisitorName;
-export type VisitorName = NTypeKey | 'all' | keyof typeof aliasVisitorName;
+export type VisitorName =
+	| NTypeKey
+	| 'all'
+	| keyof typeof aliasVisitorName
+	;
 export type TransfModule = {
 	[I in VisitorName]?: Visitor;
 };
