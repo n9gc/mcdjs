@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 2.1.0
+ * @version 2.2.0
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -49,4 +49,3 @@ import './cmdobj';
 export import Command = McdJSTemp.Command;
 export import Struct = McdJSTemp.Struct;
 export import chCommand = McdJSTemp.chCommand;
-export import Types = Struct.Types;

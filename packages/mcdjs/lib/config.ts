@@ -1,14 +1,14 @@
 /**
  * 配置相关
  * @module mcdjs/lib/config
- * @version 5.1.0
+ * @version 5.1.1
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
 import Imp from '.';
-import { Types, reger0 } from './alload';
-import Ased = Types.Ased;
+import { reger0 } from './alload';
+import type { Ased, BInT } from './types';
 
 reger0('config', exports);
 
@@ -60,7 +60,7 @@ export namespace Text {
 	export interface Enum {
 		[key: number | string]: number | string;
 	}
-	export type EnumKeyOf<B extends Enum> = B extends B ? Types.BInT<keyof B, string> : never;
+	export type EnumKeyOf<B extends Enum> = B extends B ? BInT<keyof B, string> : never;
 	export type EnumValueOf<B extends Enum> = Ased<number, B extends B ? B[EnumKeyOf<B>] : never>;
 	type EnumTextMap<B extends Enum> = { [I in EnumValueOf<B>]?: Obj };
 	interface EnumObj<B extends Enum> {

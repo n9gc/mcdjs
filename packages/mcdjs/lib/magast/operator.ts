@@ -1,25 +1,24 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
-import Temp, { chCommand, Types } from '../alload';
+import Temp, { chCommand } from '../alload';
 import { EType, getTracker, holdErr } from '../errlib';
+import { Condition, Shifted, TypeId, Vcb } from '../types';
 import {
 	AST,
 	InitedNodeAttr,
+	NType,
 	Node,
 	NodeCodeBlock,
 	NodeSystem,
-	NType,
 	SelNode
 } from '../types/nodes';
 import PathInfo from './pathinfo';
-import Vcb = Types.Vcb;
-import TypeId = Types.TypeId;
 
 export default class Operator {
 	constructor(tips: string) {
@@ -56,7 +55,7 @@ export default class Operator {
 		tips && (node.tips = tips);
 		return node;
 	}
-	regPath<T extends NType, D extends NType>(...args: Types.Shifted<ConstructorParameters<typeof PathInfo<T, D>>>) {
+	regPath<T extends NType, D extends NType>(...args: Shifted<ConstructorParameters<typeof PathInfo<T, D>>>) {
 		new PathInfo(this, ...args);
 		return args[0];
 	}
@@ -70,7 +69,7 @@ export default class Operator {
 		this.opering = dad;
 		return nBlk;
 	}
-	condition(expr: Types.Condition) {
+	condition(expr: Condition) {
 		switch (expr.tid) {
 			case TypeId.CommandRslt:
 				return this.node(NType.ConditionCommand, {
@@ -93,7 +92,7 @@ export default class Operator {
 		);
 		return nCommand.index;
 	}
-	If(expr: Types.Condition, tdoOri: Vcb, fdoOri: Vcb) {
+	If(expr: Condition, tdoOri: Vcb, fdoOri: Vcb) {
 		const nBranch = this.regPath(
 			this.node(NType.Branch),
 			this.opering,

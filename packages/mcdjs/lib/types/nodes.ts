@@ -1,12 +1,12 @@
 /**
  * 抽象语法树节点类型定义模块
- * @module mcdjs/lib/magast/nodes
- * @version 1.0.2
+ * @module mcdjs/lib/types/nodes
+ * @version 1.0.3
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
-import type { Types } from '../alload';
+import type { AnyArr, CbType, Expression, Select, SimTag } from '.';
 import { Text } from '../config';
 import { holdErr } from '../errlib';
 
@@ -54,7 +54,7 @@ export function eachNType<T>(cb: (value: number, key: NTypeKey) => T): T[] {
 	while (i in NType) rslt.push(cb(i, NType[i++] as NTypeKey));
 	return rslt;
 }
-export const keyNType = eachNType((_, k) => k) as Types.AnyArr<NTypeKey>;
+export const keyNType = eachNType((_, k) => k) as AnyArr<NTypeKey>;
 export const valueNType = eachNType((v => v)) as readonly NType[];
 export interface Node {
 	ntype: NType;
@@ -90,8 +90,8 @@ export interface NodeConditionCommand extends Node {
 }
 export interface NodeConditionSelector extends Node {
 	ntype: NType.ConditionSelector;
-	range: Types.Select.At;
-	expr: Types.Expression;
+	range: Select.At;
+	expr: Expression;
 }
 export type NodeCondition =
 	| NodeConditionCommand
@@ -106,41 +106,41 @@ export interface NodeBranch extends Node {
 export interface NodeBlock extends Node {
 	ntype: NType.Block;
 	con: boolean;
-	cbtype: Types.CbType;
+	cbtype: CbType;
 }
 export interface NodeExpressionAnd extends Node {
 	ntype: NType.ExpressionAnd;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export interface NodeExpressionOr extends Node {
 	ntype: NType.ExpressionOr;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export interface NodeExpressionNot extends Node {
 	ntype: NType.ExpressionNot;
-	oFirst: Expression;
+	oFirst: MagExpression;
 }
 export interface NodeExpressionNand extends Node {
 	ntype: NType.ExpressionNand;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export interface NodeExpressionNor extends Node {
 	ntype: NType.ExpressionNor;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export interface NodeExpressionXor extends Node {
 	ntype: NType.ExpressionXor;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export interface NodeExpressionXnor extends Node {
 	ntype: NType.ExpressionXnor;
-	oFirst: Expression;
-	oSecond: Expression;
+	oFirst: MagExpression;
+	oSecond: MagExpression;
 }
 export type NodeExpression =
 	| NodeExpressionAnd
@@ -151,9 +151,9 @@ export type NodeExpression =
 	| NodeExpressionXor
 	| NodeExpressionXnor
 	;
-export type Expression =
+export type MagExpression =
 	| NodeExpression
-	| Types.SimTag
+	| SimTag
 	;
 export type AllNode =
 	| NodeSystemDad
