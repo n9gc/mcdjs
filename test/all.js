@@ -1,5 +1,13 @@
-require('promise-snake');
-const { spawn, fork } = require('child_process');
+require('../packages/mcdjs-cli/node_modules/promise-snake');
+const { spawn, fork, ChildProcess } = require('child_process');
+
+/**@type {((dir:string,n:string)=>ChildProcess)[]} */
+const methods = [
+	(dir, n) => fork(`${dir}/${n}.js`, {
+		stdio: 'overlapped'
+	}),
+];
+const method = methods[0];
 
 module.exports = (
 	/**@type {string} */
@@ -7,9 +15,16 @@ module.exports = (
 	/**@type {string[]} */
 	fileList,
 ) => Promise.snake(fileList.map(n =>
-	// (res, rej) => spawn('node', [`${__dirname}/${n}.js`]).on('close', i => i ? rej(n) : res())
-	(res, rej) => fork(`${dir}/${n}.js`).on('close', i => i ? rej(n) : res())
+	(res, rej) => method(dir, n)
+		.on('message', i => console.log(`From ${n}:`, i))
+		.on('close', i => i ? rej(n) : res())
 )).then(
-	() => process.exit(0),
-	n => (console.log(n), process.exit(1))
+	() => {
+		console.log('Success!');
+		process.exit(0);
+	},
+	n => {
+		console.log(`Err at ${n}`);
+		process.exit(1);
+	},
 );

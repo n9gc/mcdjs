@@ -25,6 +25,7 @@ module.exports = (
 			console.log(cmd);
 		}
 	}
-).then(
-	({ err }) => process.exit(err),
-);
+).then(({ err, detail }) => {
+	err && process.send?.(detail);
+	process.exit(err);
+});

@@ -1,6 +1,17 @@
 {
 	"private": true,
 	"devDependencies": {
+		"export-tester": "^1.0.11",
+		"webpack": "",
+		"typescript": "",
+		"webpack-cli": "",
+		"lethal-build": "^1.3.2",
 		"turbo": "^1.9.1"
+	},
+	"scripts": {
+		"build": "pnpm turbo build",
+		"devb": "pnpm turbo devb",
+		"test": "pnpm turbo test",
+		"prod-test": "pnpm turbo prod-test"
 	}
 }

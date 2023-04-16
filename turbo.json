@@ -18,10 +18,10 @@
 				"lib/**/*.ts"
 			]
 		},
-		"test-all": {
+		"test": {
 			"dependsOn": [
 				"devb",
-				"^test-all"
+				"^test"
 			],
 			"inputs": [
 				"dist/**",
@@ -29,10 +29,10 @@
 				"node_modules/**"
 			]
 		},
-		"prod-test-all": {
+		"prod-test": {
 			"dependsOn": [
 				"build",
-				"^prod-test-all"
+				"^prod-test"
 			],
 			"inputs": [
 				"dist/**",

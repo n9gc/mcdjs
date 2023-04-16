@@ -12,8 +12,8 @@
 	},
 	"scripts": {
 		"build": "",
-		"test-all": "node test/all",
-		"prod-test-all": "node test/all",
+		"test": "node test/all",
+		"prod-test": "node test/all",
 		"dev": "pnpm tsc -w",
 		"devb": "pnpm tsc"
 	},
@@ -38,11 +38,6 @@
 	},
 	"dependencies": {
 		"@types/node": ""
-	},
-	"devDependencies": {
-		"export-tester": "^1.0.7",
-		"webpack": "",
-		"typescript": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }
