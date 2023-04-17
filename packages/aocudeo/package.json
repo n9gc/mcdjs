@@ -1,7 +1,7 @@
 {
-	"name": "mcdjs-cli",
-	"version": "1.0.4",
-	"description": "Cli for McdJS",
+	"name": "aocudeo",
+	"version": "0.1.0",
+	"description": "Load your interdependent modules with the correct order.",
 	"main": "./lib/index.ts",
 	"module": "./lib/index.ts",
 	"types": "./lib/index.ts",
@@ -12,28 +12,22 @@
 	},
 	"scripts": {
 		"build": "",
-		"dev": "pnpm tsc -w",
 		"test": "node --enable-source-maps test/all",
 		"prod-test": "node --enable-source-maps test/all",
+		"dev": "pnpm tsc -w",
 		"devb": "pnpm tsc"
 	},
-	"bin": {
-		"mcdjsc": "./bin/mcdjsc"
-	},
 	"files": [
-		"bin",
 		"dist",
 		"lib",
 		"LICENSE",
 		"README.md"
 	],
 	"keywords": [
-		"minecraft",
-		"command",
-		"generator",
-		"cli",
-		"complier",
-		"mcdjs"
+		"pipeline",
+		"loader",
+		"modules",
+		"flow-control"
 	],
 	"author": "e0selmy4v",
 	"license": "GPL-3.0-or-later",
@@ -43,11 +37,6 @@
 	},
 	"bugs": {
 		"url": "https://github.com/n9gc/mcdjs/issues"
-	},
-	"dependencies": {
-		"@types/node": "",
-		"promise-snake": "^1.2.0",
-		"mcdjs": "workspace:*"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs#readme"
 }
