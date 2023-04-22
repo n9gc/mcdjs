@@ -1,13 +1,13 @@
 /**
  * 胡乱加载链表类定义模块
  * @module mcdjs/lib/alload/chainlist
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './chainlist';
 
-import { EType, throwErr } from '../errlib';
-import { BInT, Shifted, Vcb } from '../types';
+import { EType, throwErr } from '@mcdjs/base/dist/errlib';
+import { BInT, Shifted, Vcb } from '@mcdjs/base/dist/types';
 
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;

@@ -1,7 +1,7 @@
 /**
  * 类型定义模块
- * @module mcdjs/lib/types
- * @version 1.3.1
+ * @module @mcdjs/base/lib/types
+ * @version 1.3.2
  * @license GPL-3.0-or-later
  */
 declare module '.';

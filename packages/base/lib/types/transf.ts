@@ -1,23 +1,14 @@
 /**
  * 转译相关定义模块
- * @module mcdjs/lib/types/transf
- * @version 1.0.4
+ * @module @mcdjs/base/lib/types/transf
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module './transf';
 
 import { EType, throwErr } from '../errlib';
-import { PathInfo } from '../magast';
 import { NType, NTypeKey, isNType, valueNType } from './nodes';
 
-export interface VisitorFn {
-	(pathInfo: PathInfo): void;
-}
-export interface VisitorObj {
-	entry?: VisitorFn;
-	exit?: VisitorFn;
-}
-export type Visitor = VisitorObj | VisitorFn;
 export const aliasVisitorName = {
 	'condition': [
 		NType.ConditionCommand,
@@ -40,9 +31,6 @@ export type VisitorName =
 	| 'all'
 	| keyof typeof aliasVisitorName
 	;
-export type TransfModule = {
-	[I in VisitorName]?: Visitor;
-};
 function isAlias(n: string): n is keyof typeof aliasVisitorName {
 	return Array.isArray((aliasVisitorName as any)[n]);
 }

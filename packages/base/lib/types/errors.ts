@@ -1,7 +1,7 @@
 /**
  * 错误类型定义模块
- * @module mcdjs/lib/types/errors
- * @version 1.3.6
+ * @module @mcdjs/base/lib/types/errors
+ * @version 1.3.7
  * @license GPL-3.0-or-later
  */
 declare module './errors';

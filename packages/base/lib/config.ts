@@ -1,16 +1,15 @@
 /**
  * 配置相关
- * @module mcdjs/lib/config
- * @version 5.1.2
+ * @module @mcdjs/base/lib/config
+ * @version 5.1.4
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
-import Imp from '.';
+import * as Imp from '.';
 import type { Ased, BInT } from './types';
 
 export const env = {
-	version: '0.9.2',
 	defaultLang: 'zh-CN',
 	config: {
 		lang: 'zh-CN',
@@ -32,7 +31,6 @@ export namespace env {
 		track: boolean;
 	}
 	export interface Env {
-		version: string;
 		defaultLang: Lang;
 		config: Config;
 		setConfig(conf: Config): void;

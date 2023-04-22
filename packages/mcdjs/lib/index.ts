@@ -7,11 +7,11 @@
  */
 declare module '.';
 
+export * as config from '@mcdjs/base/dist/config';
+export * as errlib from '@mcdjs/base/dist/errlib';
+export * as types from '@mcdjs/base/dist/types';
 export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';
-export * as config from './config';
-export * as errlib from './errlib';
 export * as magast from './magast';
 export * as transf from './transf';
-export * as types from './types';

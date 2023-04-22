@@ -1,19 +1,19 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './pathinfo';
 
-import { EType, getTracker, holdErr } from '../errlib';
+import { EType, getTracker, holdErr } from '@mcdjs/base/dist/errlib';
 import type {
 	GotSelNode,
 	InitedNodeAttr,
 	NType,
 	Node,
 	SelNode,
-} from '../types/nodes';
+} from '@mcdjs/base/dist/types/nodes';
 import Operator from './operator';
 
 

@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
- * @module mcdjs/lib/types/nodes
- * @version 1.0.3
+ * @module @mcdjs/base/lib/types/nodes
+ * @version 1.0.4
  * @license GPL-3.0-or-later
  */
 declare module './nodes';

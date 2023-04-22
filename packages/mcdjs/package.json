@@ -44,6 +44,7 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
+		"@mcdjs/base": "workspace:^",
 		"@types/node": ""
 	},
 	"devDependencies": {

@@ -1,13 +1,13 @@
 /**
  * 命令行工具模块
  * @module mcdjs-cli
- * @version 1.0.4
+ * @version 1.0.5
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
+import { env } from '@mcdjs/base/dist/config';
 import 'mcdjs/dist/index';
-import { env } from 'mcdjs/dist/config';
 import run, { out, RunInfos } from './hfile';
 
 export default async function handle() {
