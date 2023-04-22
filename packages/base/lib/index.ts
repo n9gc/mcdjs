@@ -6,6 +6,7 @@
  * @see https://github.com/n9gc/mcdjs 在线代码仓库
  */
 declare module '.';
+export const version = '1.0.0';
 
 export * as config from './config';
 export * as errlib from './errlib';

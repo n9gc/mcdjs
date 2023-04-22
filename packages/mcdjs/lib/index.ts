@@ -6,6 +6,7 @@
  * @see https://github.com/n9gc/mcdjs 在线代码仓库
  */
 declare module '.';
+export const version = '0.9.4';
 
 export * as config from '@mcdjs/base/dist/config';
 export * as errlib from '@mcdjs/base/dist/errlib';
@@ -15,3 +16,4 @@ export * as alload from './alload';
 export * as appinf from './appinf';
 export * as magast from './magast';
 export * as transf from './transf';
+
