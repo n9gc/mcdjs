@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "0.1.0",
+	"version": "1.0.2",
 	"description": "Load your interdependent modules with the correct order.",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",

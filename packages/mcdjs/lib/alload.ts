@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 3.0.1
+ * @version 3.0.2
  * @license GPL-3.0-or-later
  */
 declare module './alload';

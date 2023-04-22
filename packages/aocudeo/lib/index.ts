@@ -1,7 +1,7 @@
 /**
  * 胡乱加载链表类定义模块
- * @module mcdjs/lib/alload/chainlist
- * @version 1.0.1
+ * @module aocudeo
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module '.';
