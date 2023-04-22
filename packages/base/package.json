@@ -1,6 +1,6 @@
 {
 	"name": "@mcdjs/base",
-	"version": "0.9.0",
+	"version": "1.0.1",
 	"description": "Base libraries for McdJS",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",

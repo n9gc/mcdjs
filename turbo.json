@@ -12,10 +12,9 @@
 				"dist/**"
 			],
 			"inputs": [
-				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**/*.ts"
+				"lib/**"
 			]
 		},
 		"test": {
@@ -25,7 +24,7 @@
 			],
 			"inputs": [
 				"dist/**",
-				"test/**/*.js",
+				"test/**",
 				"node_modules/**"
 			]
 		},
@@ -36,7 +35,7 @@
 			],
 			"inputs": [
 				"dist/**",
-				"test/**/*.js",
+				"test/**",
 				"node_modules/**"
 			]
 		},
@@ -48,10 +47,9 @@
 				"dist/**"
 			],
 			"inputs": [
-				"dist/**/*.js",
 				"package.json",
 				"tsconfig.json",
-				"lib/**/*.ts"
+				"lib/**"
 			]
 		}
 	}

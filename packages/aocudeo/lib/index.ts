@@ -6,6 +6,10 @@
  */
 declare module '.';
 
+export const versions = {
+	aocudeo: '1.0.2',
+} as const;
+
 import { EType, throwErr } from '@mcdjs/base/dist/errlib';
 import { BInT, Shifted, Vcb } from '@mcdjs/base/dist/types';
 
