@@ -27,8 +27,8 @@ jobs:
 
       - name: Development test
         run: |
-          pnpm turbo test-all
+          pnpm turbo test
 
       - name: Production test
         run: |
-          pnpm turbo prod-test-all
+          pnpm turbo prod-test
