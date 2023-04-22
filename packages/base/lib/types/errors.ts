@@ -126,34 +126,26 @@ export type SelErr<T extends EType> = AllFnErr & { type: T; };
 export type AllErr = AllFnErr | Err;
 
 export type ArgGetErr<T extends EType> = [type: T, tracker: Error, ...ele: ArgGetErrList[T]];
-export type ArgGetErrList = [
-	[files: string[]],
-	[],
-	[throwTracker: Error],
-	[module: string],
-	[varName: string],
-	[varName: string],
-	[args: IArguments | readonly any[]],
-	[node: Node],
-	[name: string],
-	[enumDomain: string, enumNumber: number],
-	[enumObj: Enum],
-];
-export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
-	(type, tracker, files) => ({ type, files, tracker }),
-	(type, tracker) => ({ type, tracker }),
-	(type, tracker, throwTracker) => ({ type, throwTracker, tracker }),
-	(type, tracker, module) => ({ type, module, tracker }),
-	(type, tracker, varName) => ({ type, varName, tracker }),
-	(type, tracker, varName) => ({ type, varName, tracker }),
-	(type, tracker, args) => ({ type, args, tracker }),
-	(type, tracker, node) => ({ type, node, tracker }),
-	(type, tracker, name) => ({ type, name, tracker }),
-	(type, tracker, enumDomain, enumNumber) => ({ type, enumDomain, enumNumber, tracker }),
-	(type, tracker, enumObj) => ({ type, enumObj, tracker }),
-];
+export type ArgGetErrList = { [I in EType]: Parameters<typeof GetErrFns[I]> };
+export const GetErrFns = [
+	(files: string[]) => ({ files }),
+	() => ({}),
+	(throwTracker: Error) => ({ throwTracker }),
+	(module: string) => ({ module }),
+	(varName: string) => ({ varName }),
+	(varName: string) => ({ varName }),
+	(args: IArguments | readonly any[]) => ({ args }),
+	(node: Node) => ({ node }),
+	(name: string) => ({ name }),
+	(enumDomain: string, enumNumber: number) => ({ enumDomain, enumNumber }),
+	(enumObj: Enum) => ({ enumObj }),
+] as const;
 export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
-	const [type] = pele;
-	if (type in GetErrFns) return GetErrFns[type](...pele);
+	const [type, tracker, ...args] = pele;
+	if (type in GetErrFns) return {
+		type,
+		...(GetErrFns[type] as any)(...args),
+		tracker,
+	} as SelErr<B>;
 	return throwErr(EType.ErrNoSuchErr, pele[1], Error());
 }
