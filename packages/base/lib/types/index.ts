@@ -49,6 +49,13 @@ export type Joined<
 		? Joined<S, F, `${R}${I}${F}`>
 		: `${R}${S[0]}`
 	);
+export interface Enum {
+	[key: number | string]: number | string;
+}
+export namespace Enum {
+	export type KeyOf<B extends Enum> = B extends B ? BInT<keyof B, string> : never;
+	export type ValueOf<B extends Enum> = Ased<number, B extends B ? B[KeyOf<B>] : never>;
+}
 export type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
 export enum TypeId {
 	CommandRslt,

@@ -9,6 +9,7 @@ declare module './errors';
 import { Text } from '../config';
 import { throwErr } from '../errlib';
 import type { Node } from './nodes';
+import type { Enum } from '.';
 
 export enum EType {
 	ErrNoSuchFile,
@@ -106,7 +107,7 @@ export interface ErrNoEnumText extends Err {
 }
 export interface ErrUnregisteredEnum extends Err {
 	type: EType.ErrUnregisteredEnum;
-	enumObj: Text.Enum;
+	enumObj: Enum;
 }
 export type AllFnErr =
 	| ErrNoSuchFile
@@ -136,7 +137,7 @@ export type ArgGetErrList = [
 	[node: Node],
 	[name: string],
 	[enumDomain: string, enumNumber: number],
-	[enumObj: Text.Enum],
+	[enumObj: Enum],
 ];
 export const GetErrFns: { [I in EType]: (...pele: ArgGetErr<I>) => SelErr<I> } = [
 	(type, tracker, files) => ({ type, files, tracker }),

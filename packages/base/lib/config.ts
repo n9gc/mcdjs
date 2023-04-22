@@ -6,8 +6,9 @@
  */
 declare module './config';
 
-import * as Imp from '.';
-import type { Ased, BInT } from './types';
+import type * as index from '.';
+import type { Enum } from './types';
+import type { ArgGetErrList, EType } from './types/errors';
 
 export const env = {
 	defaultLang: 'zh-CN',
@@ -39,6 +40,17 @@ export namespace env {
 /**检查 {@link env|`env`} 类型是否正确 */
 let envTest: env.Env = env;
 
+function getImp() {
+	return getImp.Imp || (getImp.Imp = require('.'));
+}
+namespace getImp {
+	export let Imp: typeof index;
+}
+
+function throwErr<T extends keyof typeof EType>(n: T, tracker: Error, ...args: ArgGetErrList[typeof EType[T]]) {
+	return getImp().errlib.throwErr(getImp().errlib.EType[n], tracker, ...args);
+}
+
 export namespace Text {
 	function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
 		return n;
@@ -52,37 +64,30 @@ export namespace Text {
 		& { [env.defaultLang]: string; }
 		& { [J in env.OptionalLang]?: string }
 		;
-	export interface Enum {
-		[key: number | string]: number | string;
-	}
-	export type EnumKeyOf<B extends Enum> = B extends B ? BInT<keyof B, string> : never;
-	export type EnumValueOf<B extends Enum> = Ased<number, B extends B ? B[EnumKeyOf<B>] : never>;
-	type EnumTextMap<B extends Enum> = { [I in EnumValueOf<B>]?: Obj };
+	type EnumTextMap<B extends Enum> = { [I in Enum.ValueOf<B>]?: Obj };
 	interface EnumObj<B extends Enum> {
 		keyMap: EnumTextMap<B>;
 		which: B;
 	};
-	type TranObj<B extends Enum> = { [I in EnumKeyOf<B>]: Obj | string };
+	type TranObj<B extends Enum> = { [I in Enum.KeyOf<B>]: Obj | string };
 	const enumNameMap = new Map<Enum, string>;
 	export function findName<B extends Enum>(n: B) {
-		return enumNameMap.get(n)
-			?? Imp.errlib.throwErr(Imp.errlib.EType.ErrUnregisteredEnum, Error(), n);
+		return enumNameMap.get(n) ?? throwErr('ErrUnregisteredEnum', Error(), n);
 	}
 	export function regEnum<B extends Enum>(name: string, which: B, obj: TranObj<B>) {
 		enumNameMap.set(which, name);
 		let keyMap: EnumTextMap<B> = {};
 		let i: keyof typeof obj;
 		for (i in obj) {
-			const k = (which as any)[i] as EnumValueOf<B>;
+			const k = (which as any)[i] as Enum.ValueOf<B>;
 			const ele: Obj | string = obj[i];
 			keyMap[k] = typeof ele === 'string' ? { [env.defaultLang]: ele } : ele;
 		}
 		return getEnumFn({ keyMap, which });
 	}
 	function getEnumFn<B extends Enum>(enumObj: EnumObj<B>) {
-		return (value: EnumValueOf<B>) => {
-			const nameObj = enumObj.keyMap?.[value]
-				?? Imp.errlib.throwErr(Imp.errlib.EType.ErrNoEnumText, Error(), findName(enumObj.which), value);
+		return (value: Enum.ValueOf<B>) => {
+			const nameObj = enumObj.keyMap?.[value] ?? throwErr('ErrNoEnumText', Error(), findName(enumObj.which), value);
 			return nameObj[env.config.lang] ?? nameObj[env.defaultLang];
 		};
 	}
