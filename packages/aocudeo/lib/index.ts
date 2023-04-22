@@ -6,8 +6,10 @@
  */
 declare module '.';
 
+import { versions as mcdjsBaseVer } from '@mcdjs/base';
 export const versions = {
 	aocudeo: '1.0.2',
+	...mcdjsBaseVer,
 } as const;
 
 import { EType, throwErr } from '@mcdjs/base/dist/errlib';
