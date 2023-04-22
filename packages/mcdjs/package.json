@@ -2,14 +2,9 @@
 	"name": "mcdjs",
 	"version": "0.9.4",
 	"description": "Using JS to program Minecraft commands",
-	"main": "./lib/index.ts",
-	"module": "./lib/index.ts",
-	"types": "./lib/index.ts",
-	"publishConfig": {
-		"main": "./dist/index.js",
-		"module": "./dist/index.js",
-		"types": "./dist/index.d.ts"
-	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "node build -prod",
 		"dev": "pnpm tsc -w",

@@ -2,14 +2,9 @@
 	"name": "@mcdjs/base",
 	"version": "0.9.0",
 	"description": "Base libraries for McdJS",
-	"main": "./lib/index.ts",
-	"module": "./lib/index.ts",
-	"types": "./lib/index.ts",
-	"publishConfig": {
-		"main": "./dist/index.js",
-		"module": "./dist/index.js",
-		"types": "./dist/index.d.ts"
-	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "",
 		"test": "node --enable-source-maps test/all",
