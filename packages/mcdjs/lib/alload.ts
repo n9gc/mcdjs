@@ -4,7 +4,7 @@
  * @version 3.0.1
  * @license GPL-3.0-or-later
  */
-declare module '.';
+declare module './alload';
 declare global {
 	/**
 	 * McdJS 全局临时对象
@@ -22,8 +22,8 @@ declare global {
 }
 
 import * as Types from '@mcdjs/base/dist/types';
-import * as Index from '..';
-import ChainList from './chainlist';
+import * as Index from '.';
+import ChainList from 'aocudeo';
 import glo = globalThis;
 
 glo.McdJSTemp = {
