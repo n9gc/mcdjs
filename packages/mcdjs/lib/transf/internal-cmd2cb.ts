@@ -6,8 +6,8 @@
  */
 declare module './internal-cmd2cb';
 
-import { CbType } from '@mcdjs/base/dist/types';
 import { NType } from '@mcdjs/base/dist/types/nodes';
+import { CbType } from '@mcdjs/types/game';
 import { TransfModule } from './types';
 
 const mod: TransfModule = {

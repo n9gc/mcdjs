@@ -39,6 +39,7 @@
 	},
 	"dependencies": {
 		"@mcdjs/base": "workspace:^",
+		"@mcdjs/types": "workspace:^",
 		"aocudeo": "workspace:^",
 		"@types/node": ""
 	},

@@ -22,7 +22,8 @@
 		"flow-control"
 	],
 	"dependencies": {
-		"@mcdjs/base": "workspace:^"
+		"@mcdjs/base": "workspace:^",
+		"@mcdjs/types": "workspace:^"
 	},
 	"author": "e0selmy4v",
 	"license": "GPL-3.0-or-later",

@@ -13,7 +13,7 @@ export const versions = {
 } as const;
 
 import { EType, throwErr } from '@mcdjs/base/dist/errlib';
-import { BInT, Shifted, Vcb } from '@mcdjs/base/dist/types';
+import { BInT, Shifted, Vcb } from '@mcdjs/types/tool';
 
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;

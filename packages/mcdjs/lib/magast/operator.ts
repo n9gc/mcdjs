@@ -7,7 +7,6 @@
 declare module './operator';
 
 import { EType, getTracker, holdErr } from '@mcdjs/base/dist/errlib';
-import { Condition, Shifted, TypeId, Vcb } from '@mcdjs/base/dist/types';
 import {
 	AST,
 	InitedNodeAttr,
@@ -17,6 +16,8 @@ import {
 	NodeSystem,
 	SelNode,
 } from '@mcdjs/base/dist/types/nodes';
+import { Condition, TypeId } from '@mcdjs/types/game';
+import type { Shifted, Vcb } from '@mcdjs/types/tool';
 import { chCommand } from '../cmdobj';
 import { Temp } from '../struct';
 import PathInfo from './pathinfo';
