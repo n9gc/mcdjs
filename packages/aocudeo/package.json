@@ -2,9 +2,7 @@
 	"name": "aocudeo",
 	"version": "1.0.2",
 	"description": "Load your interdependent modules with the correct order.",
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"types": "./index.ts",
 	"scripts": {
 		"test": "node --enable-source-maps test/all",
 		"dev": "pnpm tsc -w",
