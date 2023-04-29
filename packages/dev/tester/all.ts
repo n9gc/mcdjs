@@ -11,7 +11,7 @@ import 'promise-snake';
 import checkrun from '../tool/checkrun';
 
 export default function def(fileList: string[]) {
-	fileList.forEachAsync(file => import(resolve(file)));
+	return fileList.forEachAsync(async file => (await import(resolve(file))).default?.());
 }
 
 checkrun(def);
