@@ -25,7 +25,14 @@
 			"inputs": [
 				"package.json",
 				"tsconfig.json",
+				"tsconfig.tsbuildinfo",
 				"lib/**"
+			]
+		},
+		"clear": {
+			"outputs": [
+				"tsconfig.tsbuildinfo",
+				"dist/**"
 			]
 		}
 	}

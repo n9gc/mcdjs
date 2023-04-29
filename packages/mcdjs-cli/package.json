@@ -7,8 +7,9 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "pnpm tsc",
+		"test": "node --enable-source-maps test/all",
 		"dev": "pnpm tsc -w",
-		"test": "node --enable-source-maps test/all"
+		"clear": "node ../../script/clear"
 	},
 	"bin": {
 		"mcdjsc": "./bin/mcdjsc"

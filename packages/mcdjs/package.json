@@ -7,8 +7,9 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "pnpm tsc",
-		"dev": "pnpm tsc -w",
 		"test": "node --enable-source-maps test/all",
+		"dev": "pnpm tsc -w",
+		"clear": "node ../../script/clear",
 		"run": "node --enable-source-maps test/run"
 	},
 	"files": [

@@ -12,6 +12,7 @@
 		"strictPropertyInitialization": true,
 		"alwaysStrict": true,
 		"noImplicitThis": true,
+		"declarationDir": "./temp",
 		"sourceMap": true
 	}
 }

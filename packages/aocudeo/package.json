@@ -4,9 +4,10 @@
 	"description": "Load your interdependent modules with the correct order.",
 	"types": "./index.ts",
 	"scripts": {
+		"build": "pnpm tsc",
 		"test": "node --enable-source-maps test/all",
 		"dev": "pnpm tsc -w",
-		"build": "pnpm tsc"
+		"clear": "node ../../script/clear"
 	},
 	"files": [
 		"*",

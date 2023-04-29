@@ -4,5 +4,11 @@
 		"noEmit": true,
 		"checkJs": true,
 		"resolveJsonModule": true,
+		"composite": true,
+		"rootDir": ".."
 	},
+	"include": [
+		".",
+		"../tsconfig.json"
+	]
 }

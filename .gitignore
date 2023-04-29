@@ -6,3 +6,4 @@ pnpm-lock.yaml
 .turbo
 * copy
 tsconfig.tsbuildinfo
+temp

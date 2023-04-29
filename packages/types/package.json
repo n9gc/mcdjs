@@ -5,7 +5,8 @@
 	"scripts": {
 		"build": "pnpm tsc",
 		"test": "node --enable-source-maps test/all",
-		"dev": "pnpm tsc -w"
+		"dev": "pnpm tsc -w",
+		"clear": "node ../../script/clear"
 	},
 	"files": [
 		"*",
