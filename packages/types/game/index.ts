@@ -6,17 +6,19 @@
  */
 declare module '.';
 
+import { Text } from '../base';
+
 /**接口标识 */
 export enum TypeId {
 	CommandRslt,
 	Selected,
 	SimTag,
 }
-// export const tranumTypeId = Text.regEnum('TypeId', TypeId, {
-// 	CommandRslt: '命令结果表示',
-// 	Selected: '选择器表示',
-// 	SimTag: '标签表示',
-// });
+Text.regData('TypeId', TypeId, {
+	CommandRslt: '命令结果表示',
+	Selected: '选择器表示',
+	SimTag: '标签表示',
+});
 
 /**命令方块类型 */
 export enum CbType {
@@ -24,11 +26,11 @@ export enum CbType {
 	Chain,
 	Repeat,
 }
-// export const tranumCbType = Text.regEnum('CbType', CbType, {
-// 	Impulse: '脉冲',
-// 	Chain: '链式',
-// 	Repeat: '重复',
-// });
+Text.regData('CbType', CbType, {
+	Impulse: '脉冲',
+	Chain: '链式',
+	Repeat: '重复',
+});
 
 // export interface RoundParsed extends Array<AST> {
 // }

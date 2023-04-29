@@ -2,7 +2,6 @@
 	"name": "@mcdjs/types",
 	"version": "1.4.0",
 	"description": "Type util for McdJS",
-	"types": "./index",
 	"scripts": {
 		"build": "pnpm tsc",
 		"test": "node --enable-source-maps test/all",

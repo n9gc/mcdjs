@@ -1,7 +1,7 @@
 /**
  * 工具类型定义模块
  * @module @mcdjs/types/tool
- * @version 1.3.4
+ * @version 1.3.5
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -67,20 +67,6 @@ export type Joined<
 		? Joined<S, F, `${R}${I}${F}`>
 		: `${R}${S[0]}`
 	);
-
-export import Enum = Enum.Enum;
-export namespace Enum {
-	/**枚举 */
-	export interface Enum {
-		[key: number | string]: number | string;
-	}
-
-	/**枚举的键 */
-	export type KeyOf<B extends Enum> = B extends B ? BInT<keyof B, string> : never;
-
-	/**枚举的值 */
-	export type ValueOf<B extends Enum> = Ased<number, B extends B ? B[KeyOf<B>] : never>;
-}
 
 /**扔掉首元素 */
 export type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
