@@ -29,10 +29,6 @@ jobs:
           pnpm i
           pnpm i
 
-      - name: Development build
+      - name: build
         run: |
-          pnpm turbo devb
-
-      - name: Production build
-        run: |
-          pnpm turbo build
+          pnpm build
