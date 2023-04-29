@@ -1,8 +1,6 @@
 {
 	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"composite": true,
-		"sourceMap": false,
-		"declarationDir": "../../temp",
-	},
+	"include": [
+		"*",
+	],
 }

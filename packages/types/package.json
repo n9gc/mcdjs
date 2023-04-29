@@ -2,11 +2,17 @@
 	"name": "@mcdjs/types",
 	"version": "1.4.0",
 	"description": "Type util for McdJS",
+	"main": "./index",
+	"module": "./index",
+	"types": "./index",
 	"scripts": {
+		"clear": "pnpm ts-node ../../script/clear",
 		"build": "pnpm tsc",
-		"test": "node --enable-source-maps test/all",
-		"dev": "pnpm tsc -w",
-		"clear": "node ../../script/clear"
+		"pretest": "pnpm run build",
+		"test": "pnpm ts-node test/all",
+		"posttest": "pnpm run clear",
+		"prepublishOnly": "pnpm run build",
+		"postpublish": "pnpm run clear"
 	},
 	"files": [
 		"*",
