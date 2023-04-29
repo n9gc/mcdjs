@@ -1,7 +1,7 @@
 /**
  * 测试导入
  * @module @mcdjs/dev/tester/import
- * @version 1.2.0
+ * @version 1.2.1
  * @license GPL-3.0-or-later
  */
 declare module './import';
@@ -27,14 +27,17 @@ const cmd = ['', ...Object.keys(tsc)].reduce((p, k) =>
 );
 
 export default async function def(
-	cfg: Parameters<typeof tester>[0]['cfg'],
-	...dirs: string[]
+	file: string | string[],
+	cfg: Parameters<typeof tester>[0]['cfg'] = {},
+	opt: Parameters<typeof tester>[0] = {},
 ) {
 	const { err, detail } = await tester(
 		{
-			file: path.join(dirNow, ...dirs),
+			disp: { path: false, stat: false },
+			file: path.join(dirNow, ...(typeof file === 'string' ? [file] : file)),
 			sign: 'cmd',
 			cfg: { ...cfg, ts: { cmd, ...cfg?.ts } },
+			...opt,
 		},
 		{
 			import() {

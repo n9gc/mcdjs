@@ -6,33 +6,10 @@
 		},
 		"test": {
 			"dependsOn": [
-				"build",
 				"^test"
 			],
 			"inputs": [
-				"dist/**",
-				"test/**",
-				"node_modules/**"
-			]
-		},
-		"build": {
-			"dependsOn": [
-				"^build"
-			],
-			"outputs": [
-				"dist/**"
-			],
-			"inputs": [
-				"package.json",
-				"tsconfig.json",
-				"tsconfig.tsbuildinfo",
-				"lib/**"
-			]
-		},
-		"clear": {
-			"outputs": [
-				"tsconfig.tsbuildinfo",
-				"dist/**"
+				"**/*.ts"
 			]
 		}
 	}
