@@ -5,6 +5,7 @@
  * @license GPL-3.0-or-later
  * @see https://github.com/n9gc/mcdjs 在线代码仓库
  */
+/// <reference types="node" />
 declare module '.';
 
 export const versions = {

@@ -1,18 +1,17 @@
 /**
  * 功能无关类型定义模块
- * @module @mcdjs/types/base
- * @version 1.0.0
+ * @module @mcdjs/base/lib/types/base
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
-declare module '.';
+declare module './base';
 
-import { Ased, BInT } from '../tool';
+import type { Ased, BInT } from './tool';
 
 export type Lang =
 	| 'en-US'
 	| 'zh-CN'
 	;
-
 
 export type SigreqObj<N extends C, C extends string, T> = { [I in N]: T } & { [I in C]?: T };
 

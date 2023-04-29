@@ -16,6 +16,7 @@ const tsc = {
 	"module": "CommonJS",
 	"moduleResolution": "Node",
 	"target": "ESNext",
+	"skipLibCheck": true,
 } as const;
 const skipKey = [
 	'noImplicitAny',
@@ -33,7 +34,7 @@ export default async function def(
 ) {
 	const { err, detail } = await tester(
 		{
-			disp: { path: false, stat: false },
+			disp: false,
 			file: path.join(dirNow, ...(typeof file === 'string' ? [file] : file)),
 			sign: 'cmd',
 			cfg: { ...cfg, ts: { cmd, ...cfg?.ts } },

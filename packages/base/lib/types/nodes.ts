@@ -1,15 +1,15 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module @mcdjs/base/lib/types/nodes
- * @version 1.0.5
+ * @version 1.0.6
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
-import type { CbType, Expression, Select, SimTag } from '@mcdjs/types/game';
-import type { AnyArr } from '@mcdjs/types/tool';
 import { Text } from '../config';
 import { holdErr } from '../errlib';
+import type { CbType, Expression, Select, SimTag } from './game';
+import type { AnyArr } from './tool';
 
 export enum NType {
 	SystemDad,

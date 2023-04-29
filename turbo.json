@@ -9,7 +9,46 @@
 				"^test"
 			],
 			"inputs": [
-				"**/*.ts"
+				"./**/*.ts"
+			]
+		},
+		"f-clear": {
+			"inputs": [
+				"./**/*.js",
+				"./**/*.js.map",
+				"./**/*.d.ts"
+			],
+			"outputs": [
+				"./**/*.js",
+				"./**/*.js.map",
+				"./**/*.d.ts"
+			],
+			"cache": false
+		},
+		"clear": {
+			"dependsOn": [
+				"^f-clear"
+			],
+			"inputs": [
+				"./**/*.js",
+				"./**/*.js.map",
+				"./**/*.d.ts"
+			],
+			"outputs": [
+				"./**/*.js",
+				"./**/*.js.map",
+				"./**/*.d.ts"
+			],
+			"cache": false
+		},
+		"build": {
+			"inputs": [
+				"./**/*.ts"
+			],
+			"outputs": [
+				"./**/*.js",
+				"./**/*.js.map",
+				"./**/*.d.ts"
 			]
 		}
 	}

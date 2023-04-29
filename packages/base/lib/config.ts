@@ -1,12 +1,12 @@
 /**
  * 配置相关
  * @module @mcdjs/base/lib/config
- * @version 5.2.2
+ * @version 5.2.3
  * @license GPL-3.0-or-later
  */
 declare module './config';
 
-import { Enum, Lang, Text as TextType } from '@mcdjs/types/base';
+import { Enum, Lang, Text as TextType } from './types/base';
 import type * as index from '.';
 import type { ArgGetErrList, EType } from './types/errors';
 

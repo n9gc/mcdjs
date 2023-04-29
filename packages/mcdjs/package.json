@@ -2,18 +2,19 @@
 	"name": "mcdjs",
 	"version": "0.9.4",
 	"description": "Using JS to program Minecraft commands",
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./lib",
+	"module": "./lib",
+	"types": "./lib",
 	"scripts": {
+		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "node --enable-source-maps test/all",
-		"dev": "pnpm tsc -w",
-		"clear": "node ../../script/clear",
-		"run": "node --enable-source-maps test/run"
+		"test": "pnpm ts-node .",
+		"prepublishOnly": "pnpm run build",
+		"postpublish": "pnpm run clear",
+		"run": "ts-node test/run"
 	},
 	"files": [
-		"dist",
+		"lib",
 		"global.d.ts",
 		"LICENSE",
 		"README.md"
@@ -39,12 +40,12 @@
 	},
 	"dependencies": {
 		"@mcdjs/base": "workspace:^",
-		"@mcdjs/types": "workspace:^",
 		"aocudeo": "workspace:^",
 		"@types/node": ""
 	},
 	"devDependencies": {
-		"promise-snake": "^1.2.2"
+		"promise-snake": "^1.2.2",
+		"devok": "workspace:^"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs#readme"
 }

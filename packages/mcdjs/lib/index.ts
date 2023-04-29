@@ -15,9 +15,9 @@ export const versions = {
 	...aocudeoVer,
 } as const;
 
-export * as config from '@mcdjs/base/dist/config';
-export * as errlib from '@mcdjs/base/dist/errlib';
-export * as types from '@mcdjs/base/dist/types';
+export * as config from '@mcdjs/base/lib/config';
+export * as errlib from '@mcdjs/base/lib/errlib';
+export * as types from '@mcdjs/base/lib/types';
 export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';

@@ -2,22 +2,24 @@
 	"name": "@mcdjs/base",
 	"version": "1.0.1",
 	"description": "Base libraries for McdJS",
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./lib",
+	"module": "./lib",
+	"types": "./lib",
 	"scripts": {
+		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "node --enable-source-maps test/all",
-		"dev": "pnpm tsc -w",
-		"clear": "node ../../script/clear"
+		"test": "pnpm ts-node .",
+		"prepublishOnly": "pnpm run build",
+		"postpublish": "pnpm run clear"
 	},
 	"files": [
-		"dist",
-		"lib",
-		"LICENSE",
-		"README.md"
+		"*",
+		"!test",
+		"!.turbo",
+		"!tsconfig.json"
 	],
 	"keywords": [
+		"error-handler",
 		"data",
 		"util",
 		"mcdjs"
@@ -32,8 +34,10 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
-		"@types/node": "",
-		"@mcdjs/types": "workspace:^"
+		"@types/node": ""
+	},
+	"devDependencies": {
+		"devok": "workspace:^"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/base#readme"
 }

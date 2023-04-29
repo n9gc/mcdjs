@@ -12,15 +12,7 @@
 
 - ## [`@mcdjs/base`](/packages/base/) 通用工具库
 
-  包含各种 McdJS 相关包需要的工具。
-
-- ## [`@mcdjs/errlib`](/packages/errlib/) 错误处理库
-
-  包含 McdJS 错误处理相关的函数和定义。
-
-- ## ## [`@mcdjs/types`](/packages/types/) 类型工具库
-
-  包含各种类型工具，十分实用。
+  本包是大部分 McdJS 相关包依赖的库。
 
 - ## [`aocudeo`](/packages/aocudeo/) 胡乱加载器
 

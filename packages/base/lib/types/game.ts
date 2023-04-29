@@ -1,12 +1,12 @@
 /**
  * 游戏相关类型定义模块
- * @module @mcdjs/types/game
- * @version 1.3.4
+ * @module @mcdjs/base/lib/types/game
+ * @version 1.3.5
  * @license GPL-3.0-or-later
  */
-declare module '.';
+declare module './game';
 
-import { Text } from '../base';
+import { Text } from './base';
 
 /**接口标识 */
 export enum TypeId {
@@ -31,9 +31,6 @@ Text.regData('CbType', CbType, {
 	Chain: '链式',
 	Repeat: '重复',
 });
-
-// export interface RoundParsed extends Array<AST> {
-// }
 
 /**命令运行结果 */
 export interface CommandRslt {

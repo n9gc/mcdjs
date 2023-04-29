@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @module @mcdjs/base/lib/errlib
- * @version 2.0.5
+ * @version 2.0.6
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
@@ -16,7 +16,7 @@ import {
 	tranumEType,
 } from './types/errors';
 import type { Node } from './types/nodes';
-import type { Text as TextType } from '@mcdjs/types/base';
+import type { Text as TextType } from './types/base';
 
 export { EType };
 
@@ -37,9 +37,10 @@ export interface ClearedErr {
 	tracker: Error;
 }
 export function clearErr(n: AllErr): ClearedErr {
-	return Object.assign(n, {
+	return {
+		...n,
 		type: tranumEType(n.type),
-	});
+	};
 }
 
 export function throwErr<T extends EType>(...ele: ArgGetErr<T>): never;

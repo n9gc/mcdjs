@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.6
+ * @version 1.2.7
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -24,7 +24,7 @@ namespace McdJSTemp {
 		}
 		export let tagExist: { [name: string]: true; } = {};
 		/**标签实体 */
-		export class Tag implements Types.SimTag {
+		export class Tag implements TGame.SimTag {
 			constructor(
 				public name = 'ranTag' + Math.floor(Math.random() * 999999),
 			) {
@@ -37,15 +37,17 @@ namespace McdJSTemp {
 			}
 		}
 	}
-	import TypeId = Types.TypeId;
-	import CommandRslt = Types.CommandRslt;
-	import Expression = Types.Expression;
-	import SelectString = Types.SelectString;
-	import Selected = Types.Selected;
-	import Condition = Types.Condition;
+	import TGame = Types.game;
+	import TTool = Types.tool;
+	import TypeId = TGame.TypeId;
+	import CommandRslt = TGame.CommandRslt;
+	import Expression = TGame.Expression;
+	import SelectString = TGame.SelectString;
+	import Selected = TGame.Selected;
+	import Condition = TGame.Condition;
 	import CRClass = Struct.CommandRsltClass;
 	import SEClass = Struct.SelectedClass;
-	import Vcb = Types.Vcb;
+	import Vcb = TTool.Vcb;
 	export import Tag = Struct.Tag;
 	export const AND = 'and';
 	export const OR = 'or';

@@ -2,12 +2,15 @@
 	"name": "aocudeo",
 	"version": "1.0.2",
 	"description": "Load your interdependent modules with the correct order.",
-	"types": "./index.ts",
+	"main": "./index",
+	"module": "./index",
+	"types": "./index",
 	"scripts": {
+		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "node --enable-source-maps test/all",
-		"dev": "pnpm tsc -w",
-		"clear": "node ../../script/clear"
+		"test": "pnpm ts-node .",
+		"prepublishOnly": "pnpm run build",
+		"postpublish": "pnpm run clear"
 	},
 	"files": [
 		"*",
@@ -22,8 +25,7 @@
 		"flow-control"
 	],
 	"dependencies": {
-		"@mcdjs/base": "workspace:^",
-		"@mcdjs/types": "workspace:^"
+		"@mcdjs/base": "workspace:^"
 	},
 	"author": "e0selmy4v",
 	"license": "GPL-3.0-or-later",
@@ -33,6 +35,9 @@
 	},
 	"bugs": {
 		"url": "https://github.com/n9gc/mcdjs/issues"
+	},
+	"devDependencies": {
+		"devok": "workspace:^"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/aocudeo#readme"
 }

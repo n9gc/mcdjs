@@ -7,6 +7,7 @@
 	},
 	"scripts": {
 		"build": "pnpm turbo build",
+		"clear": "pnpm turbo clear",
 		"test": "pnpm turbo test"
 	}
 }

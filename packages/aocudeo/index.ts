@@ -1,7 +1,7 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 1.0.2
+ * @version 1.0.3
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -12,8 +12,8 @@ export const versions = {
 	...mcdjsBaseVer,
 } as const;
 
-import { EType, throwErr } from '@mcdjs/base/dist/errlib';
-import { BInT, Shifted, Vcb } from '@mcdjs/types/tool';
+import { EType, throwErr } from '@mcdjs/base/lib/errlib';
+import { BInT, Shifted, Vcb } from '@mcdjs/base/lib/types/tool';
 
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;

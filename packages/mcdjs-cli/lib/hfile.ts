@@ -1,19 +1,22 @@
 /**
  * 文件解析处理模块
  * @module mcdjs-cli/lib/hfile
- * @version 1.0.9
+ * @version 1.0.10
  * @license GPL-3.0-or-later
  */
 declare module './hfile';
 
-import { EType, errCatcher, getTracker, trapErr } from '@mcdjs/base/dist/errlib';
-import { RoundParsed } from '@mcdjs/base/dist/types';
+import { EType, errCatcher, getTracker, trapErr } from '@mcdjs/base/lib/errlib';
+import { AST } from '@mcdjs/base/lib/types/nodes';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
-import { parse } from "mcdjs/dist/appinf";
-import 'mcdjs/dist/index';
+import 'mcdjs';
+import { parse } from "mcdjs/lib/appinf";
 import * as path from 'path';
 import 'promise-snake';
+
+export interface RoundParsed extends Array<AST> {
+}
 
 export interface ParRunInfos extends Partial<RunInfos> { }
 export class RunInfos {

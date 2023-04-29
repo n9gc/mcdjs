@@ -1,7 +1,7 @@
 /**
  * 清理目录
  * @module @mcdjs/dev/tester/all
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './clear';
@@ -22,7 +22,7 @@ const {
 
 export default function def() {
 	return snake(
-		dels(RegExp(`${goodReg(dir + path.sep)}.*(\.d\.ts|\.js|\.js\.map)$`)),
+		dels(RegExp(`${goodReg(dir + path.sep)}.*(\\.d\\.ts|\\.js|\\.js\\.map)$`)),
 		timeEnd(),
 		log<any>('Clear successfully in', time(), 'ms')
 	);

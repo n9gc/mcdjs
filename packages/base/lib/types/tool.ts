@@ -1,10 +1,10 @@
 /**
  * 工具类型定义模块
- * @module @mcdjs/types/tool
- * @version 1.3.5
+ * @module @mcdjs/base/lib/types/tool
+ * @version 1.3.6
  * @license GPL-3.0-or-later
  */
-declare module '.';
+declare module './tool';
 
 /**空回调 */
 export type Vcb = () => void;
