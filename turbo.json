@@ -4,34 +4,10 @@
 		"dev": {
 			"persistent": true
 		},
-		"devb": {
-			"dependsOn": [
-				"^devb"
-			],
-			"outputs": [
-				"dist/**"
-			],
-			"inputs": [
-				"package.json",
-				"tsconfig.json",
-				"lib/**"
-			]
-		},
 		"test": {
 			"dependsOn": [
-				"devb",
-				"^test"
-			],
-			"inputs": [
-				"dist/**",
-				"test/**",
-				"node_modules/**"
-			]
-		},
-		"prod-test": {
-			"dependsOn": [
 				"build",
-				"^prod-test"
+				"^test"
 			],
 			"inputs": [
 				"dist/**",
@@ -41,7 +17,7 @@
 		},
 		"build": {
 			"dependsOn": [
-				"devb"
+				"^build"
 			],
 			"outputs": [
 				"dist/**"

@@ -6,12 +6,10 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
-		"build": "node build -prod",
+		"build": "pnpm tsc",
 		"dev": "pnpm tsc -w",
 		"test": "node --enable-source-maps test/all",
-		"prod-test": "node test/all",
-		"run": "node --enable-source-maps test/run",
-		"devb": "node build"
+		"run": "node --enable-source-maps test/run"
 	},
 	"files": [
 		"dist",
