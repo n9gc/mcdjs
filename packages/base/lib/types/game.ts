@@ -6,7 +6,7 @@
  */
 declare module './game';
 
-import { Text } from './base';
+import { Text } from '../config';
 
 /**接口标识 */
 export enum TypeId {
@@ -14,7 +14,7 @@ export enum TypeId {
 	Selected,
 	SimTag,
 }
-Text.regData('TypeId', TypeId, {
+export const tranumTypeId = Text.regEnum('TypeId', TypeId, {
 	CommandRslt: '命令结果表示',
 	Selected: '选择器表示',
 	SimTag: '标签表示',
@@ -26,7 +26,7 @@ export enum CbType {
 	Chain,
 	Repeat,
 }
-Text.regData('CbType', CbType, {
+export const tranumCbType = Text.regEnum('CbType', CbType, {
 	Impulse: '脉冲',
 	Chain: '链式',
 	Repeat: '重复',

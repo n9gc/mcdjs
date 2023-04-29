@@ -8,8 +8,8 @@ declare module './errors';
 
 import { Text } from '../config';
 import { throwErr } from '../errlib';
-import type { Node } from './nodes';
 import type { Enum } from './base';
+import type { Node } from './nodes';
 
 export enum EType {
 	ErrNoSuchFile,

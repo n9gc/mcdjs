@@ -70,3 +70,5 @@ export type Joined<
 
 /**扔掉首元素 */
 export type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
+
+export type SigreqObj<N extends C, C extends string, T> = { [I in N]: T } & { [I in C]?: T };

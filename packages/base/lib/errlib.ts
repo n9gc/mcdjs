@@ -16,11 +16,10 @@ import {
 	tranumEType,
 } from './types/errors';
 import type { Node } from './types/nodes';
-import type { Text as TextType } from './types/base';
 
 export { EType };
 
-let trackerMap: TextType.Obj<Error>;
+let trackerMap: Text.Obj<Error>;
 function getTrackerDefault() {
 	if (trackerMap) return trackerMap;
 	trackerMap = {} as any;

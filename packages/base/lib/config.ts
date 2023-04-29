@@ -6,9 +6,10 @@
  */
 declare module './config';
 
-import { Enum, Lang, Text as TextType } from './types/base';
 import type * as index from '.';
+import type { Enum, Lang } from './types/base';
 import type { ArgGetErrList, EType } from './types/errors';
+import type { SigreqObj } from './types/tool';
 
 export const env = {
 	defaultLang: 'zh-CN',
@@ -46,9 +47,11 @@ function throwErr<T extends keyof typeof EType>(n: T, tracker: Error, ...args: A
 }
 
 export namespace Text {
-	export import Obj = TextType.Obj;
-	export import EnumTextMap = TextType.EnumTextMap;
-	export import RegArgs = TextType.RegArgs;
+	export type Obj<T = string, N extends Lang = Lang> = (N extends N ? SigreqObj<N, Lang, T> : never);
+	export type EnumTextMap<B extends Enum> = { [I in Enum.ValueOf<B>]?: Obj };
+	export type TranObj<B extends Enum> = { [I in Enum.KeyOf<B>]: Obj | string };
+	export type RegArgs<B extends Enum> = [name: string, which: B, obj: TranObj<B>];
+	export const datas: RegArgs<any>[] = [];
 	function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
 		return n;
 	}
@@ -76,7 +79,6 @@ export namespace Text {
 		}
 		return getEnumFn({ keyMap, which });
 	}
-	TextType.datas.forEach(n => regEnum(...n));
 	export function sureObj<N>(obj: Obj<N>) {
 		return obj[env.config.lang]
 			?? obj[env.defaultLang]
