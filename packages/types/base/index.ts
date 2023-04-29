@@ -6,21 +6,19 @@
  */
 declare module '.';
 
-import { BInT, Ased, Exted, InterOfUnion } from '../tool';
+import { Ased, BInT } from '../tool';
 
 export type Lang =
 	| 'en-US'
 	| 'zh-CN'
 	;
 
+
+export type SigreqObj<N extends C, C extends string, T> = { [I in N]: T } & { [I in C]?: T };
+
 export namespace Text {
-	type SigreqObj<N extends Lang> = { [I in N]: string } & { [I in Lang]?: string };
-	export type Obj<N extends Lang = Lang> = (N extends N ? SigreqObj<N> : never);
+	export type Obj<T = string, N extends Lang = Lang> = (N extends N ? SigreqObj<N, Lang, T> : never);
 	export type EnumTextMap<B extends Enum> = { [I in Enum.ValueOf<B>]?: Obj };
-	export interface EnumObj<B extends Enum> {
-		keyMap: EnumTextMap<B>;
-		which: B;
-	};
 	export type TranObj<B extends Enum> = { [I in Enum.KeyOf<B>]: Obj | string };
 	export type RegArgs<B extends Enum> = [name: string, which: B, obj: TranObj<B>];
 	export const datas: RegArgs<any>[] = [];

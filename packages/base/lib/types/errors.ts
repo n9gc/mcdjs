@@ -1,7 +1,7 @@
 /**
  * 错误类型定义模块
  * @module @mcdjs/base/lib/types/errors
- * @version 1.3.9
+ * @version 1.3.10
  * @license GPL-3.0-or-later
  */
 declare module './errors';
@@ -9,7 +9,7 @@ declare module './errors';
 import { Text } from '../config';
 import { throwErr } from '../errlib';
 import type { Node } from './nodes';
-import type { Enum } from '.';
+import type { Enum } from '@mcdjs/types/base';
 
 export enum EType {
 	ErrNoSuchFile,

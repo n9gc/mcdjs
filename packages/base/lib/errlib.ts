@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @module @mcdjs/base/lib/errlib
- * @version 2.0.4
+ * @version 2.0.5
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
@@ -16,18 +16,20 @@ import {
 	tranumEType,
 } from './types/errors';
 import type { Node } from './types/nodes';
+import type { Text as TextType } from '@mcdjs/types/base';
 
 export { EType };
 
-let trackerMap: { [env.defaultLang]: Error; } & { [I in env.OptionalLang]?: Error };
+let trackerMap: TextType.Obj<Error>;
 function getTrackerDefault() {
 	if (trackerMap) return trackerMap;
-	trackerMap = { 'zh-CN': Error() };
+	trackerMap = {} as any;
 	for (const i in Text.some.tracker) (trackerMap as any)[i] = Error((Text.some.tracker as any)[i]);
 	return trackerMap;
 }
 export function getTracker() {
-	return env.config.track ? Error() : getTrackerDefault()[env.config.lang] ?? trackerMap[env.defaultLang];
+	if (env.config.track) return Error();
+	return Text.sureObj(getTrackerDefault());
 }
 
 export interface ClearedErr {

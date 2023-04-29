@@ -1,12 +1,13 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module @mcdjs/base/lib/types/nodes
- * @version 1.0.4
+ * @version 1.0.5
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
-import type { AnyArr, CbType, Expression, Select, SimTag } from '.';
+import type { CbType, Expression, Select, SimTag } from '@mcdjs/types/game';
+import type { AnyArr } from '@mcdjs/types/tool';
 import { Text } from '../config';
 import { holdErr } from '../errlib';
 

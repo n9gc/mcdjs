@@ -31,7 +31,8 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
-		"@types/node": ""
+		"@types/node": "",
+		"@mcdjs/types": "workspace:^"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/base#readme"
 }
