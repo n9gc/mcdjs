@@ -1,6 +1,6 @@
 {
 	"name": "@mcdjs/types",
-	"version": "0.9.0",
+	"version": "1.3.3",
 	"description": "Type util for McdJS",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -11,10 +11,10 @@
 		"dev": "pnpm tsc -w"
 	},
 	"files": [
-		"dist",
-		"lib",
-		"LICENSE",
-		"README.md"
+		"*",
+		"!test",
+		"!.turbo",
+		"!tsconfig.json"
 	],
 	"keywords": [
 		"types",
@@ -29,9 +29,6 @@
 	},
 	"bugs": {
 		"url": "https://github.com/n9gc/mcdjs/issues"
-	},
-	"dependencies": {
-		"@types/node": ""
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/types#readme"
 }
