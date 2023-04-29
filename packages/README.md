@@ -3,7 +3,7 @@
 本项目使用 pnpm + truborepo 实现的 monorepo 模式，包含很多包。
 
 - ## [`mcdjs`](/packages/mcdjs) 主包
-  
+
   大部分的核心代码位于此包中。
 
 - ## [`mcdjs-cli`](/packages/mcdjs-cli/) 命令行工具
@@ -12,7 +12,11 @@
 
 - ## [`@mcdjs/base`](/packages/base/) 通用工具库
 
-  本包是大部分 McdJS 相关包依赖的库。
+  包含各种 McdJS 相关包需要的工具。
+
+- ## [`@mcdjs/errlib`](/packages/errlib/) 错误处理库
+
+  包含 McdJS 错误处理相关的函数和定义。
 
 - ## [`aocudeo`](/packages/aocudeo/) 胡乱加载器
 

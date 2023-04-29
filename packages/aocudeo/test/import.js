@@ -1,1 +1,1 @@
-require('../../../test/import')({}, __dirname, '../dist/index.js');
+require('../../../test/import')({}, __dirname, '../index.js');

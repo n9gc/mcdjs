@@ -1,31 +1,24 @@
 {
-	"name": "mcdjs-cli",
-	"version": "1.0.4",
-	"description": "Cli for McdJS",
+	"name": "@mcdjs/errlib",
+	"version": "0.9.0",
+	"description": "Util about Errors for McdJS",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "pnpm tsc",
-		"dev": "pnpm tsc -w",
-		"test": "node --enable-source-maps test/all"
-	},
-	"bin": {
-		"mcdjsc": "./bin/mcdjsc"
+		"test": "node --enable-source-maps test/all",
+		"dev": "pnpm tsc -w"
 	},
 	"files": [
-		"bin",
 		"dist",
 		"lib",
 		"LICENSE",
 		"README.md"
 	],
 	"keywords": [
-		"minecraft",
-		"command",
-		"generator",
-		"cli",
-		"complier",
+		"error-handler",
+		"util",
 		"mcdjs"
 	],
 	"author": "e0selmy4v",
@@ -38,10 +31,7 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
-		"@mcdjs/base": "workspace:^",
-		"@types/node": "",
-		"promise-snake": "^1.2.0",
-		"mcdjs": "workspace:^"
+		"@types/node": ""
 	},
-	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs-cli#readme"
+	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/errlib#readme"
 }

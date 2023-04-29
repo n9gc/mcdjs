@@ -44,5 +44,5 @@
 	"devDependencies": {
 		"promise-snake": "^1.2.2"
 	},
-	"homepage": "https://github.com/n9gc/mcdjs#readme"
+	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs#readme"
 }
