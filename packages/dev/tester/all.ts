@@ -1,6 +1,15 @@
-import '../packages/mcdjs-cli/node_modules/promise-snake';
-import { spawn, fork, ChildProcess } from 'child_process';
+/**
+ * 批量测试
+ * @module @mcdjs/dev/tester/all
+ * @version 1.2.0
+ * @license GPL-3.0-or-later
+ */
+declare module './all';
+
+import { ChildProcess, fork } from 'child_process';
 import { resolve } from 'path';
+import 'promise-snake';
+import checkrun from '../tool/checkrun';
 
 const dirNow = resolve();
 const methods: ((dir: string, n: string) => ChildProcess)[] = [
@@ -10,7 +19,7 @@ const methods: ((dir: string, n: string) => ChildProcess)[] = [
 ];
 const method = methods[0];
 
-export default function (fileList: string[]) {
+export default function def(fileList: string[]) {
 	return Promise.snake(fileList.map(n =>
 		(res, rej) => method(dirNow, n)
 			.on('message', i => console.log(`From ${n}:`, i))
@@ -26,3 +35,5 @@ export default function (fileList: string[]) {
 		},
 	);
 }
+
+checkrun(def);

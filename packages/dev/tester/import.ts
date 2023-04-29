@@ -1,7 +1,14 @@
-// import { compilerOptions as tsc } from '../tsconfig.json';
-/// <reference types="../packages/mcdjs-cli/node_modules/@types/node" />
+/**
+ * 测试导入
+ * @module @mcdjs/dev/tester/import
+ * @version 1.2.0
+ * @license GPL-3.0-or-later
+ */
+declare module './import';
+
 import tester = require('export-tester');
 import * as path from 'path';
+import checkrun from '../tool/checkrun';
 
 const dirNow = path.resolve();
 
@@ -19,7 +26,7 @@ const cmd = ['', ...Object.keys(tsc)].reduce((p, k) =>
 	skipKey.includes(k) ? p : `${p} --${k} ${tsc[k] === true ? '' : tsc[k]}`
 );
 
-export default async function (
+export default async function def(
 	cfg: Parameters<typeof tester>[0]['cfg'],
 	...dirs: string[]
 ) {
@@ -38,3 +45,5 @@ export default async function (
 	err && process.send?.(detail);
 	process.exit(err);
 }
+
+checkrun(def);

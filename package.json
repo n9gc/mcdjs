@@ -1,11 +1,9 @@
 {
 	"private": true,
 	"devDependencies": {
-		"export-tester": "^1.0.11",
 		"turbo": "^1.9.3",
 		"typescript": "^5.0.4",
-		"ts-node": "^10.9.1",
-		"lethal-build": "^1.3.2"
+		"ts-node": "^10.9.1"
 	},
 	"scripts": {
 		"build": "pnpm turbo build",
