@@ -11,10 +11,10 @@
 		"build": "pnpm tsc"
 	},
 	"files": [
-		"dist",
-		"lib",
-		"LICENSE",
-		"README.md"
+		"*",
+		"!test",
+		"!.turbo",
+		"!tsconfig.json"
 	],
 	"keywords": [
 		"pipeline",
