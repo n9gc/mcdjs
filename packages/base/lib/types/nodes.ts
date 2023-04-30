@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module @mcdjs/base/lib/types/nodes
- * @version 1.0.7
+ * @version 1.0.8
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
@@ -9,7 +9,6 @@ declare module './nodes';
 import { regEnum } from '../config/text';
 import { holdErr } from '../errlib';
 import type { CbType, Expression, Select, SimTag } from './game';
-import type { AnyArr } from './tool';
 
 export enum NType {
 	SystemDad,
@@ -46,17 +45,6 @@ export const tranumNType = regEnum('NType', NType, {
 	ExpressionXnor: '同或表达式',
 });
 export type NTypeKey = keyof typeof NType;
-export function isNType(n: string): n is NTypeKey {
-	return typeof NType[n as any] === 'number';
-}
-export function eachNType<T>(cb: (value: number, key: NTypeKey) => T): T[] {
-	const rslt = [];
-	let i = 0;
-	while (i in NType) rslt.push(cb(i, NType[i++] as NTypeKey));
-	return rslt;
-}
-export const keyNType = eachNType((_, k) => k) as AnyArr<NTypeKey>;
-export const valueNType = eachNType((v => v)) as readonly NType[];
 export interface Node {
 	ntype: NType;
 	index: number;
