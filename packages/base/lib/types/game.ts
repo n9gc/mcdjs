@@ -1,12 +1,12 @@
 /**
  * 游戏相关类型定义模块
  * @module @mcdjs/base/lib/types/game
- * @version 1.3.5
+ * @version 1.3.6
  * @license GPL-3.0-or-later
  */
 declare module './game';
 
-import { Text } from '../config';
+import { regEnum } from '../config/text';
 
 /**接口标识 */
 export enum TypeId {
@@ -14,7 +14,7 @@ export enum TypeId {
 	Selected,
 	SimTag,
 }
-export const tranumTypeId = Text.regEnum('TypeId', TypeId, {
+export const tranumTypeId = regEnum('TypeId', TypeId, {
 	CommandRslt: '命令结果表示',
 	Selected: '选择器表示',
 	SimTag: '标签表示',
@@ -26,7 +26,7 @@ export enum CbType {
 	Chain,
 	Repeat,
 }
-export const tranumCbType = Text.regEnum('CbType', CbType, {
+export const tranumCbType = regEnum('CbType', CbType, {
 	Impulse: '脉冲',
 	Chain: '链式',
 	Repeat: '重复',

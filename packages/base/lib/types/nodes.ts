@@ -1,12 +1,12 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module @mcdjs/base/lib/types/nodes
- * @version 1.0.6
+ * @version 1.0.7
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
-import { Text } from '../config';
+import { regEnum } from '../config/text';
 import { holdErr } from '../errlib';
 import type { CbType, Expression, Select, SimTag } from './game';
 import type { AnyArr } from './tool';
@@ -28,7 +28,7 @@ export enum NType {
 	ExpressionXor,
 	ExpressionXnor,
 }
-export const tranumNType = Text.regEnum('NType', NType, {
+export const tranumNType = regEnum('NType', NType, {
 	SystemDad: '指令系统的父节点',
 	System: '指令系统',
 	CodeBlock: '代码块',

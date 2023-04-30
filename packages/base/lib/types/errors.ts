@@ -1,12 +1,12 @@
 /**
  * 错误类型定义模块
  * @module @mcdjs/base/lib/types/errors
- * @version 1.3.11
+ * @version 1.3.12
  * @license GPL-3.0-or-later
  */
 declare module './errors';
 
-import { Text } from '../config';
+import { regEnum } from '../config/text';
 import { throwErr } from '../errlib';
 import type { Enum } from './base';
 import type { Node } from './nodes';
@@ -24,7 +24,7 @@ export enum EType {
 	ErrNoEnumText,
 	ErrUnregisteredEnum,
 }
-export const tranumEType = Text.regEnum('EType', EType, {
+export const tranumEType = regEnum('EType', EType, {
 	ErrNoSuchFile: {
 		'zh-CN': '找不到文件',
 		'en-US': 'Cannot find such file',

@@ -1,12 +1,13 @@
 /**
  * 错误处理模块
  * @module @mcdjs/base/lib/errlib
- * @version 2.0.6
+ * @version 2.0.7
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
 
-import { Text, env } from './config';
+import env from './config/env';
+import { Obj, some, sureObj } from './config/text';
 import {
 	AllErr,
 	ArgGetErr,
@@ -19,16 +20,16 @@ import type { Node } from './types/nodes';
 
 export { EType };
 
-let trackerMap: Text.Obj<Error>;
+let trackerMap: Obj<Error>;
 function getTrackerDefault() {
 	if (trackerMap) return trackerMap;
 	trackerMap = {} as any;
-	for (const i in Text.some.tracker) (trackerMap as any)[i] = Error((Text.some.tracker as any)[i]);
+	for (const i in some.tracker) (trackerMap as any)[i] = Error((some.tracker as any)[i]);
 	return trackerMap;
 }
 export function getTracker() {
 	if (env.config.track) return Error();
-	return Text.sureObj(getTrackerDefault());
+	return sureObj(getTrackerDefault());
 }
 
 export interface ClearedErr {
