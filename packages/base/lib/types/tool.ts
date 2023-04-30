@@ -1,7 +1,7 @@
 /**
  * 工具类型定义模块
  * @module @mcdjs/base/lib/types/tool
- * @version 1.4.0
+ * @version 1.4.2
  * @license GPL-3.0-or-later
  */
 declare module './tool';
@@ -20,6 +20,9 @@ export type Exted<C extends D, D> = C;
 
 /**保证 {@link T} 被 {@link N} 包含 */
 export type Ased<N, T> = BInT<T, N>;
+
+/**类似于 `infer N notExtends T` */
+export type Shred<N, T> = N extends T ? never : N;
 
 /**任意数组 */
 export type AnyArr<T = any> = readonly T[];
@@ -53,12 +56,9 @@ type OneOfUnion<N> = InterOfUnion<N extends N ? () => N : 0> extends () => infer
 export type EachOfUnion<
 	N,
 	R extends any[] = []>
-	= ([N] extends [never]
-		? R
-		: (OneOfUnion<N> extends infer K
-			? EachOfUnion<Exclude<N, K>, [...R, K]>
-			: []
-		)
+	= ({ s: OneOfUnion<N>; } extends Shred<{ s: infer K; }, { s: never; }>
+		? EachOfUnion<Exclude<N, K>, [K, ...R]>
+		: R
 	);
 
 /**由元组 {@link L} 中元素构成的不重复数组 */
@@ -130,4 +130,4 @@ type RevedArrLtd<
 export type RevedArr<T extends AnyArr> = SWArray<T> extends SWTmpl<infer R> ? [...RevedArrLtd<R[2]>, ...R[1], ...RevedArrLtd<R[0]>] : never;
 
 /**{@link Object.keys} 得到的结果 */
-export type KeyArrayOf<T> = RevedArr<EachOfUnion<keyof T>>
+export type KeyArrayOf<T> = EachOfUnion<keyof T>;
