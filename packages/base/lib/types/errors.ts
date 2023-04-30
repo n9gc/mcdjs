@@ -1,29 +1,54 @@
 /**
  * 错误类型定义模块
  * @module @mcdjs/base/lib/types/errors
- * @version 1.3.12
+ * @version 1.4.0
  * @license GPL-3.0-or-later
  */
 declare module './errors';
 
 import { regEnum } from '../config/text';
 import { throwErr } from '../errlib';
-import type { Enum } from './base';
+import { Enum } from './base';
 import type { Node } from './nodes';
+import type { KeyArrayOf } from './tool';
 
-export enum EType {
-	ErrNoSuchFile,
-	ErrNoParser,
-	ErrNoSuchErr,
-	ErrCannotBeImported,
-	ErrUseBeforeDefine,
-	ErrCannotBeSeted,
-	ErrIllegalParameter,
-	ErrForgetPathInfo,
-	ErrIllegalVisitorName,
-	ErrNoEnumText,
-	ErrUnregisteredEnum,
-}
+export const errs = {
+	ErrNoSuchFile: (files: string[]) => ({
+		files,
+	}),
+	ErrNoParser: () => ({}),
+	ErrNoSuchErr: (throwTracker: Error) => ({
+		throwTracker,
+	}),
+	ErrCannotBeImported: (moduleName: string) => ({
+		moduleName,
+	}),
+	ErrUseBeforeDefine: (varName: string) => ({
+		varName,
+	}),
+	ErrCannotBeSeted: (varName: string) => ({
+		varName,
+	}),
+	ErrIllegalParameter: (args: IArguments | readonly any[]) => ({
+		args,
+	}),
+	ErrForgetPathInfo: (node: Node) => ({
+		node,
+	}),
+	ErrIllegalVisitorName: (name: string) => ({
+		name,
+	}),
+	ErrNoEnumText: (enumDomain: string, enumNumber: number) => ({
+		enumDomain,
+		enumNumber,
+	}),
+	ErrUnregisteredEnum: (enumObj: Enum) => ({
+		enumObj,
+	}),
+} as const;
+export const EType = Enum.from(Object.keys(errs) as KeyArrayOf<typeof errs>);
+export type ETypeKey = Enum.KeyOf<typeof EType>;
+export type EType<K extends ETypeKey = ETypeKey> = Enum.ValueOf<typeof EType, K>;
 export const tranumEType = regEnum('EType', EType, {
 	ErrNoSuchFile: {
 		'zh-CN': '找不到文件',
@@ -61,91 +86,22 @@ export const tranumEType = regEnum('EType', EType, {
 	ErrNoEnumText: '找不到枚举对应的文本',
 	ErrUnregisteredEnum: '使用了未被注册的枚举',
 });
-export interface Err {
+export interface ErrBase {
 	type: EType;
 	tracker: Error;
 }
-export interface ErrNoSuchFile extends Err {
-	type: EType.ErrNoSuchFile;
-	files: string[];
-}
-export interface ErrNoParser extends Err {
-	type: EType.ErrNoParser;
-}
-export interface ErrNoSuchErr extends Err {
-	type: EType.ErrNoSuchErr;
-	throwTracker: Error;
-}
-export interface ErrCannotBeImported extends Err {
-	type: EType.ErrCannotBeImported;
-	module: string;
-}
-export interface ErrUseBeforeDefine extends Err {
-	type: EType.ErrUseBeforeDefine;
-	varName: string;
-}
-export interface ErrCannotBeSeted extends Err {
-	type: EType.ErrCannotBeSeted;
-	varName: string;
-}
-export interface ErrIllegalParameter extends Err {
-	type: EType.ErrIllegalParameter;
-	args: IArguments | readonly any[];
-}
-export interface ErrForgetPathInfo extends Err {
-	type: EType.ErrForgetPathInfo;
-	node: Node;
-}
-export interface ErrIllegalVisitorName extends Err {
-	type: EType.ErrIllegalVisitorName;
-	name: string;
-}
-export interface ErrNoEnumText extends Err {
-	type: EType.ErrNoEnumText;
-	enumDomain: string;
-	enumNumber: number;
-}
-export interface ErrUnregisteredEnum extends Err {
-	type: EType.ErrUnregisteredEnum;
-	enumObj: Enum;
-}
-export type AllFnErr =
-	| ErrNoSuchFile
-	| ErrNoParser
-	| ErrNoSuchErr
-	| ErrCannotBeImported
-	| ErrUseBeforeDefine
-	| ErrCannotBeSeted
-	| ErrIllegalParameter
-	| ErrForgetPathInfo
-	| ErrIllegalVisitorName
-	| ErrNoEnumText
-	| ErrUnregisteredEnum
-	;
-export type SelErr<T extends EType> = AllFnErr & { type: T; };
-export type AllErr = AllFnErr | Err;
+export type Err<T extends EType = any> = ReturnType<typeof errs[typeof EType[T]]> & ErrBase;
 
 export type ArgGetErr<T extends EType> = [type: T, tracker: Error, ...ele: ArgGetErrList[T]];
-export type ArgGetErrList = { [I in EType]: Parameters<typeof GetErrFns[I]> };
-export const GetErrFns = [
-	(files: string[]) => ({ files }),
-	() => ({}),
-	(throwTracker: Error) => ({ throwTracker }),
-	(module: string) => ({ module }),
-	(varName: string) => ({ varName }),
-	(varName: string) => ({ varName }),
-	(args: IArguments | readonly any[]) => ({ args }),
-	(node: Node) => ({ node }),
-	(name: string) => ({ name }),
-	(enumDomain: string, enumNumber: number) => ({ enumDomain, enumNumber }),
-	(enumObj: Enum) => ({ enumObj }),
-] as const;
+export type ArgGetErrList = { [I in EType]: Parameters<typeof errs[typeof EType[I]]> };
 export function GetErr<B extends EType>(...pele: ArgGetErr<B>) {
 	const [type, tracker, ...args] = pele;
-	if (type in GetErrFns) return {
+	const typeName = EType[type];
+	if (!(typeName in EType)) return throwErr(EType.ErrNoSuchErr, pele[1], Error());
+	const fn = errs[typeName] as (...n: typeof args) => Omit<Err<B>, keyof ErrBase>;
+	return {
 		type,
-		...(GetErrFns[type] as any)(...args),
+		...fn(...args),
 		tracker,
-	} as SelErr<B>;
-	return throwErr(EType.ErrNoSuchErr, pele[1], Error());
+	} as Err<B>;
 }

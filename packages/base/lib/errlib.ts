@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @module @mcdjs/base/lib/errlib
- * @version 2.0.7
+ * @version 2.0.8
  * @license GPL-3.0-or-later
  */
 declare module './errlib';
@@ -9,11 +9,10 @@ declare module './errlib';
 import env from './config/env';
 import { Obj, some, sureObj } from './config/text';
 import {
-	AllErr,
 	ArgGetErr,
 	EType,
+	Err,
 	GetErr,
-	SelErr,
 	tranumEType,
 } from './types/errors';
 import type { Node } from './types/nodes';
@@ -36,7 +35,7 @@ export interface ClearedErr {
 	type: string;
 	tracker: Error;
 }
-export function clearErr(n: AllErr): ClearedErr {
+export function clearErr(n: Err): ClearedErr {
 	return {
 		...n,
 		type: tranumEType(n.type),
@@ -44,8 +43,8 @@ export function clearErr(n: AllErr): ClearedErr {
 }
 
 export function throwErr<T extends EType>(...ele: ArgGetErr<T>): never;
-export function throwErr(err: AllErr): never;
-export function throwErr<T extends EType>(...args: [AllErr] | ArgGetErr<T>): never {
+export function throwErr(err: Err): never;
+export function throwErr<T extends EType>(...args: [Err] | ArgGetErr<T>): never {
 	const [err] = args;
 	if (typeof err !== 'object') return throwErr(GetErr(...args as ArgGetErr<T>));
 	const c = clearErr(err);
@@ -54,9 +53,9 @@ export function throwErr<T extends EType>(...args: [AllErr] | ArgGetErr<T>): nev
 	else throw c;
 }
 
-export const errCatcher = (err: AllErr) => throwErr(err);
+export const errCatcher = (err: Err) => throwErr(err);
 
-export function trapErr<T extends EType>(rej: (err: SelErr<T>) => void, ...eles: ArgGetErr<T>) {
+export function trapErr<T extends EType>(rej: (err: Err<T>) => void, ...eles: ArgGetErr<T>) {
 	return () => rej(GetErr(...eles));
 }
 
