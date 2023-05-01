@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "1.0.2",
+	"version": "1.0.5",
 	"description": "Load your interdependent modules with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -24,9 +24,6 @@
 		"modules",
 		"flow-control"
 	],
-	"dependencies": {
-		"@mcdjs/base": "workspace:^"
-	},
 	"author": "e0selmy4v",
 	"license": "GPL-3.0-or-later",
 	"repository": {

@@ -1,22 +1,29 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 1.0.3
+ * @version 1.0.5
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-import { versions as mcdjsBaseVer } from '@mcdjs/base';
-export const versions = {
-	aocudeo: '1.0.2',
-	...mcdjsBaseVer,
-} as const;
-
-import { EType, throwErr } from '@mcdjs/base/lib/errlib';
-import { BInT, Shifted, Vcb } from '@mcdjs/base/lib/types/tool';
-
+type Shifted<T extends readonly any[]> = T extends readonly [any, ...infer T] ? T : T;
+type Vcb = () => void;
+type BInT<T, B> = T extends B ? T : never;
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;
+
+export enum ErrorType {
+	UseBeforeDefine,
+	CannotBeSeted,
+}
+
+type ErrorHandler = (errorType: ErrorType, trakcer: Error, info: string) => never;
+let throwError: ErrorHandler = (errorType, tracker, info) => {
+	throw { errorType, info, tracker };
+};
+export function setErrorHandler(handler: ErrorHandler) {
+	throwError = handler;
+}
 
 export default class ChainList {
 	private list = new Map([['pole', 'pole']]);
@@ -65,7 +72,7 @@ export default class ChainList {
 				this.act(),
 				key in n
 					? n[key]
-					: throwErr(EType.ErrUseBeforeDefine, Error(), key)
+					: throwError(ErrorType.UseBeforeDefine, Error(), key)
 			);
 		return this.getProp(n, key);
 	};
@@ -74,7 +81,7 @@ export default class ChainList {
 		keys.forEach(key => {
 			keyMap[key] = {
 				get: () => this.getProp(ori, key),
-				set: () => throwErr(EType.ErrCannotBeSeted, Error(), key),
+				set: () => throwError(ErrorType.CannotBeSeted, Error(), key),
 			};
 		});
 		Object.defineProperties(mod, keyMap);
