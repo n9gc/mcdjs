@@ -39,7 +39,6 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
-		"@mcdjs/base": "workspace:^",
 		"aocudeo": "workspace:^",
 		"@types/node": ""
 	},
