@@ -1,21 +1,21 @@
 /**
  * 错误处理模块
- * @module @mcdjs/base/lib/errlib
- * @version 2.0.8
+ * @module mcdjs/lib/errlib
+ * @version 2.0.9
  * @license GPL-3.0-or-later
  */
-declare module './errlib';
+declare module '.';
 
-import env from './config/env';
-import { Obj, some, sureObj } from './config/text';
+import env from '../config/env';
+import { Obj, some, sureObj } from '../config/text';
+import type { Node } from '../magast/nodes';
 import {
 	ArgGetErr,
 	EType,
 	Err,
 	GetErr,
 	tranumEType,
-} from './types/errors';
-import type { Node } from './types/nodes';
+} from './errors';
 
 export { EType };
 

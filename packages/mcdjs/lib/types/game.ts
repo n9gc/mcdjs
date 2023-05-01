@@ -1,7 +1,7 @@
 /**
  * 游戏相关类型定义模块
- * @module @mcdjs/base/lib/types/game
- * @version 1.3.6
+ * @module mcdjs/lib/types/game
+ * @version 1.3.7
  * @license GPL-3.0-or-later
  */
 declare module './game';

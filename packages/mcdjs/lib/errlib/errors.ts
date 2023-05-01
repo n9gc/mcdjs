@@ -1,16 +1,16 @@
 /**
  * 错误类型定义模块
- * @module @mcdjs/base/lib/types/errors
- * @version 1.4.0
+ * @module mcdjs/lib/errlib/errors
+ * @version 1.4.1
  * @license GPL-3.0-or-later
  */
 declare module './errors';
 
 import { regEnum } from '../config/text';
 import { throwErr } from '../errlib';
-import { Enum } from './base';
-import type { Node } from './nodes';
-import type { KeyArrayOf } from './tool';
+import type { Node } from '../magast/nodes';
+import { Enum } from '../types/base';
+import type { KeyArrayOf } from '../types/tool';
 
 export const errs = {
 	ErrNoSuchFile: (files: string[]) => ({

@@ -1,7 +1,7 @@
 /**
  * 功能无关类型定义模块
- * @module @mcdjs/base/lib/types/base
- * @version 1.2.0
+ * @module mcdjs/lib/types/base
+ * @version 1.2.1
  * @license GPL-3.0-or-later
  */
 declare module './base';

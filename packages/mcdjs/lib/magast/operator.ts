@@ -1,13 +1,16 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.0.5
+ * @version 1.0.6
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
-import { EType, getTracker, holdErr } from '@mcdjs/base/lib/errlib';
-import { Condition, TypeId } from '@mcdjs/base/lib/types/game';
+import { chCommand } from '../cmdobj';
+import { EType, getTracker, holdErr } from '../errlib';
+import { Temp } from '../struct';
+import { Condition, TypeId } from '../types/game';
+import { Shifted, Vcb } from '../types/tool';
 import {
 	AST,
 	InitedNodeAttr,
@@ -16,10 +19,7 @@ import {
 	NodeCodeBlock,
 	NodeSystem,
 	SelNode,
-} from '@mcdjs/base/lib/types/nodes';
-import { Shifted, Vcb } from '@mcdjs/base/lib/types/tool';
-import { chCommand } from '../cmdobj';
-import { Temp } from '../struct';
+} from './nodes';
 import PathInfo from './pathinfo';
 
 export default class Operator {

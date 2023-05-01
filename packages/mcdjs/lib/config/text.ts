@@ -1,7 +1,7 @@
 /**
  * 文本配置处理相关
- * @module @mcdjs/base/lib/config/text
- * @version 1.0.0
+ * @module mcdjs/lib/config/text
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './text';

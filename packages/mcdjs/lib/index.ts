@@ -7,19 +7,15 @@
  */
 declare module '.';
 
-import { versions as mcdjsBaseVer } from '@mcdjs/base';
-import { versions as aocudeoVer } from 'aocudeo';
 export const versions = {
 	mcdjs: '0.9.4',
-	...mcdjsBaseVer,
-	...aocudeoVer,
 } as const;
 
-export * as config from '@mcdjs/base/lib/config';
-export * as errlib from '@mcdjs/base/lib/errlib';
-export * as types from '@mcdjs/base/lib/types';
 export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';
+export * as config from './config';
+export * as errlib from './errlib';
 export * as magast from './magast';
 export * as transf from './transf';
+export * as types from './types';

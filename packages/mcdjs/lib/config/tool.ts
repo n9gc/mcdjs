@@ -1,13 +1,13 @@
 /**
  * 配置相关辅助模块
- * @module @mcdjs/base/lib/config/tool
- * @version 1.0.1
+ * @module mcdjs/lib/config/tool
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './tool';
 
 import type * as index from '..';
-import type { ArgGetErrList, EType, ETypeKey } from '../types/errors';
+import type { ArgGetErrList, EType, ETypeKey } from '../errlib/errors';
 
 export function getImp() {
 	return getImp.Imp || (getImp.Imp = require('..'));

@@ -1,7 +1,7 @@
 /**
  * 元配置相关
- * @module @mcdjs/base/lib/config/env
- * @version 1.0.0
+ * @module mcdjs/lib/config/env
+ * @version 1.0.1
  * @license GPL-3.0-or-later
  */
 declare module './env';

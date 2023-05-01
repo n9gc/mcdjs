@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 3.0.3
+ * @version 3.0.4
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -21,9 +21,9 @@ declare global {
 	function McdJSTempGet(): typeof McdJSTemp;
 }
 
-import * as Types from '@mcdjs/base/lib/types';
-import * as Index from '.';
 import ChainList from 'aocudeo';
+import * as Index from '.';
+import * as Types from './types';
 import glo = globalThis;
 
 glo.McdJSTemp = {

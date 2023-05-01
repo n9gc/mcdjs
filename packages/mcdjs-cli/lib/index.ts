@@ -1,16 +1,14 @@
 /**
  * 命令行工具模块
  * @module mcdjs-cli
- * @version 1.0.5
+ * @version 1.0.6
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-import { versions as mcdjsBaseVer } from '@mcdjs/base';
 import { versions as mcdjsVer } from 'mcdjs';
 export const versions = {
 	'mcdjs-cli': '1.0.5',
-	...mcdjsBaseVer,
 	...mcdjsVer,
 } as const;
 

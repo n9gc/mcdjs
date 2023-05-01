@@ -1,7 +1,7 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.2.2
+ * @version 1.2.3
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -11,8 +11,7 @@ import {
 	NType,
 	NodeExpression,
 	SelNode,
-} from '@mcdjs/base/lib/types/nodes';
-import { getNodesVisited } from '@mcdjs/base/lib/types/transf';
+} from '../magast/nodes';
 import Operator from '../magast/operator';
 import PathInfo from '../magast/pathinfo';
 import internalCmd2cb from './internal-cmd2cb';
@@ -22,6 +21,7 @@ import {
 	Visitor,
 	VisitorFn,
 	VisitorObj,
+	getNodesVisited,
 } from './types';
 
 export const modules = [
