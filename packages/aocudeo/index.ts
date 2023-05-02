@@ -1,66 +1,51 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 1.1.0
+ * @version 2.0.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-type Shifted<T extends readonly any[]> = T extends readonly [any, ...infer T] ? T : T;
+type AnyArr<T = any> = readonly T[];
+type Shifted<T extends AnyArr> = T extends readonly [any, ...infer T] ? T : T;
 type Vcb = () => void;
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;
-
-export enum ErrorType {
-	UseBeforeDefine,
-	CannotBeSeted,
+type Id = string | symbol;
+interface PosInfo {
+	after?: AnyArr<Id> | Id;
 }
-
-type ErrorHandler = (errorType: ErrorType, trakcer: Error, info: string) => never;
-let throwError: ErrorHandler = (errorType, tracker, info) => {
-	throw { errorType, info, tracker };
-};
-export function setErrorHandler(handler: ErrorHandler) {
-	throwError = handler;
+interface DepInfo {
+	count: number;
+	id: Id;
 }
-
+const EXIST = Symbol();
+function noMulti(arr: Id | AnyArr<Id> = [], rslt: Id[] = []) {
+	const map: { [x: Id]: symbol; } = {};
+	rslt.forEach(n => map[n] = EXIST);
+	(typeof arr === 'object'
+		? arr
+		: [arr]
+	).forEach(n => map[n] === EXIST
+		|| (map[n] = EXIST, rslt.push(n))
+	);
+	return rslt;
+}
 export default class ChainList {
-	private list = new Map([['pole', 'pole']]);
-	private listRev = new Map([['pole', 'pole']]);
-	private actions = new Map<string, Vcb>;
-	private waiting = new Map<string, ArgAll[]>;
-	protected insertAllType(...args: ArgAll[]): this {
-		if (!args.length) return this;
-		const [[rev, pos, name, action], ...argsNext] = args;
-		this.actions.set(name, action);
-		const [l0, l1] = rev ? [this.listRev, this.list] : [this.list, this.listRev];
-		const n = l0.get(pos);
-		if (!n) {
-			let argList: ArgAll[];
-			this.waiting.has(pos)
-				? argList = this.waiting.get(pos)!
-				: this.waiting.set(pos, argList = []);
-			argList.push(args[0]);
-			return this;
-		}
-		l0.set(pos, name);
-		l0.set(name, n);
-		l1.set(n, name);
-		l1.set(name, pos);
-		return this.insertAllType(...argsNext, ...(this.waiting.get(name) ?? []));
+	static START = Symbol();
+	private actMap: { [id: Id]: Vcb; } = Object.create(null);
+	private postListMap: { [id: Id]: DepInfo[]; } = Object.create(null);
+	private infoStart: DepInfo = { id: ChainList.START, count: 1 };
+	insert(pos: PosInfo, id: Id, act: Vcb) {
+		this.actMap[id] = act;
+		const afters = noMulti(pos.after, [ChainList.START]);
+		const depInfo: DepInfo = { id, count: afters.length };
+		afters.forEach(n => (this.postListMap[n] || (this.postListMap[n] = [])).push(depInfo));
 	}
-	insertAfter(...args: Arg) {
-		return this.insertAllType([false, ...args]);
-	}
-	insertBefore(...args: Arg) {
-		return this.insertAllType([true, ...args]);
-	}
-	load() {
-		let now = this.list.get('pole');
-		while (now && now !== 'pole') {
-			this.actions.get(now)?.();
-			this.actions.delete(now);
-			now = this.list.get(now);
-		}
+	load = (depInfo = this.infoStart) => {
+		if (--depInfo.count) return;
+		const { id } = depInfo;
+		this.actMap[id]?.();
+		this.postListMap[id]?.forEach(this.load);
 	}
 }
