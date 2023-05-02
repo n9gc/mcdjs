@@ -1,14 +1,13 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 1.0.5
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
 type Shifted<T extends readonly any[]> = T extends readonly [any, ...infer T] ? T : T;
 type Vcb = () => void;
-type BInT<T, B> = T extends B ? T : never;
 type ArgAll = [rev: boolean, pos: string, name: string, action: Vcb];
 type Arg = Shifted<ArgAll>;
 
@@ -56,35 +55,12 @@ export default class ChainList {
 	insertBefore(...args: Arg) {
 		return this.insertAllType([true, ...args]);
 	}
-	protected act() {
+	load() {
 		let now = this.list.get('pole');
 		while (now && now !== 'pole') {
 			this.actions.get(now)?.();
 			this.actions.delete(now);
 			now = this.list.get(now);
 		}
-	}
-	private getProp = <T extends {}, K extends BInT<keyof T, string>>(n: T, key: K): T[K] => {
-		this.act();
-		this.getProp = (n, key) => key in n
-			? n[key]
-			: (
-				this.act(),
-				key in n
-					? n[key]
-					: throwError(ErrorType.UseBeforeDefine, Error(), key)
-			);
-		return this.getProp(n, key);
-	};
-	setGetter<T extends {}>(mod: T, ori: T, keys: BInT<keyof T, string>[]) {
-		const keyMap: PropertyDescriptorMap = {};
-		keys.forEach(key => {
-			keyMap[key] = {
-				get: () => this.getProp(ori, key),
-				set: () => throwError(ErrorType.CannotBeSeted, Error(), key),
-			};
-		});
-		Object.defineProperties(mod, keyMap);
-		return this;
 	}
 }

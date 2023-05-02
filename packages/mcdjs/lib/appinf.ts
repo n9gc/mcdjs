@@ -1,14 +1,14 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.1.1
+ * @version 1.1.2
  * @license GPL-3.0-or-later
  */
 declare module './appinf';
 
+import Temp from './alload';
 import { Operator } from './magast';
 import transform from './transf';
-import { Temp } from './cmdobj';
 
 const globalExcludeKeys: (keyof typeof Temp)[] = [
 	'Imp',

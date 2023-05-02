@@ -1,7 +1,7 @@
 /**
  * 工具类型定义模块
  * @module mcdjs/lib/types/tool
- * @version 1.4.3
+ * @version 1.4.5
  * @license GPL-3.0-or-later
  */
 declare module './tool';
@@ -26,6 +26,9 @@ export type Shred<N, T> = N extends T ? never : N;
 
 /**任意数组 */
 export type AnyArr<T = any> = readonly T[];
+
+/**数组或不是数组 */
+export type MayArr<T> = AnyArr<T> | T;
 
 /**广义的数字类型 */
 export type WideNum = number | bigint;
