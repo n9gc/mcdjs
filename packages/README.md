@@ -8,7 +8,7 @@
 
 - ## [`mcdjs-cli`](/packages/mcdjs-cli/) 命令行工具
 
-  就像 `webpack` 与 `webpack-cli` 的关系一样，安装本包不会附带安装主包，但是如果不安装本包，你就无法在终端中输入命令来使用 McdJS 。
+  在主包 `mcdjs` 的基础上，本包提供了在终端中输入命令来使用 McdJS 相关的命令行工具。
 
 - ## [`aocudeo`](/packages/aocudeo/) 胡乱加载器
 
