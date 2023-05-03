@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "Load your interdependent modules with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -11,6 +11,9 @@
 		"test": "pnpm ts-node .",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"
+	},
+	"publishConfig": {
+		"scripts": {}
 	},
 	"files": [
 		"*",
