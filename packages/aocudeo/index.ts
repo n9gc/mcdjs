@@ -1,7 +1,7 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 2.1.0
+ * @version 2.1.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -44,8 +44,9 @@ export default class ChainList {
 	addAct(id: Id, act: MayArr<Vcb>) {
 		(this.actMap[id] || (this.actMap[id] = []))
 			.push(...(typeof act === 'function' ? [act] : act));
+		return this;
 	}
-	insert(pos: PosInfo, id: Id, act: MayArr<Vcb> | null = null) {
+	insert(id: Id, pos: PosInfo, act: MayArr<Vcb> | null = null) {
 		act && this.addAct(id, act);
 		const afters = noMulti(pos.after, [ChainList.START]);
 		this.plusCount(id, afters.length);
@@ -53,6 +54,7 @@ export default class ChainList {
 		const befores = noMulti(pos.before, [ChainList.END]);
 		befores.forEach(n => this.plusCount(n));
 		this.getList(id).push(...befores);
+		return this;
 	}
 	load = (id: Id = ChainList.START) => {
 		if (--this.countMap[id]) return;

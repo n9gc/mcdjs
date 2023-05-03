@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 4.1.1
+ * @version 4.1.2
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -50,6 +50,6 @@ import { infoStruct } from './struct/init';
 		infoCmdobj,
 	];
 	const loader = new ChainList;
-	infos.forEach(info => loader.insert(info, info.id, info.act));
+	infos.forEach(info => loader.insert(info.id, info, info.act));
 	loader.load();
 })();

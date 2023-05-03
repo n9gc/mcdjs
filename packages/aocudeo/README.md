@@ -1,10 +1,34 @@
 # Aocudeo
 
-*An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can load your interdependent modules with the correct order through the dependency list of each of them.
+*An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can load your interdependent modules with the correct order through the dependency list registered by each of modules.
 
 ## How to Load Your Modules
 
-1. Using `new Loader();`, get a public loader for your modules.
+1. Get a public loader for your modules.
+
+   ```ts
+   import Loader from 'aocudeo';
+
+   export const loader = new Loader();
+   ```
+
 2. Use loader's APIs to register the module ID and dependencies' ID in each of your modules.
-3. Register modules all.
-4. `loader.load();`
+
+   Such as:
+
+   ```ts
+   loader
+     .insert('myMod', {
+       after: ['toolMod', 'baseMod'],
+       before: 'endMod',
+     })
+     .addAct('myMod', () => {
+       console.log('Loading myMod');
+     });
+   ```
+
+3. Run modules all.
+
+4. ```ts
+   loader.load();
+   ```
