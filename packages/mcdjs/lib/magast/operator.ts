@@ -1,14 +1,13 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.0.7
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
 import Temp from '../alload';
 import { chCommand } from '../cmdobj';
-import { EType, getTracker, holdErr } from '../errlib';
 import { Condition, TypeId } from '../types/game';
 import { Shifted, Vcb } from '../types/tool';
 import {
@@ -49,12 +48,8 @@ export default class Operator {
 	node<T extends NType>(ntype: T, body: Omit<SelNode<T>, InitedNodeAttr>): SelNode<T>;
 	node<T extends NType>(ntype: T, body: Partial<Omit<SelNode<T>, InitedNodeAttr>>, init: true): SelNode<T>;
 	node(ntype: NType, body: any = {}) {
-		const node = body as Node;
-		node.ntype = ntype;
-		node.index = this.nodeNum++;
-		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node);
-		const tips = Temp.tip.getTip();
-		tips && (node.tips = tips);
+		const node = new Node(ntype, this.nodeNum++, Temp.tip.getTip());
+		Object.assign(node, body);
 		return node;
 	}
 	regPath<T extends NType, D extends NType>(...args: Shifted<ConstructorParameters<typeof PathInfo<T, D>>>) {

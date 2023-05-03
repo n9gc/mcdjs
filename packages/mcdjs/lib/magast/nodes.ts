@@ -1,13 +1,14 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.0.9
+ * @version 1.1.0
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
 import { regEnum } from '../config/text';
-import { holdErr } from '../errlib';
+import { EType, getTracker, holdErr } from '../errlib';
+import type { Enum } from '../types/base';
 import type { CbType, Expression, Select, SimTag } from '../types/game';
 
 export enum NType {
@@ -44,12 +45,18 @@ export const tranumNType = regEnum('NType', NType, {
 	ExpressionXor: '异或表达式',
 	ExpressionXnor: '同或表达式',
 });
-export type NTypeKey = keyof typeof NType;
-export interface Node {
-	ntype: NType;
-	index: number;
-	tips?: string;
-	endTimer?: ReturnType<typeof holdErr>;
+export type NTypeKey = Enum.KeyOf<typeof NType>;
+export class Node {
+	constructor(
+		public ntype: NType,
+		public index: number,
+		tips = '',
+	) {
+		tips && (this.tips = tips);
+		this.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), this);
+	}
+	tips?;
+	endTimer?;
 }
 export type InitedNodeAttr =
 	| 'index'
