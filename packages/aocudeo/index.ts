@@ -1,7 +1,7 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 2.3.0
+ * @version 2.3.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -68,15 +68,16 @@ class Loader<T = void> {
 			const postId = `post:${id}`;
 			this.regAfter(preId, pos);
 			this.regAfter(id, { after: preId });
-			this.regAfter(postId, { after: id });
+			this.regBefore(id, { before: postId });
 			this.regBefore(postId, pos);
 		}
 		return this;
 	}
-	load = (id: Id = Loader.START) => {
+	protected loadImp(id: Id) {
 		if (--this.countMap[id]) return;
 		this.actMap[id]?.forEach(fn => this.n = fn(this.n));
 		this.postListMap[id]?.forEach(this.load);
-	};
+	}
+	load = (id: Id = Loader.START) => this.loadImp(id);
 }
 export default Loader;

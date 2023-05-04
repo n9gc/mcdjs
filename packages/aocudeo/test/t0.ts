@@ -11,7 +11,8 @@ const a = new Loader(1);
 loader.insert(0, {}, log(0))
 loader.insert(1, {after:[0, 2]}, log(1))
 loader.insert(2, {}, log(2))
-loader.insert('z', {after:'pre:2',before:2}, log('z'))
+loader.insert('z', {after:'pre:2'}, log('z'))
+loader.insert('z', {before:2,after:'pre:2'})
 
 a.addAct(0, (n) => {
 	return n;
