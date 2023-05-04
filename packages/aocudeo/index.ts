@@ -1,7 +1,7 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 2.2.0
+ * @version 2.3.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -21,12 +21,10 @@ class Loader<T = void> {
 	static noMulti(arr: MayArr<Id> = [], rslt: Id[] = []) {
 		const map: { [x: Id]: symbol; } = {};
 		rslt.forEach(n => map[n] = this.EXIST);
-		(typeof arr === 'object'
-			? arr
-			: [arr]
-		).forEach(n => map[n] === this.EXIST
-			|| (map[n] = this.EXIST, rslt.push(n))
-		);
+		(typeof arr === 'object' ? arr : [arr])
+			.forEach(n => map[n] === this.EXIST
+				|| (map[n] = this.EXIST, rslt.push(n))
+			);
 		return rslt;
 	}
 	static START = Symbol('load start');
@@ -45,10 +43,12 @@ class Loader<T = void> {
 	protected plusCount(id: Id, num = 1) {
 		this.countMap[id] = (this.countMap[id] || 0) + num;
 	}
-	protected regist(id: Id, pos: Loader.PosInfo) {
+	protected regAfter(id: Id, pos: Loader.PosInfo) {
 		const afters = Loader.noMulti(pos.after, [Loader.START]);
 		this.plusCount(id, afters.length);
 		afters.forEach(n => this.getList(n).push(id));
+	}
+	protected regBefore(id: Id, pos: Loader.PosInfo) {
 		const befores = Loader.noMulti(pos.before, [Loader.END]);
 		befores.forEach(n => this.plusCount(n));
 		this.getList(id).push(...befores);
@@ -60,7 +60,17 @@ class Loader<T = void> {
 	}
 	insert(id: Id, pos: Loader.PosInfo = {}, act: MayArr<Cb<T>> | null = null) {
 		act && this.addAct(id, act);
-		this.regist(id, pos);
+		if (typeof id === 'symbol') {
+			this.regAfter(id, pos);
+			this.regBefore(id, pos);
+		} else {
+			const preId = `pre:${id}`;
+			const postId = `post:${id}`;
+			this.regAfter(preId, pos);
+			this.regAfter(id, { after: preId });
+			this.regAfter(postId, { after: id });
+			this.regBefore(postId, pos);
+		}
 		return this;
 	}
 	load = (id: Id = Loader.START) => {
