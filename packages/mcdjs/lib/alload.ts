@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 4.1.2
+ * @version 4.1.3
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -21,7 +21,7 @@ declare global {
 	function McdJSTempGet(): typeof McdJSTemp;
 }
 
-import ChainList, { PosInfo } from 'aocudeo';
+import Loader from 'aocudeo';
 import * as Index from '.';
 import * as Types from './types';
 import { Vcb } from './types/tool';
@@ -36,7 +36,7 @@ glo.McdJSTempGet = () => glo.McdJSTemp;
 export import Temp = glo.McdJSTemp;
 export default Temp;
 
-export interface Info extends PosInfo {
+export interface Info extends Loader.PosInfo {
 	id: string | symbol;
 	act: Vcb;
 }
@@ -49,7 +49,7 @@ import { infoStruct } from './struct/init';
 		infoStruct,
 		infoCmdobj,
 	];
-	const loader = new ChainList;
+	const loader = new Loader;
 	infos.forEach(info => loader.insert(info.id, info, info.act));
 	loader.load();
 })();

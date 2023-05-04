@@ -6,8 +6,14 @@ function log<T>(n: T) {
 
 const loader = new Loader;
 
+const a = new Loader(1);
+
 loader.insert(0, {}, log(0))
 loader.insert(1, {after:[0, 2]}, log(1))
 loader.insert(2, {}, log(2))
+
+a.addAct(0, (n) => {
+	return n;
+})
 
 loader.load();

@@ -1,38 +1,42 @@
 /**
  * 胡乱加载链表类定义模块
  * @module aocudeo
- * @version 2.1.2
+ * @version 2.2.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
 type AnyArr<T = any> = readonly T[];
 type MayArr<T> = AnyArr<T> | T;
-type Vcb = () => void;
+type Cb<T> = (n: T) => T;
 type Id = string | symbol | number;
-export interface PosInfo {
-	after?: AnyArr<Id> | Id;
-	before?: AnyArr<Id> | Id;
-}
-const EXIST = Symbol();
-export function noMulti(arr: Id | AnyArr<Id> = [], rslt: Id[] = []) {
-	const map: { [x: Id]: symbol; } = {};
-	rslt.forEach(n => map[n] = EXIST);
-	(typeof arr === 'object'
-		? arr
-		: [arr]
-	).forEach(n => map[n] === EXIST
-		|| (map[n] = EXIST, rslt.push(n))
-	);
-	return rslt;
-}
-export default class ChainList {
-	static START = Symbol('Load start');
-	static END = Symbol('Load end');
-	constructor() {
-		this.countMap[ChainList.START] = 1;
+namespace Loader {
+	export interface PosInfo {
+		after?: MayArr<Id>;
+		before?: MayArr<Id>;
 	}
-	private actMap: { [id: Id]: Vcb[]; } = Object.create(null);
+}
+class Loader<T = void> {
+	static EXIST = Symbol('exist');
+	static noMulti(arr: MayArr<Id> = [], rslt: Id[] = []) {
+		const map: { [x: Id]: symbol; } = {};
+		rslt.forEach(n => map[n] = this.EXIST);
+		(typeof arr === 'object'
+			? arr
+			: [arr]
+		).forEach(n => map[n] === this.EXIST
+			|| (map[n] = this.EXIST, rslt.push(n))
+		);
+		return rslt;
+	}
+	static START = Symbol('load start');
+	static END = Symbol('load end');
+	constructor(n?: T) {
+		this.n = n!;
+		this.countMap[Loader.START] = 1;
+	}
+	private n: T;
+	private actMap: { [id: Id]: Cb<T>[]; } = Object.create(null);
 	private postListMap: { [id: Id]: Id[]; } = Object.create(null);
 	private countMap: { [id: Id]: number; } = Object.create(null);
 	protected getList(id: Id) {
@@ -41,24 +45,28 @@ export default class ChainList {
 	protected plusCount(id: Id, num = 1) {
 		this.countMap[id] = (this.countMap[id] || 0) + num;
 	}
-	addAct(id: Id, act: MayArr<Vcb>) {
+	protected regist(id: Id, pos: Loader.PosInfo) {
+		const afters = Loader.noMulti(pos.after, [Loader.START]);
+		this.plusCount(id, afters.length);
+		afters.forEach(n => this.getList(n).push(id));
+		const befores = Loader.noMulti(pos.before, [Loader.END]);
+		befores.forEach(n => this.plusCount(n));
+		this.getList(id).push(...befores);
+	}
+	addAct(id: Id, act: MayArr<Cb<T>>) {
 		(this.actMap[id] || (this.actMap[id] = []))
 			.push(...(typeof act === 'function' ? [act] : act));
 		return this;
 	}
-	insert(id: Id, pos: PosInfo = {}, act: MayArr<Vcb> | null = null) {
+	insert(id: Id, pos: Loader.PosInfo = {}, act: MayArr<Cb<T>> | null = null) {
 		act && this.addAct(id, act);
-		const afters = noMulti(pos.after, [ChainList.START]);
-		this.plusCount(id, afters.length);
-		afters.forEach(n => this.getList(n).push(id));
-		const befores = noMulti(pos.before, [ChainList.END]);
-		befores.forEach(n => this.plusCount(n));
-		this.getList(id).push(...befores);
+		this.regist(id, pos);
 		return this;
 	}
-	load = (id: Id = ChainList.START) => {
+	load = (id: Id = Loader.START) => {
 		if (--this.countMap[id]) return;
-		this.actMap[id]?.forEach(fn => fn());
+		this.actMap[id]?.forEach(fn => this.n = fn(this.n));
 		this.postListMap[id]?.forEach(this.load);
 	};
 }
+export default Loader;
