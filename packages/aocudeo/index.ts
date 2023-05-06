@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.6.0
+ * @version 2.6.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -38,6 +38,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	) {
 		this.countMap[Loader.START] = 1;
 	}
+	loaded = false;
 	protected actMap: MapObj<F[]> = Object.create(null);
 	protected postListMap: MapObj<Id[]> = Object.create(null);
 	protected countMap: MapObj<number> = Object.create(null);
@@ -95,6 +96,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
 	}
 	walk() {
+		if (this.loaded) return [];
 		const countMap = Object.create(this.countMap);
 		const path: Id[] = [];
 		this.walkAt(Loader.START, countMap, path);
@@ -115,7 +117,7 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 	constructor(n?: T) {
 		super(n!);
 	}
-	override async load(id: Id = Loader.START) {
+	protected async loadSub(id: Id) {
 		if (--this.countMap[id]) return this.n;
 		let waiter = Promise.resolve();
 		this.actMap[id]?.forEach(fn =>
@@ -124,8 +126,12 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 			})
 		);
 		await waiter;
-		await Promise.all(this.postListMap[id]?.map(id => this.load(id)) || []);
+		await Promise.all(this.postListMap[id]?.map(id => this.loadSub(id)) || []);
 		return this.n;
+	}
+	override load() {
+		this.loaded = true;
+		return this.loadSub(Loader.START);
 	}
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
@@ -133,7 +139,9 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 		super(n!);
 	}
 	override load() {
-		this.walk().forEach(id =>
+		const path = this.walk();
+		this.loaded = true;
+		path.forEach(id =>
 			this.actMap[id]?.forEach(fn =>
 				this.n = fn(this.n)
 			)
