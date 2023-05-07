@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.2
+ * @version 2.7.3
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -48,7 +48,6 @@ namespace Ts {
 	}
 }
 import Id = Ts.Id;
-import Hokab = Ts.Hokab;
 import MapObj = Ts.MapObj;
 import PosInfo = Ts.PosInfo;
 import ErrorType = Ts.ErrorType;
@@ -56,7 +55,7 @@ function isSym(n: any): n is symbol {
 	return typeof n === 'symbol';
 }
 function getArr<T>(mayArr?: MayArr<T>) {
-	return mayArr ? mayArr instanceof Array ? mayArr : [mayArr] : [];
+	return typeof mayArr === 'undefined' ? [] : mayArr instanceof Array ? mayArr : [mayArr];
 }
 abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static throwError(type: ErrorType, tracker: Error, infos?: any): never {
@@ -67,8 +66,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected static noMulti<T extends Id>(arr: MayArr<T> = [], rslt: T[] = [], chkType?: 0 | 1) {
 		const map: MapObj<symbol> = {};
 		rslt.forEach(n => map[n] = this.EXIST);
-		getArr(arr).forEach(n => map[n] === this.EXIST
-			|| (map[n] = this.EXIST, rslt.push(n)));
+		getArr(arr).forEach(n => map[n] === this.EXIST || (map[n] = this.EXIST, rslt.push(n)));
 		typeof chkType === 'number'
 			&& map[chkType ? this.END : this.START] === this.EXIST
 			&& this.throwError(chkType, Error(`不能在 ${chkType ? 'START 前' : 'END 后'}插入东西`));
@@ -78,31 +76,26 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
 	constructor(
-		protected n: T,
+		n?: T,
 	) {
+		this.n = n!;
 		this.countMap[Loader.END] = 0;
 		this.countMap[Loader.START] = 1;
 		this.postListMap[Loader.START] = [];
 		this.postListMap[Loader.END] = [];
 	}
+	protected n: T;
 	loaded = false;
 	protected actMap: MapObj<F[]> = Object.create(null);
 	protected postListMap: MapObj<Id[]> = Object.create(null);
 	protected countMap: MapObj<number> = Object.create(null);
-	protected getList(id: Id) {
-		return this.postListMap[id] || (this.postListMap[id] = []);
-	}
-	protected plusCount(id: Id, num = 1) {
-		this.countMap[id] = (this.countMap[id] || 0) + num;
-	}
 	protected tidy(odName: 'after' | 'before', pos: PosInfo) {
 		const order = odName === 'after' ? 1 : 0;
 		const odSign = Loader.HOOK_NAME[order];
 		const odUnsign = Loader.HOOK_NAME[Number(!order)];
-		const aous = (n: Hokab) => odUnsign + n;
 		let preOf = Loader.noMulti(pos.preOf);
 		let postOf = Loader.noMulti(pos.postOf);
-		order ? preOf = preOf.map(aous) : postOf = postOf.map(aous);
+		order ? preOf = preOf.map(n => odUnsign + n) : postOf = postOf.map(n => odUnsign + n);
 		return [
 			order ? Loader.START : Loader.END,
 			...preOf,
@@ -110,13 +103,19 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			...postOf,
 		];
 	}
+	private putInList(id: Id, lazy: boolean, ...ids: Id[]) {
+		(this.postListMap[id] || (this.postListMap[id] = []))[lazy ? 'push' : 'unshift'](...ids);
+	}
+	private plusCount(id: Id, num = 1) {
+		this.countMap[id] = (this.countMap[id] || 0) + num;
+	}
 	protected regAfter(id: Id, afters: Id[], lazy = false) {
 		this.plusCount(id, afters.length);
-		afters.forEach(n => this.getList(n)[lazy ? 'push' : 'unshift'](id));
+		afters.forEach(n => this.putInList(n, lazy, id));
 	}
 	protected regBefore(id: Id, befores: Id[], lazy = false) {
 		befores.forEach(n => this.plusCount(n));
-		this.getList(id)[lazy ? 'push' : 'unshift'](...befores);
+		this.putInList(id, lazy, ...befores);
 	}
 	addAct(id: Id, act: MayArr<F>) {
 		(this.actMap[id] || (this.actMap[id] = [])).push(...getArr(act));
@@ -143,7 +142,10 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected regSign(method: true, id: Id): void;
 	protected regSign(method: false, n: PosInfo | Id): void;
 	protected regSign(...args: [true, Id] | [false, PosInfo | Id]): void {
-		if (args[0]) return void (this.idSign[args[1]] = Loader.EXIST);
+		if (args[0]) {
+			this.idSign[args[1]] = Loader.EXIST;
+			return;
+		}
 		const n = args[1];
 		if (typeof n !== 'object') this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING);
 		else PosInfo.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
@@ -185,19 +187,14 @@ namespace Loader {
 	export import Types = Ts;
 }
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	constructor(n?: T) {
-		super(n!);
-	}
 	protected async loadSub(id: Id) {
 		if (--this.countMap[id]) return this.n;
-		let waiter = Promise.resolve();
-		this.actMap[id]?.forEach(fn =>
-			waiter = waiter.then(async () => {
-				this.n = await fn(this.n);
-			})
-		);
-		await waiter;
-		await Promise.all(this.postListMap[id]?.map(id => this.loadSub(id)) || []);
+		if (id in this.actMap) {
+			let waiter = new Promise<T>(res => res(this.n));
+			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
+			this.n = await waiter;
+		}
+		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id)));
 		return this.n;
 	}
 	override load() {
@@ -211,17 +208,10 @@ export namespace LoaderAsync {
 	export import Types = Ts;
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
-	constructor(n?: T) {
-		super(n!);
-	}
 	override load() {
 		const path = this.walk();
 		this.loaded = true;
-		path.forEach(id =>
-			this.actMap[id]?.forEach(fn =>
-				this.n = fn(this.n)
-			)
-		);
+		path.forEach(id => this.actMap[id]?.forEach(fn => this.n = fn(this.n)));
 		return this.n;
 	}
 }
