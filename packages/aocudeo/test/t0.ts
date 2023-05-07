@@ -18,11 +18,15 @@ loader.insert(1, {after:[0, 2]}, log(1))
 loader.insert(2, {}, log(2))
 loader.addAct(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
-loader.insert(8, { postOf: 2 }, log(8))
+loader.insert(8, { postOf: 2, preOf: 2}, log(8))
+loader.checkCircle()
 
-a.insert('a', { after: 'b' });
-a.insert('b', { after: 'a' });
-a.insert('c', { after: 'b' });
+const s0 = Symbol(0);
+const s1 = Symbol(1);
+const s2 = Symbol(2);
+a.insert(s0, { before: s1 });
+a.insert(s1, { before: s0 });
+a.insert(s1, { before: s0 });
 // console.log(a);
 // console.log(a.walk())
 

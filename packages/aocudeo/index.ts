@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.0
+ * @version 2.7.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -55,6 +55,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		throw new Ts.AocudeoError(type, tracker, infos);
 	}
 	protected static EXIST = Symbol('exist');
+	protected static EXISTING = Symbol('existing');
 	protected static noMulti<T extends Id>(arr: MayArr<T> = [], rslt: T[] = [], chkType?: 0 | 1) {
 		const map: MapObj<symbol> = {};
 		rslt.forEach(n => map[n] = this.EXIST);
@@ -72,7 +73,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		protected n: T,
 	) {
 		this.countMap[Loader.END] = 0;
-		this.countMap[Loader.START] = 1
+		this.countMap[Loader.START] = 1;
 		this.postListMap[Loader.START] = [];
 		this.postListMap[Loader.END] = [];
 	}
@@ -128,11 +129,6 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		}
 		return this;
 	}
-	protected walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
-		if (--countMap[id]) return;
-		path.push(id);
-		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
-	}
 	checkLost() {
 		const list: Id[] = [];
 		const cKeys = Reflect.ownKeys(this.countMap);
@@ -141,15 +137,31 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		lKeys.forEach(id => cKeys.includes(id) || list.push(id));
 		if (list.length) Loader.throwError(3, Error('出现了未注册的模块'), { list });
 	}
+	protected checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
+		if (statMap[id] === Loader.EXIST) return false;
+		if (statMap[id] === Loader.EXISTING) return circle.splice(0, circle.indexOf(id)), true;
+		statMap[id] = Loader.EXISTING, circle.push(id);
+		let p: Id;
+		for (p of this.postListMap[id] || []) if (this.checkCircleSub(p, statMap, circle)) return true;
+		statMap[id] = Loader.EXIST, circle.pop();
+		return false;
+	}
+	checkCircle(id: Id = Loader.START, statMap: MapObj<symbol> = {}) {
+		const circle: Id[] = [];
+		if (this.checkCircleSub(id, statMap, circle)) Loader.throwError(2, Error('出现环形引用'), { circle });
+	}
+	protected walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
+		if (--countMap[id]) return;
+		path.push(id);
+		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
+	}
 	walk() {
 		if (this.loaded) return [];
 		this.checkLost();
-		const countMap = Object.create(this.countMap);
+		this.checkCircle();
+		const countMap: MapObj<number> = Object.create(this.countMap);
 		const path: Id[] = [];
 		this.walkAt(Loader.START, countMap, path);
-		const mayCircle: Id[] = [];
-		Reflect.ownKeys(countMap).forEach(n => countMap[n] > 0 && mayCircle.push(n));
-		if (mayCircle.length) Loader.throwError(2, Error('环形引用造成阻塞'), { at: mayCircle })
 		return path;
 	}
 	abstract load(): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
@@ -174,6 +186,8 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 		return this.n;
 	}
 	override load() {
+		this.checkLost();
+		this.checkCircle();
 		this.loaded = true;
 		return this.loadSub(Loader.START);
 	}
