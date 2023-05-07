@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.3
+ * @version 2.7.4
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -79,9 +79,9 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		n?: T,
 	) {
 		this.n = n!;
-		this.countMap[Loader.END] = 0;
 		this.countMap[Loader.START] = 1;
-		this.postListMap[Loader.START] = [];
+		this.countMap[Loader.END] = 1;
+		this.postListMap[Loader.START] = [Loader.END];
 		this.postListMap[Loader.END] = [];
 	}
 	protected n: T;

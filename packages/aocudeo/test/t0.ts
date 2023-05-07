@@ -26,9 +26,10 @@ const s1 = Symbol(1);
 const s2 = Symbol(2);
 a.insert(s0, { before: s1 });
 a.insert(s1, { before: s0 });
-a.insert(s1, { before: s0 });
+a.insert(s1, { before: s2 });
 // console.log(a);
 // console.log(a.walk())
 
+new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
-loader.load()
+// loader.load()
