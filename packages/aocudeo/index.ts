@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.1
+ * @version 2.7.2
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -19,6 +19,14 @@ namespace Ts {
 		before?: MayArr<Id>;
 		preOf?: MayArr<Hokab>;
 		postOf?: MayArr<Hokab>;
+	}
+	export namespace PosInfo {
+		export const keys = [
+			'after',
+			'before',
+			'preOf',
+			'postOf',
+		] as const;
 	}
 	export type MapObj<T, K extends Id = Id> = { [I in K]: T };
 	export enum ErrorType {
@@ -47,8 +55,8 @@ import ErrorType = Ts.ErrorType;
 function isSym(n: any): n is symbol {
 	return typeof n === 'symbol';
 }
-function getArr<T>(mayArr: MayArr<T>) {
-	return mayArr instanceof Array ? mayArr : [mayArr];
+function getArr<T>(mayArr?: MayArr<T>) {
+	return mayArr ? mayArr instanceof Array ? mayArr : [mayArr] : [];
 }
 abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static throwError(type: ErrorType, tracker: Error, infos?: any): never {
@@ -115,6 +123,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return this;
 	}
 	insert(id: Id, pos: PosInfo = {}, act: MayArr<F> | null = null) {
+		this.regSign(true, id);
+		this.regSign(false, pos);
 		act && this.addAct(id, act);
 		if (isSym(id)) {
 			this.regAfter(id, this.tidy('after', pos));
@@ -129,12 +139,17 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		}
 		return this;
 	}
+	private idSign: MapObj<symbol> = {};
+	protected regSign(method: true, id: Id): void;
+	protected regSign(method: false, n: PosInfo | Id): void;
+	protected regSign(...args: [true, Id] | [false, PosInfo | Id]): void {
+		if (args[0]) return void (this.idSign[args[1]] = Loader.EXIST);
+		const n = args[1];
+		if (typeof n !== 'object') this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING);
+		else PosInfo.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
+	}
 	checkLost() {
-		const list: Id[] = [];
-		const cKeys = Reflect.ownKeys(this.countMap);
-		const lKeys = Reflect.ownKeys(this.postListMap);
-		cKeys.forEach(id => lKeys.includes(id) || list.push(id));
-		lKeys.forEach(id => cKeys.includes(id) || list.push(id));
+		const list = Reflect.ownKeys(this.idSign).filter(id => this.idSign[id] === Loader.EXISTING);
 		if (list.length) Loader.throwError(3, Error('出现了未注册的模块'), { list });
 	}
 	protected checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
