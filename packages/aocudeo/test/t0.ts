@@ -4,7 +4,7 @@ const timeout = (n: number) => new Promise(res => setTimeout(res, n));
 function log<T>(n: T) {
 	return async () => {
 		console.log('go', n);
-		await timeout(700);
+		await timeout(200);
 		console.log('end', n);
 	}
 }
@@ -20,9 +20,11 @@ loader.addAct(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
 loader.insert(8, { postOf: 2 }, log(8))
 
-a.addAct(0, (n) => {
-	return n;
-})
+a.insert('a', { after: 'b' });
+a.insert('b', { after: 'a' });
+a.insert('c', { after: 'b' });
+// console.log(a);
+// console.log(a.walk())
 
-console.log(loader);
+// console.log(loader);
 loader.load()

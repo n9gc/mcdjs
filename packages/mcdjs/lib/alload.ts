@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 4.1.3
+ * @version 4.1.4
  * @license GPL-3.0-or-later
  */
 declare module './alload';
@@ -36,7 +36,7 @@ glo.McdJSTempGet = () => glo.McdJSTemp;
 export import Temp = glo.McdJSTemp;
 export default Temp;
 
-export interface Info extends Loader.PosInfo {
+export interface Info extends Loader.Types.PosInfo {
 	id: string | symbol;
 	act: Vcb;
 }
