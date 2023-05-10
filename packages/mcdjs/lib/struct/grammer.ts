@@ -1,11 +1,12 @@
 /**
  * 实用语法相关
- * @version 1.2.8
+ * @version 1.2.9
  * @license GPL-3.0-or-later
  */
-(McdJSTemp as any) = globalThis.McdJSTempGet();
+"use strict";
 
 namespace McdJSTemp {
+	globalThis.McdJSTempMerge(McdJSTemp);
 	export namespace Struct {
 		export class CommandRsltClass implements CommandRslt {
 			constructor(

@@ -1,11 +1,12 @@
 /**
  * 命令集通用库
- * @version 0.1.4
+ * @version 0.1.5
  * @license GPL-3.0-or-later
  */
-(McdJSTemp as any) = globalThis.McdJSTempGet();
+"use strict";
 
 namespace McdJSTemp {
+	globalThis.McdJSTempMerge(McdJSTemp);
 	import insert = chCommand.insert;
 	import CRClass = Struct.CommandRsltClass;
 	export namespace Command {

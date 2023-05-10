@@ -1,11 +1,12 @@
 /**
  * 命令集初始化
- * @version 0.1.9
+ * @version 0.1.10
  * @license GPL-3.0-or-later
  */
-(McdJSTemp as any) = globalThis.McdJSTempGet();
+"use strict";
 
 namespace McdJSTemp {
+	globalThis.McdJSTempMerge(McdJSTemp);
 	import CRClass = Struct.CommandRsltClass;
 	import Operm = Imp.magast.Operator;
 	const errlib = Imp.errlib;
