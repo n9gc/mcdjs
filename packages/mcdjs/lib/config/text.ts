@@ -1,7 +1,7 @@
 /**
  * 文本配置处理相关
  * @module mcdjs/lib/config/text
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './text';
@@ -13,14 +13,9 @@ import { throwErr } from './tool';
 
 export type Obj<T = string, N extends Lang = Lang> = (N extends N ? SigreqObj<N, Lang, T> : never);
 
-function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
+export function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
 	return n;
 }
-export const some = initText({
-	tracker: {
-		'zh-CN': `以下追踪信息仅供参考`,
-	},
-});
 
 const enumNameMap = new Map<Enum, string>;
 export function findName<B extends Enum>(n: B) {

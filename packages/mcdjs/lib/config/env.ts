@@ -1,7 +1,7 @@
 /**
  * 元配置相关
  * @module mcdjs/lib/config/env
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-3.0-or-later
  */
 declare module './env';
@@ -17,7 +17,7 @@ export const env = {
 	defaultLang: 'zh-CN',
 	config: {
 		lang: 'zh-CN',
-		track: false,
+		track: true,
 	} as Config,
 	setConfig(conf: Config) {
 		return Object.assign(this.config, conf);

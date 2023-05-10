@@ -22,8 +22,7 @@
 				"./**/*.js",
 				"./**/*.js.map",
 				"./**/*.d.ts"
-			],
-			"cache": false
+			]
 		},
 		"clear": {
 			"dependsOn": [
@@ -38,8 +37,7 @@
 				"./**/*.js",
 				"./**/*.js.map",
 				"./**/*.d.ts"
-			],
-			"cache": false
+			]
 		},
 		"build": {
 			"inputs": [

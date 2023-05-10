@@ -1,21 +1,20 @@
 /**
  * 错误处理模块
  * @module mcdjs/lib/errlib
- * @version 2.0.9
+ * @version 2.1.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
 import env from '../config/env';
-import { Obj, some, sureObj } from '../config/text';
-import type { Node } from '../magast/nodes';
+import { Obj, sureObj } from '../config/text';
 import {
 	ArgGetErr,
 	EType,
 	Err,
 	GetErr,
-	tranumEType,
 } from './errors';
+import { some, tranumEType } from './text';
 
 export { EType };
 
@@ -64,6 +63,23 @@ export function checkHolded() {
 	let fn: (() => never) | void;
 	while (fn = holdeds.pop(), holdeds.length) fn?.();
 }
+export type HoldFnObj<T extends keyof any = 'holder'> = { [I in T]?: HoldFn | KeyHoldFn<HoldFnObj<T>> };
+export interface HoldFn {
+	(tracker: Error): never;
+	(): boolean;
+	addKey<K extends keyof any>(n: K): KeyHoldFn<HoldFnObj<K>>;
+}
+export interface KeyHoldFn<T> {
+	(this: T, tracker: Error): never;
+	(this: T): boolean;
+}
+function getHoldFn(fn: (n?: Error) => boolean) {
+	const rfn = fn as HoldFn;
+	rfn.addKey = (n) => function (this: any, k?: Error) {
+		return (fn(k) ? (delete this[n], true) : false);
+	} as any;
+	return rfn;
+}
 export function holdErr<T extends EType>(...args: ArgGetErr<T>) {
 	const cb = () => {
 		clearTimeout(timer);
@@ -72,12 +88,13 @@ export function holdErr<T extends EType>(...args: ArgGetErr<T>) {
 	const timer = setTimeout(cb);
 	const index = holdeds.push(cb);
 	let unend = true;
-	return function (this: Node) {
+	return getHoldFn((tracker?: Error) => {
+		if (tracker) return args[1] = tracker, throwErr(...args);
 		if (unend) {
 			delete holdeds[index];
 			clearTimeout(timer);
-			delete this.endTimer;
 			unend = false;
-		};
-	};
+			return true;
+		} else return false;
+	});
 }
