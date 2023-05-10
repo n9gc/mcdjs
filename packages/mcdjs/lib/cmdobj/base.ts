@@ -1,6 +1,6 @@
 /**
  * 命令集初始化
- * @version 0.1.8
+ * @version 0.1.9
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -31,7 +31,8 @@ namespace McdJSTemp {
 		}
 		export function insert(cmd: string) {
 			const opering = getOperm();
-			return new CRClass(opering.insert(cmd));
+			const cmdObj = opering.getCls('Command', cmd);
+			return new CRClass(opering.push(cmdObj));
 		}
 	}
 }

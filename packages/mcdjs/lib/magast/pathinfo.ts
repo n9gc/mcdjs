@@ -1,25 +1,20 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 1.0.4
+ * @version 2.0.0
  * @license GPL-3.0-or-later
  */
 declare module './pathinfo';
 
-import { EType, getTracker, holdErr } from '../errlib';
 import type {
-	GotSelNode,
-	InitedNodeAttr,
-	NType,
-	Node,
-	SelNode,
+	NType
 } from './nodes';
-import Operator from './operator';
 
-export default class PathInfo<T extends NType = any, D extends NType = any> {
+export default class PathInfo<T extends NType = NType> {
+	/*
 	constructor(
 		public operm: Operator,
-		public node: SelNode<T>,
+		public node: Node<T>,
 		parent: Partial<SelNode<D>>,
 		public key: Exclude<keyof SelNode<D>, keyof Node>,
 	) {
@@ -35,7 +30,7 @@ export default class PathInfo<T extends NType = any, D extends NType = any> {
 		node.endTimer?.();
 		operm.paths[node.index] = this;
 	}
-	parent: SelNode<D>;
+	parent: T extends typeof NType.System ? null : Node;
 	posInList: number;
 	inList: boolean;
 	listIn: Node[] | null;
@@ -53,7 +48,8 @@ export default class PathInfo<T extends NType = any, D extends NType = any> {
 	getNode(ntype: NType, body: any = {}) {
 		const node = body as GotSelNode;
 		node.ntype = ntype;
-		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node);
+		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node).addKey('endTimer');
 		return node;
 	}
+	*/
 }

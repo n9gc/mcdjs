@@ -1,16 +1,14 @@
 /**
  * 转译模块
  * @module mcdjs/lib/transf
- * @version 1.2.3
+ * @version 1.2.4
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
 import {
-	AllNode,
 	NType,
-	NodeExpression,
-	SelNode,
+	Node,
 } from '../magast/nodes';
 import Operator from '../magast/operator';
 import PathInfo from '../magast/pathinfo';
@@ -56,7 +54,7 @@ export class StdedModule {
 	}
 }
 type TraverseObjType = {
-	[I in NType]: (node: SelNode<I>) => void;
+	[I in NType]: (node: Node<I>) => void;
 };
 export class TraverseObj implements TraverseObjType {
 	constructor(
@@ -65,27 +63,24 @@ export class TraverseObj implements TraverseObjType {
 	) {
 		this.do(operm.ast);
 	}
-	[NType.SystemDad](node: SelNode<NType.SystemDad>) {
-		this.do(node.system);
-	}
-	[NType.System](node: SelNode<NType.System>) {
+	[NType.System](node: Node.System) {
 		this.dos(node.nodes);
 	};
-	[NType.CodeBlock](node: SelNode<NType.CodeBlock>) {
+	[NType.CodeBlock](node: Node.CodeBlock) {
 		this.dos(node.nodes);
 	};
-	[NType.Command](node: SelNode<NType.Command>) { };
-	[NType.ConditionCommand](node: SelNode<NType.ConditionCommand>) { };
-	[NType.ConditionSelector](node: SelNode<NType.ConditionSelector>) { };
-	[NType.Branch](node: SelNode<NType.Branch>) {
-		this.do(node.expr);
+	[NType.Command](node: Node.Command) { };
+	[NType.ConditionCommand](node: Node.ConditionCommand) { };
+	[NType.ConditionSelector](node: Node.ConditionSelector) { };
+	[NType.Branch](node: Node.Branch) {
+		this.do(node.cond);
 		this.do(node.tdo);
 		this.do(node.fdo);
 	}
-	[NType.Block](node: SelNode<NType.Block>) { };
-	Expression(node: NodeExpression) {
-		if ('ntype' in node.oFirst) this.do(node.oFirst);
-		if ('oSecond' in node && 'ntype' in node.oSecond) this.do(node.oSecond);
+	[NType.Block](node: Node.Block) { };
+	Expression(node: Node.Expression) {
+		if ('ntype' in node.a) this.do(node.a);
+		if ('b' in node && 'ntype' in node.b) this.do(node.b);
 	}
 	[NType.ExpressionAnd] = this.Expression;
 	[NType.ExpressionOr] = this.Expression;
@@ -94,14 +89,14 @@ export class TraverseObj implements TraverseObjType {
 	[NType.ExpressionNor] = this.Expression;
 	[NType.ExpressionXor] = this.Expression;
 	[NType.ExpressionXnor] = this.Expression;
-	protected do<T extends NType>(node: SelNode<T>) {
+	protected do<T extends NType>(node: Node<T>) {
 		const type: T = node.ntype;
-		const pathInfo = this.operm.paths[node.index];
+		const pathInfo = new PathInfo();
 		this.mod.entry(type, pathInfo);
 		(this as TraverseObjType)[type](node);
 		this.mod.exit(type, pathInfo);
 	}
-	protected dos(nodes: AllNode[]) {
+	protected dos(nodes: Node[]) {
 		return nodes.forEach(n => this.do(n));
 	}
 }

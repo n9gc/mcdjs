@@ -1,41 +1,29 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 1.1.0
+ * @version 2.0.0
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
-import Temp from '../alload';
 import { chCommand } from '../cmdobj';
-import { Condition, TypeId } from '../types/game';
-import { Shifted, Vcb } from '../types/tool';
+import { Shifted } from '../types/tool';
 import {
-	AST,
-	InitedNodeAttr,
 	NType,
-	Node,
-	NodeCodeBlock,
-	NodeSystem,
-	SelNode,
+	AST,
+	NTypeKey,
+	Node
 } from './nodes';
-import PathInfo from './pathinfo';
+import * as Types from './nodes';
 
 export default class Operator {
 	constructor(tips: string) {
-		this.opering = this.ast = this.regPath(
-			this.node(
-				NType.System,
-				{ nodes: [], tips },
-			),
-			{ ntype: NType.SystemDad, index: -1 },
-			'system',
-		);
+		this.scope = this.ast = new Node.System(this, tips);
 	}
-	opering: NodeCodeBlock | NodeSystem;
+	scope: Node.CodeBlock | Node.System;
 	ast: AST;
-	nodeNum: number = 0;
-	paths: { [index: number]: PathInfo; } = {};
+	nodes: Node[] = [];
+	Types = Types;
 	come() {
 		chCommand.come(this);
 		return this;
@@ -44,72 +32,12 @@ export default class Operator {
 		chCommand.exit();
 		return this;
 	}
-	node<T extends NType>(ntype: T): SelNode<T>;
-	node<T extends NType>(ntype: T, body: Omit<SelNode<T>, InitedNodeAttr>): SelNode<T>;
-	node<T extends NType>(ntype: T, body: Partial<Omit<SelNode<T>, InitedNodeAttr>>, init: true): SelNode<T>;
-	node(ntype: NType, body: any = {}) {
-		const node = new Node(ntype, this.nodeNum++, Temp.tip.getTip());
-		Object.assign(node, body);
-		return node;
+	push(node: Node) {
+		this.scope.nodes.push(node);
+		return node.index;
 	}
-	regPath<T extends NType, D extends NType>(...args: Shifted<ConstructorParameters<typeof PathInfo<T, D>>>) {
-		new PathInfo(this, ...args);
-		return args[0];
-	}
-	block(cbOri: Vcb) {
-		const nBlk = this.node(NType.CodeBlock, {
-			nodes: [],
-		});
-		const dad = this.opering;
-		this.opering = nBlk;
-		cbOri();
-		this.opering = dad;
-		return nBlk;
-	}
-	condition(expr: Condition) {
-		switch (expr.tid) {
-			case TypeId.CommandRslt:
-				return this.node(NType.ConditionCommand, {
-					pos: expr.index,
-				});
-			case TypeId.Selected:
-				return this.node(NType.ConditionSelector, {
-					expr: expr.expr,
-					range: expr.range,
-				});
-		}
-	}
-	insert(cmd: string) {
-		const nCommand = this.regPath(
-			this.node(NType.Command, {
-				exec: cmd,
-			}),
-			this.opering,
-			'nodes',
-		);
-		return nCommand.index;
-	}
-	If(expr: Condition, tdoOri: Vcb, fdoOri: Vcb) {
-		const nBranch = this.regPath(
-			this.node(NType.Branch),
-			this.opering,
-			'nodes',
-		);
-		this.regPath(
-			this.condition(expr),
-			nBranch,
-			'expr',
-		);
-		this.regPath(
-			this.block(tdoOri),
-			nBranch,
-			'tdo',
-		);
-		this.regPath(
-			this.block(fdoOri),
-			nBranch,
-			'fdo',
-		);
-		return nBranch.index;
+	getCls<T extends NTypeKey>(name: T, ...args: Shifted<ConstructorParameters<typeof Node[T]>>): Node<NType<T>> {
+		const cls = Node[name] as new (operm: Operator, ...n: typeof args) => any;
+		return new cls(this, ...args);
 	}
 }

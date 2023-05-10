@@ -1,170 +1,201 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.1.0
+ * @version 1.2.0
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
+import Temp from '../alload';
 import { regEnum } from '../config/text';
-import { EType, getTracker, holdErr } from '../errlib';
-import type { Enum } from '../types/base';
-import type { CbType, Expression, Select, SimTag } from '../types/game';
+import { Enum } from '../types/base';
+import {
+	CbType,
+	Condition as GameCond,
+	Expression as GameExpr,
+	Select,
+	SimTag,
+	TypeId,
+} from '../types/game';
+import type { KeyArrayOf, Vcb } from '../types/tool';
+import type Operator from './operator';
 
-export enum NType {
-	SystemDad,
-	System,
-	CodeBlock,
-	Command,
-	ConditionCommand,
-	ConditionSelector,
-	Branch,
-	Block,
-	ExpressionAnd,
-	ExpressionOr,
-	ExpressionNot,
-	ExpressionNand,
-	ExpressionNor,
-	ExpressionXor,
-	ExpressionXnor,
+export interface NodeBase {
+	ntype: NType;
+	index: number;
+	tips?: string;
 }
-export const tranumNType = regEnum('NType', NType, {
-	SystemDad: '指令系统的父节点',
-	System: '指令系统',
-	CodeBlock: '代码块',
-	Command: '单命令',
-	ConditionCommand: '有条件命令方块',
-	ConditionSelector: '选择器',
-	Branch: '条件分支',
-	Block: '命令方块',
-	ExpressionAnd: '与表达式',
-	ExpressionOr: '或表达式',
-	ExpressionNot: '非表达式',
-	ExpressionNand: '与非表达式',
-	ExpressionNor: '或非表达式',
-	ExpressionXor: '异或表达式',
-	ExpressionXnor: '同或表达式',
-});
-export type NTypeKey = Enum.KeyOf<typeof NType>;
-export class Node {
+abstract class Base implements NodeBase {
 	constructor(
-		public ntype: NType,
-		public index: number,
-		tips = '',
+		operm: Operator,
 	) {
-		tips && (this.tips = tips);
-		this.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), this);
+		this.index = operm.nodes.push(this as any);
+		this.tips || delete this.tips;
 	}
-	tips?;
-	endTimer?;
+	abstract ntype: NType;
+	index: number;
+	tips?= Temp.tip.getTip();
 }
-export type InitedNodeAttr =
-	| 'index'
-	| 'ntype'
-	;
-export interface NodeSystemDad extends Node {
-	ntype: NType.SystemDad;
-	index: -1;
-	system: NodeSystem;
+export namespace Node {
+	export class System extends Base {
+		ntype = NType.System;
+		static 'zh-CN' = '指令系统';
+		constructor(
+			operm: Operator,
+			public tips: string,
+		) { super(operm); }
+		nodes: Node[] = [];
+	}
+	export class CodeBlock extends Base {
+		ntype = NType.CodeBlock;
+		static 'zh-CN' = '代码块';
+		constructor(operm: Operator, cbOri: Vcb) {
+			super(operm);
+			const dadScope = operm.scope;
+			operm.scope = this;
+			cbOri();
+			operm.scope = dadScope;
+			dadScope.nodes.push(this);
+		}
+		nodes: Node[] = [];
+	}
+	export class Command extends Base {
+		ntype = NType.Command;
+		static 'zh-CN' = '单命令';
+		constructor(
+			operm: Operator,
+			public exec: string,
+		) { super(operm); }
+	}
+	export class Branch extends Base {
+		ntype = NType.Branch;
+		static 'zh-CN' = '条件分支';
+		constructor(operm: Operator, cond: GameCond, tdoOri: Vcb, fdoOri: Vcb) {
+			super(operm);
+			this.cond = getCondition(operm, cond);
+			this.tdo = new Node.CodeBlock(operm, tdoOri);
+			this.fdo = new Node.CodeBlock(operm, fdoOri);
+		}
+		cond;
+		tdo;
+		fdo;
+	}
+	export class Block extends Base {
+		ntype = NType.Block;
+		static 'zh-CN' = '命令方块';
+		constructor(
+			operm: Operator,
+			public con: boolean,
+			public cbtype: CbType,
+		) { super(operm); }
+	}
 }
-export interface NodeSystem extends Node {
-	ntype: NType.System;
-	tips: string;
-	nodes: AllNode[];
-}
-export interface NodeCodeBlock extends Node {
-	ntype: NType.CodeBlock;
-	nodes: AllNode[];
-}
-export interface NodeCommand extends Node {
-	ntype: NType.Command;
-	exec: string;
-}
-export interface NodeConditionCommand extends Node {
-	ntype: NType.ConditionCommand;
-	pos: number;
-}
-export interface NodeConditionSelector extends Node {
-	ntype: NType.ConditionSelector;
-	range: Select.At;
-	expr: Expression;
-}
-export type NodeCondition =
-	| NodeConditionCommand
-	| NodeConditionSelector
-	;
-export interface NodeBranch extends Node {
-	ntype: NType.Branch;
-	expr: NodeCondition;
-	tdo: NodeCodeBlock;
-	fdo: NodeCodeBlock;
-}
-export interface NodeBlock extends Node {
-	ntype: NType.Block;
-	con: boolean;
-	cbtype: CbType;
-}
-export interface NodeExpressionAnd extends Node {
-	ntype: NType.ExpressionAnd;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export interface NodeExpressionOr extends Node {
-	ntype: NType.ExpressionOr;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export interface NodeExpressionNot extends Node {
-	ntype: NType.ExpressionNot;
-	oFirst: MagExpression;
-}
-export interface NodeExpressionNand extends Node {
-	ntype: NType.ExpressionNand;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export interface NodeExpressionNor extends Node {
-	ntype: NType.ExpressionNor;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export interface NodeExpressionXor extends Node {
-	ntype: NType.ExpressionXor;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export interface NodeExpressionXnor extends Node {
-	ntype: NType.ExpressionXnor;
-	oFirst: MagExpression;
-	oSecond: MagExpression;
-}
-export type NodeExpression =
-	| NodeExpressionAnd
-	| NodeExpressionOr
-	| NodeExpressionNot
-	| NodeExpressionNand
-	| NodeExpressionNor
-	| NodeExpressionXor
-	| NodeExpressionXnor
-	;
-export type MagExpression =
-	| NodeExpression
-	| SimTag
-	;
-export type AllNode =
-	| NodeSystemDad
-	| NodeSystem
-	| NodeCodeBlock
-	| NodeCondition
-	| NodeBranch
-	| NodeBlock
-	| NodeExpression
-	| NodeCommand
-	;
 
-export type SelNode<T extends NType> = AllNode & { ntype: T; };
-export type AST = NodeSystem;
-export type GotSelNode<T extends NType = NType> =
-	& Exclude<SelNode<T>, 'index'>
-	& { endTimer: Node['endTimer'] & {}; }
-	;
+export function getCondition(operm: Operator, cond: GameCond) {
+	switch (cond.tid) {
+		case TypeId.CommandRslt:
+			return new Node.ConditionCommand(operm, cond.index);
+		case TypeId.Selected:
+			return new Node.ConditionSelector(operm, cond.range, cond.expr);
+	}
+}
+export namespace Node {
+	export class ConditionCommand extends Base {
+		ntype = NType.ConditionCommand;
+		static 'zh-CN' = '有条件命令方块';
+		constructor(
+			operm: Operator,
+			public pos: number,
+		) { super(operm); }
+	}
+	export class ConditionSelector extends Base {
+		ntype = NType.ConditionSelector;
+		static 'zh-CN' = '选择器';
+		constructor(
+			operm: Operator,
+			public range: Select.At,
+			public expr: GameExpr,
+		) { super(operm); }
+	}
+	export type Condition =
+		| ConditionCommand
+		| ConditionSelector
+		;
+}
+
+export namespace Node {
+	abstract class BaseExpressionSig extends Base {
+		constructor(
+			operm: Operator,
+			public a: MagExpression,
+		) { super(operm); }
+	}
+	abstract class BaseExpressionBin extends Base {
+		constructor(
+			operm: Operator,
+			public a: MagExpression,
+			public b: MagExpression,
+		) { super(operm); }
+	}
+	export class ExpressionAnd extends BaseExpressionBin {
+		ntype = NType.ExpressionAnd;
+		static 'zh-CN' = '与表达式';
+	}
+	export class ExpressionOr extends BaseExpressionBin {
+		ntype = NType.ExpressionOr;
+		static 'zh-CN' = '或表达式';
+	}
+	export class ExpressionNot extends BaseExpressionSig {
+		ntype = NType.ExpressionNot;
+		static 'zh-CN' = '非表达式';
+	}
+	export class ExpressionNand extends BaseExpressionBin {
+		ntype = NType.ExpressionNand;
+		static 'zh-CN' = '与非表达式';
+	}
+	export class ExpressionNor extends BaseExpressionBin {
+		ntype = NType.ExpressionNor;
+		static 'zh-CN' = '或非表达式';
+	}
+	export class ExpressionXor extends BaseExpressionBin {
+		ntype = NType.ExpressionXor;
+		static 'zh-CN' = '异或表达式';
+	}
+	export class ExpressionXnor extends BaseExpressionBin {
+		ntype = NType.ExpressionXnor;
+		static 'zh-CN' = '同或表达式';
+	}
+	export type Expression =
+		| ExpressionAnd
+		| ExpressionOr
+		| ExpressionNot
+		| ExpressionNand
+		| ExpressionNor
+		| ExpressionXor
+		| ExpressionXnor
+		;
+	export type MagExpression =
+		| Expression
+		| SimTag
+		;
+	export type All =
+		| System
+		| CodeBlock
+		| Condition
+		| Branch
+		| Block
+		| Expression
+		| Command
+		;
+}
+
+export const NType = Enum.from(Object.keys(Node) as KeyArrayOf<typeof Node>);
+type NTypeObj = typeof NType;
+type NTypeStrKey = Enum.KeyOf<NTypeObj>;
+export type NType<T extends NTypeStrKey = NTypeStrKey> = Enum.ValueOf<NTypeObj, T>;
+export type NTypeKey<V extends NType = NType> = Enum.KeyOf<NTypeObj, V>;
+export const tranumNType = regEnum('NType', NType, Node);
+
+export type Node<T extends NType = NType> = InstanceType<(typeof Node)[NTypeKey<T>]> & { ntype: T };
+export type AST = Node.System;
+export type GotSelNode<T extends NType = NType> = Exclude<Node<T>, 'index'>;

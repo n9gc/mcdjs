@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.7
+ * @version 1.2.8
  * @license GPL-3.0-or-later
  */
 (McdJSTemp as any) = globalThis.McdJSTempGet();
@@ -86,7 +86,8 @@ namespace McdJSTemp {
 		}
 		function reg(expr: Condition, tdo: Vcb, fdo: Vcb) {
 			const opering = chCommand.getOperm();
-			return new CRClass(opering.If(expr, tdo, fdo));
+			const branch = opering.getCls('Branch', expr, tdo, fdo);
+			return new CRClass(opering.push(branch));
 		}
 		function getObj(expr: Condition): BranchThen {
 			return { Then: tdo => ({ Else: fdo => reg(expr, tdo, fdo) }) };
