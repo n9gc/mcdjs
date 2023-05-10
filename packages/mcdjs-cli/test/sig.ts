@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { default as run, out, RunInfos } from '../lib/hfile';
 
 export default async function () {

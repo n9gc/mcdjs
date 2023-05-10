@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 1.2.9
+ * @version 1.3.0
  * @license GPL-3.0-or-later
  */
 "use strict";
@@ -50,6 +50,22 @@ namespace McdJSTemp {
 	import SEClass = Struct.SelectedClass;
 	import Vcb = TTool.Vcb;
 	export import Tag = Struct.Tag;
+	function binCalcsFn(sign: Expression.OperatorBin, exprs: binCalcsFn.Args) {
+		if (!exprs.length) return errParams(Error(), exprs);
+		let sub = exprs.shift()!;
+		exprs.forEach(n => sub = [sub, sign, n]);
+		return sub;
+	}
+	namespace binCalcsFn {
+		export type Args = [Expression.Calcable, ...Expression.Calcable[]];
+	}
+	export function and(...expr: binCalcsFn.Args) { return binCalcsFn(AND, expr); }
+	export function or(...expr: binCalcsFn.Args) { return binCalcsFn(OR, expr); }
+	export function not(expr: Expression.Calcable): Expression.Calcable { return [NOT, expr]; }
+	export function nand(...expr: binCalcsFn.Args) { return binCalcsFn(NAND, expr); }
+	export function nor(...expr: binCalcsFn.Args) { return binCalcsFn(NOR, expr); }
+	export function xor(...expr: binCalcsFn.Args) { return binCalcsFn(XOR, expr); }
+	export function xnor(...expr: binCalcsFn.Args) { return binCalcsFn(XNOR, expr); }
 	export const AND = 'and';
 	export const OR = 'or';
 	export const NOT = 'not';
@@ -57,7 +73,7 @@ namespace McdJSTemp {
 	export const NOR = 'nor';
 	export const XOR = 'xor';
 	export const XNOR = 'xnor';
-	function errParams(tracker: Error, args: IArguments | readonly any[]) {
+	function errParams(tracker: Error, args: IArguments | readonly any[]): never {
 		const { errlib: { throwErr, EType } } = Imp;
 		return throwErr(EType.ErrIllegalParameter, tracker, args);
 	}

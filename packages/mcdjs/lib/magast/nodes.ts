@@ -1,13 +1,14 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.2.0
+ * @version 1.2.2
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
 
 import Temp from '../alload';
 import { regEnum } from '../config/text';
+import { EType, throwErr } from '../errlib';
 import { Enum } from '../types/base';
 import {
 	CbType,
@@ -29,7 +30,7 @@ abstract class Base implements NodeBase {
 	constructor(
 		operm: Operator,
 	) {
-		this.index = operm.nodes.push(this as any);
+		this.index = operm.nodeNum++;
 		this.tips || delete this.tips;
 	}
 	abstract ntype: NType;
@@ -55,7 +56,6 @@ export namespace Node {
 			operm.scope = this;
 			cbOri();
 			operm.scope = dadScope;
-			dadScope.nodes.push(this);
 		}
 		nodes: Node[] = [];
 	}
@@ -91,14 +91,6 @@ export namespace Node {
 	}
 }
 
-export function getCondition(operm: Operator, cond: GameCond) {
-	switch (cond.tid) {
-		case TypeId.CommandRslt:
-			return new Node.ConditionCommand(operm, cond.index);
-		case TypeId.Selected:
-			return new Node.ConditionSelector(operm, cond.range, cond.expr);
-	}
-}
 export namespace Node {
 	export class ConditionCommand extends Base {
 		ntype = NType.ConditionCommand;
@@ -114,13 +106,25 @@ export namespace Node {
 		constructor(
 			operm: Operator,
 			public range: Select.At,
-			public expr: GameExpr,
+			public expr: MagExpression | null,
 		) { super(operm); }
 	}
 	export type Condition =
 		| ConditionCommand
 		| ConditionSelector
 		;
+}
+export function getCondition(operm: Operator, cond: GameCond) {
+	switch (cond.tid) {
+		case TypeId.CommandRslt:
+			return new Node.ConditionCommand(operm, cond.index);
+		case TypeId.Selected:
+			return new Node.ConditionSelector(
+				operm,
+				cond.range,
+				cond.expr && getExpression(operm, cond.expr),
+			);
+	}
 }
 
 export namespace Node {
@@ -178,15 +182,31 @@ export namespace Node {
 		| Expression
 		| SimTag
 		;
-	export type All =
-		| System
-		| CodeBlock
-		| Condition
-		| Branch
-		| Block
-		| Expression
-		| Command
-		;
+}
+const signCls = {
+	and: Node.ExpressionAnd,
+	'&': Node.ExpressionAnd,
+	or: Node.ExpressionOr,
+	'|': Node.ExpressionOr,
+	not: Node.ExpressionNot,
+	'!': Node.ExpressionNot,
+	nand: Node.ExpressionNand,
+	nor: Node.ExpressionNor,
+	xor: Node.ExpressionXor,
+	xnor: Node.ExpressionXnor,
+} as const;
+export function getExpression(operm: Operator, expr: Exclude<GameExpr, null>): Node.MagExpression {
+	if ('tid' in expr) return expr;
+	if (expr.length === 2) return new signCls[expr[0]](
+		operm,
+		getExpression(operm, expr[1])
+	);
+	if (expr.length === 3) return new signCls[expr[1]](
+		operm,
+		getExpression(operm, expr[0]),
+		getExpression(operm, expr[2]),
+	);
+	return throwErr(EType.ErrIllegalParameter, Error(), expr);
 }
 
 export const NType = Enum.from(Object.keys(Node) as KeyArrayOf<typeof Node>);
@@ -196,6 +216,6 @@ export type NType<T extends NTypeStrKey = NTypeStrKey> = Enum.ValueOf<NTypeObj, 
 export type NTypeKey<V extends NType = NType> = Enum.KeyOf<NTypeObj, V>;
 export const tranumNType = regEnum('NType', NType, Node);
 
-export type Node<T extends NType = NType> = InstanceType<(typeof Node)[NTypeKey<T>]> & { ntype: T };
+export type Node<T extends NType = NType> = InstanceType<(typeof Node)[NTypeKey<T>]> & { ntype: T; };
 export type AST = Node.System;
 export type GotSelNode<T extends NType = NType> = Exclude<Node<T>, 'index'>;

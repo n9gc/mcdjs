@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { default as run, out, RunInfos } from '../lib/hfile';
 import * as fsp from 'fs/promises';
 
