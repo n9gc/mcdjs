@@ -8,6 +8,7 @@
 	"scripts": {
 		"build": "pnpm turbo build",
 		"clear": "pnpm turbo clear",
+		"test:cli": "pnpm turbo test:cli",
 		"test": "pnpm turbo test"
 	}
 }

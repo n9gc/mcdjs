@@ -27,6 +27,8 @@
 		"*",
 		"!test",
 		"!.turbo",
+		"!**/*.ts",
+		"**/*.d.ts",
 		"!tsconfig.json"
 	],
 	"keywords": [

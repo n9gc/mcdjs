@@ -1,4 +1,4 @@
-/// <reference types="../../../mcdjs/global" />
+/// <reference types="../../global" />
 {
 	const tagA = new Tag();
 	const tagB = new Tag();

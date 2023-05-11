@@ -12,6 +12,12 @@
 				"./**/*.ts"
 			]
 		},
+		"test:cli": {
+			"dependsOn": [
+				"build",
+				"^build"
+			]
+		},
 		"f-clear": {
 			"inputs": [
 				"./**/*.js",

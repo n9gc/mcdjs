@@ -8,7 +8,8 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "pnpm ts-node ../dev/tester/all -R=\"[[['test/sig','test/multi']]]\"",
+		"test:cli": "./bin/mcdjsc ../mcdjs/test/tests/say ./test/out.json",
+		"test": "ts-node .",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"
 	},
@@ -19,6 +20,8 @@
 		"bin",
 		"lib",
 		"LICENSE",
+		"!**/*.ts",
+		"**/*.d.ts",
 		"README.md"
 	],
 	"keywords": [

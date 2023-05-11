@@ -1,4 +1,4 @@
-/// <reference types="../../../mcdjs/global" />
+/// <reference types="../../global" />
 {
 	const rslt = Command.say('hh');
 

@@ -1,4 +1,4 @@
-/// <reference types="../../../mcdjs/global" />
+/// <reference types="../../global" />
 {
 	Command.say('890');
 

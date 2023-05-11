@@ -1,4 +1,4 @@
-/// <reference types="../../../mcdjs/global" />
+/// <reference types="../../global" />
 {
 	const AllEntity = select('@e');
 	If(AllEntity, () => {

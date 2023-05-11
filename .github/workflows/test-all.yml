@@ -28,3 +28,8 @@ jobs:
       - name: Test
         run: |
           pnpm test
+
+      - name: Test cli
+        run: |
+          pnpm test:cli
+          pnpm clear

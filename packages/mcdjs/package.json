@@ -8,15 +8,15 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "pnpm ts-node .",
+		"test": "pnpm ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi']]]\"",
 		"prepublishOnly": "pnpm run build",
-		"postpublish": "pnpm run clear",
-		"run": "ts-node test/run"
+		"postpublish": "pnpm run clear"
 	},
 	"files": [
 		"lib",
-		"global.d.ts",
 		"LICENSE",
+		"!**/*.ts",
+		"**/*.d.ts",
 		"README.md"
 	],
 	"keywords": [
