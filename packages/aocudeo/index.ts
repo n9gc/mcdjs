@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.0.0
+ * @version 3.0.1
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -40,10 +40,13 @@ namespace Ts {
 		tracker: Error;
 	}
 	export class AocudeoError {
-		constructor(type: ErrorType, tracker: Error, infos?: any) {
+		constructor(
+			type: ErrorType,
+			public tracker: Error,
+			infos?: any
+		) {
 			this.type = ErrorType[type] as any;
 			Object.assign(this, infos);
-			this.tracker = tracker;
 		}
 	}
 }
@@ -67,9 +70,9 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		const map: MapObj<symbol> = {};
 		rslt.forEach(n => map[n] = this.EXIST);
 		getArr(arr).forEach(n => map[n] === this.EXIST || (map[n] = this.EXIST, rslt.push(n)));
-		typeof chkType === 'number'
-			&& map[chkType ? this.END : this.START] === this.EXIST
-			&& this.throwError(chkType, Error(`不能在 ${chkType ? 'START 前' : 'END 后'}插入东西`));
+		if (typeof chkType === 'number' && map[chkType ? this.END : this.START] === this.EXIST) {
+			this.throwError(chkType, Error(`不能在 ${chkType ? 'START 前' : 'END 后'}插入东西`));
+		}
 		return rslt;
 	}
 	static START = Symbol('load start');
@@ -96,7 +99,11 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		const odUnsign = Loader.HOOK_NAME[Number(!order)];
 		let preOf = Loader.noMulti(pos.preOf);
 		let postOf = Loader.noMulti(pos.postOf);
-		order ? preOf = preOf.map(n => odUnsign + n) : postOf = postOf.map(n => odUnsign + n);
+		if (order) {
+			preOf = preOf.map(n => odUnsign + n);
+		} else {
+			postOf = postOf.map(n => odUnsign + n);
+		}
 		return [
 			order ? Loader.START : Loader.END,
 			...preOf,
@@ -118,14 +125,17 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		befores.forEach(n => this.plusCount(n));
 		this.putInList(id, lazy, ...befores);
 	}
-	addAct(id: Id, act: MayArr<F>) {
+	addAct(id: Id, act: MayArr<F>, noInsert = false) {
+		if (!noInsert && this.idSign[id] !== Loader.EXIST) {
+			this.insert(id);
+		}
 		(this.actMap[id] || (this.actMap[id] = [])).push(...getArr(act));
 		return this;
 	}
 	insert(id: Id, pos: PosInfo = {}, act: MayArr<F> | null = null) {
 		this.regSign(true, id);
 		this.regSign(false, pos);
-		act && this.addAct(id, act);
+		if (act) this.addAct(id, act);
 		if (isSym(id)) {
 			this.regAfter(id, this.tidy('after', pos));
 			this.regBefore(id, this.tidy('before', pos));
@@ -148,25 +158,36 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			return;
 		}
 		const n = args[1];
-		if (typeof n !== 'object') this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING);
-		else PosInfo.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
+		if (typeof n !== 'object') {
+			this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING);
+		} else {
+			PosInfo.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
+		}
 	}
 	checkLost() {
 		const list = Reflect.ownKeys(this.idSign).filter(id => this.idSign[id] === Loader.EXISTING);
-		if (list.length) Loader.throwError(3, Error('出现了未注册的模块'), { list });
+		if (list.length) {
+			Loader.throwError(3, Error('出现了未注册的模块'), { list });
+		}
 	}
 	protected checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
 		if (statMap[id] === Loader.EXIST) return false;
-		if (statMap[id] === Loader.EXISTING) return circle.splice(0, circle.indexOf(id)), true;
+		if (statMap[id] === Loader.EXISTING) {
+			circle.splice(0, circle.indexOf(id));
+			return true;
+		}
 		statMap[id] = Loader.EXISTING, circle.push(id);
-		let p: Id;
-		for (p of this.postListMap[id] || []) if (this.checkCircleSub(p, statMap, circle)) return true;
+		for (const p of this.postListMap[id] || []) {
+			if (this.checkCircleSub(p, statMap, circle)) return true;
+		}
 		statMap[id] = Loader.EXIST, circle.pop();
 		return false;
 	}
 	checkCircle(id: Id = Loader.START, statMap: MapObj<symbol> = {}) {
 		const circle: Id[] = [];
-		if (this.checkCircleSub(id, statMap, circle)) Loader.throwError(2, Error('出现环形引用'), { circle });
+		if (this.checkCircleSub(id, statMap, circle)) {
+			Loader.throwError(2, Error('出现环形引用'), { circle });
+		}
 	}
 	protected walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
 		if (--countMap[id]) return;
@@ -194,9 +215,9 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
 			r.n = await waiter;
 		}
-		id in this.postListMap && await Promise.all(
-			this.postListMap[id].map(id => this.loadSub(id, countMap, r))
-		);
+		if (id in this.postListMap) {
+			await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, r)));
+		}
 	}
 	override async load(...n: T extends void ? [] : [n: T]) {
 		if (!this.reuse && this.loaded) return n[0]!;

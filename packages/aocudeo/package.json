@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "2.8.0",
+	"version": "3.0.1",
 	"description": "Load your interdependent modules with the correct order.",
 	"main": "./index",
 	"module": "./index",

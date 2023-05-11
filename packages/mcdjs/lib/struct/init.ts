@@ -1,7 +1,7 @@
 /**
  * 程序结构工具初始化
  * @module mcdjs/lib/struct/init
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-3.0-or-later
  */
 /// <reference path="./grammer.ts" />
@@ -15,12 +15,9 @@ declare global {
 	}
 }
 
-import type { Info } from '../alload';
+import { loader } from '../alload';
 
-export const infoStruct: Info = {
-	id: 'struct',
-	act() {
-		require('./grammer');
-		require('./util');
-	},
-};
+loader.addAct('struct', () => {
+	require('./grammer');
+	require('./util');
+});
