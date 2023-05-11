@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.4
+ * @version 2.7.5
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -84,11 +84,15 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.postListMap[Loader.START] = [Loader.END];
 		this.postListMap[Loader.END] = [];
 	}
+	reuse = false;
 	protected n: T;
 	loaded = false;
 	protected actMap: MapObj<F[]> = Object.create(null);
 	protected postListMap: MapObj<Id[]> = Object.create(null);
-	protected countMap: MapObj<number> = Object.create(null);
+	private countMap: MapObj<number> = Object.create(null);
+	protected getCount(): MapObj<number> {
+		return Object.create(this.countMap);
+	}
 	protected tidy(odName: 'after' | 'before', pos: PosInfo) {
 		const order = odName === 'after' ? 1 : 0;
 		const odSign = Loader.HOOK_NAME[order];
@@ -176,7 +180,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		if (this.loaded) return [];
 		this.checkLost();
 		this.checkCircle();
-		const countMap: MapObj<number> = Object.create(this.countMap);
+		const countMap = this.getCount();
 		const path: Id[] = [];
 		this.walkAt(Loader.START, countMap, path);
 		return path;
@@ -187,21 +191,24 @@ namespace Loader {
 	export import Types = Ts;
 }
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	protected async loadSub(id: Id) {
-		if (--this.countMap[id]) return this.n;
+	protected async loadSub(id: Id, countMap: MapObj<number>) {
+		if (--countMap[id]) return this.n;
 		if (id in this.actMap) {
 			let waiter = new Promise<T>(res => res(this.n));
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
 			this.n = await waiter;
 		}
-		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id)));
+		id in this.postListMap && await Promise.all(
+			this.postListMap[id].map(id => this.loadSub(id, countMap))
+		);
 		return this.n;
 	}
 	override load() {
+		if (!this.reuse && this.loaded) return Promise.resolve(this.n);
 		this.checkLost();
 		this.checkCircle();
 		this.loaded = true;
-		return this.loadSub(Loader.START);
+		return this.loadSub(Loader.START, this.getCount());
 	}
 }
 export namespace LoaderAsync {
@@ -209,6 +216,7 @@ export namespace LoaderAsync {
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	override load() {
+		if (!this.reuse && this.loaded) return this.n;
 		const path = this.walk();
 		this.loaded = true;
 		path.forEach(id => this.actMap[id]?.forEach(fn => this.n = fn(this.n)));

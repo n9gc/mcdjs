@@ -1,6 +1,7 @@
 # Aocudeo
 
 *An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can load your interdependent modules with the correct order through the dependency list registered by each of modules.
+It can also be used to organize your pipelining work.
 
 ## How to Load Your Modules
 

@@ -9,9 +9,10 @@ function log<T>(n: T) {
 	}
 }
 
-const loader = new Loader;
+const loader = new Loader();
+loader.reuse = true;
 
-const a = new Loader(1);
+const a = new Loader();
 
 loader.insert(0, {}, log(0))
 loader.insert(1, {after:[0, 2]}, log(1))
@@ -30,6 +31,8 @@ a.insert(s1, { before: s2 });
 // console.log(a);
 // console.log(a.walk())
 
-new Loader().addAct(Loader.END, log('hh')).load();
+// new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
-// loader.load()
+loader.load();
+loader.load();
+loader.load();

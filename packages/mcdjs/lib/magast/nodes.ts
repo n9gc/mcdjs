@@ -199,7 +199,7 @@ export function getExpression(operm: Operator, expr: Exclude<GameExpr, null>): N
 	if ('tid' in expr) return expr;
 	if (expr.length === 2) return new signCls[expr[0]](
 		operm,
-		getExpression(operm, expr[1])
+		getExpression(operm, expr[1]),
 	);
 	if (expr.length === 3) return new signCls[expr[1]](
 		operm,
