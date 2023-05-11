@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.8.0
+ * @version 3.0.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -75,15 +75,14 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static START = Symbol('load start');
 	static END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
-	constructor(n?: T) {
-		this.n = n!;
+	constructor(
+		public reuse = false,
+	) {
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
 		this.postListMap[Loader.START] = [Loader.END];
 		this.postListMap[Loader.END] = [];
 	}
-	reuse = false;
-	protected n: T;
 	loaded = false;
 	protected actMap: MapObj<F[]> = Object.create(null);
 	protected postListMap: MapObj<Id[]> = Object.create(null);
@@ -182,57 +181,43 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.walkAt(Loader.START, countMap, path);
 		return path;
 	}
-	abstract load(): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
-	protected copyAttr<C extends Loader<T, F>>(loader: C) {
-		loader.reuse = this.reuse;
-		loader.actMap = this.actMap;
-		loader.countMap = this.countMap;
-		loader.postListMap = this.postListMap;
-		loader.idSign = this.idSign;
-		return loader;
-	}
-	abstract create(n?: T): Loader<T, F>;
+	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
 }
 namespace Loader {
 	export import Types = Ts;
 }
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	protected async loadSub(id: Id, countMap: MapObj<number>) {
-		if (--countMap[id]) return this.n;
+	protected async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
+		if (--countMap[id]) return;
 		if (id in this.actMap) {
-			let waiter = new Promise<T>(res => res(this.n));
+			let waiter = new Promise<T>(res => res(r.n));
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
-			this.n = await waiter;
+			r.n = await waiter;
 		}
 		id in this.postListMap && await Promise.all(
-			this.postListMap[id].map(id => this.loadSub(id, countMap))
+			this.postListMap[id].map(id => this.loadSub(id, countMap, r))
 		);
-		return this.n;
 	}
-	override load() {
-		if (!this.reuse && this.loaded) return Promise.resolve(this.n);
+	override async load(...n: T extends void ? [] : [n: T]) {
+		if (!this.reuse && this.loaded) return n[0]!;
 		this.checkLost();
 		this.checkCircle();
 		this.loaded = true;
-		return this.loadSub(Loader.START, this.getCount());
-	}
-	override create(...n: T extends void ? [] : [n: T]): LoaderAsync<T> {
-		return this.copyAttr(new LoaderAsync(n[0]));
+		const r = { n: n[0]! };
+		await this.loadSub(Loader.START, this.getCount(), r);
+		return r.n;
 	}
 }
 export namespace LoaderAsync {
 	export import Types = Ts;
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
-	override load() {
-		if (!this.reuse && this.loaded) return this.n;
+	override load(...n: T extends void ? [] : [n: T]) {
+		if (!this.reuse && this.loaded) return n[0]!;
 		const path = this.walk();
 		this.loaded = true;
-		path.forEach(id => this.actMap[id]?.forEach(fn => this.n = fn(this.n)));
-		return this.n;
-	}
-	override create(...n: T extends void ? [] : [n: T]): LoaderSync<T> {
-		return this.copyAttr(new LoaderSync(n[0]));
+		path.forEach(id => this.actMap[id]?.forEach(fn => n[0] = fn(n[0]!)));
+		return n[0]!;
 	}
 }
 export namespace LoaderSync {

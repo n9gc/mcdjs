@@ -10,7 +10,6 @@ function log<T>(n: T) {
 }
 
 const loader = new Loader();
-loader.reuse = true;
 
 
 loader.insert(0, {}, log(0))
@@ -35,4 +34,4 @@ a.insert(s1, { before: s2 });
 // console.log(loader);
 
 loader.load();
-loader.create().load().then(() => loader.create().load());
+loader.load().then(() => loader.load());
