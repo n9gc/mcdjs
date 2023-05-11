@@ -1,17 +1,21 @@
 /**
  * 功能无关类型定义模块
  * @module mcdjs/lib/types/base
- * @version 1.2.3
+ * @version 1.3.0
  * @license GPL-3.0-or-later
  */
 declare module './base';
 
-import type { AnyArr, Ased, BInT, MapOfArray, RevedObj } from './tool';
+import type { AnyArr, Ased, BInT, KeyArrayOf, MapOfArray, RevedObj } from './tool';
 
 export type Lang =
 	| 'en-US'
 	| 'zh-CN'
 	;
+
+export function listKeyOf<T extends {}>(n: T): Readonly<KeyArrayOf<T>> {
+	return Object.keys(n) as any;
+}
 
 export import Enum = Enum.Enum;
 export namespace Enum {

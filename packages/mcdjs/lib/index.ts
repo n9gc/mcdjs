@@ -17,5 +17,5 @@ export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
 export * as magast from './magast';
-export * as transf from './transf';
+export * as plugin from './plugin';
 export * as types from './types';

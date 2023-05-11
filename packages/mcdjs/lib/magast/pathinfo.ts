@@ -1,24 +1,22 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.0.0
+ * @version 2.1.0
  * @license GPL-3.0-or-later
  */
 declare module './pathinfo';
 
 import type {
-	NType
+	NType,
+	Node,
 } from './nodes';
 
 export default class PathInfo<T extends NType = NType> {
-	/*
 	constructor(
-		public operm: Operator,
 		public node: Node<T>,
-		parent: Partial<SelNode<D>>,
-		public key: Exclude<keyof SelNode<D>, keyof Node>,
 	) {
-		this.parent = parent as SelNode<D>;
+		/*
+		this.parent = node;
 		const pk = (parent as any)[key];
 		if (this.inList = Array.isArray(pk)) {
 			this.posInList = (this.listIn = pk).push(node) - 1;
@@ -28,8 +26,10 @@ export default class PathInfo<T extends NType = NType> {
 			this.listIn = null;
 		}
 		node.endTimer?.();
-		operm.paths[node.index] = this;
+		operm.paths[node.index] = this
+		*/
 	}
+	/*
 	parent: T extends typeof NType.System ? null : Node;
 	posInList: number;
 	inList: boolean;

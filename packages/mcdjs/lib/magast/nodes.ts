@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.2.2
+ * @version 1.3.0
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
@@ -9,22 +9,25 @@ declare module './nodes';
 import Temp from '../alload';
 import { regEnum } from '../config/text';
 import { EType, throwErr } from '../errlib';
-import { Enum } from '../types/base';
+import { Enum, listKeyOf } from '../types/base';
 import {
 	CbType,
 	Condition as GameCond,
 	Expression as GameExpr,
 	Select,
-	SimTag,
+	Sim,
 	TypeId,
 } from '../types/game';
-import type { KeyArrayOf, Vcb } from '../types/tool';
+import type { Vcb } from '../types/tool';
 import type Operator from './operator';
+import PathInfo from './pathinfo';
+import { PluginEmiter } from './transf';
 
 export interface NodeBase {
 	ntype: NType;
 	index: number;
 	tips?: string;
+	walk(emiter: PluginEmiter): void;
 }
 abstract class Base implements NodeBase {
 	constructor(
@@ -34,6 +37,12 @@ abstract class Base implements NodeBase {
 		this.tips || delete this.tips;
 	}
 	abstract ntype: NType;
+	abstract getEles(): Node[];
+	walk(emiter: PluginEmiter) {
+		emiter.entry(this.ntype, new PathInfo(this as any));
+		this.getEles().forEach(node => node.walk(emiter));
+		emiter.exit(this.ntype, new PathInfo(this as any));
+	};
 	index: number;
 	tips?= Temp.tip.getTip();
 }
@@ -46,6 +55,9 @@ export namespace Node {
 			public tips: string,
 		) { super(operm); }
 		nodes: Node[] = [];
+		getEles() {
+			return this.nodes;
+		}
 	}
 	export class CodeBlock extends Base {
 		ntype = NType.CodeBlock;
@@ -58,6 +70,9 @@ export namespace Node {
 			operm.scope = dadScope;
 		}
 		nodes: Node[] = [];
+		getEles() {
+			return this.nodes;
+		}
 	}
 	export class Command extends Base {
 		ntype = NType.Command;
@@ -66,6 +81,9 @@ export namespace Node {
 			operm: Operator,
 			public exec: string,
 		) { super(operm); }
+		getEles() {
+			return [];
+		}
 	}
 	export class Branch extends Base {
 		ntype = NType.Branch;
@@ -79,6 +97,9 @@ export namespace Node {
 		cond;
 		tdo;
 		fdo;
+		getEles() {
+			return [this.cond, this.tdo, this.fdo];
+		}
 	}
 	export class Block extends Base {
 		ntype = NType.Block;
@@ -88,6 +109,9 @@ export namespace Node {
 			public con: boolean,
 			public cbtype: CbType,
 		) { super(operm); }
+		getEles() {
+			return [];
+		}
 	}
 }
 
@@ -99,6 +123,9 @@ export namespace Node {
 			operm: Operator,
 			public pos: number,
 		) { super(operm); }
+		getEles() {
+			return [];
+		}
 	}
 	export class ConditionSelector extends Base {
 		ntype = NType.ConditionSelector;
@@ -106,8 +133,11 @@ export namespace Node {
 		constructor(
 			operm: Operator,
 			public range: Select.At,
-			public expr: MagExpression | null,
+			public expr: Expression | null,
 		) { super(operm); }
+		getEles() {
+			return this.expr ? [this.expr] : [];
+		}
 	}
 	export type Condition =
 		| ConditionCommand
@@ -128,18 +158,35 @@ export function getCondition(operm: Operator, cond: GameCond) {
 }
 
 export namespace Node {
+	export class SimData extends Base {
+		ntype = NType.SimData;
+		static 'zh-CN' = '模拟数据';
+		constructor(
+			operm: Operator,
+			public data: Sim,
+		) { super(operm); }
+		getEles() {
+			return [];
+		}
+	}
 	abstract class BaseExpressionSig extends Base {
 		constructor(
 			operm: Operator,
-			public a: MagExpression,
+			public a: Expression,
 		) { super(operm); }
+		getEles() {
+			return [this.a];
+		}
 	}
 	abstract class BaseExpressionBin extends Base {
 		constructor(
 			operm: Operator,
-			public a: MagExpression,
-			public b: MagExpression,
+			public a: Expression,
+			public b: Expression,
 		) { super(operm); }
+		getEles() {
+			return [this.a, this.b];
+		}
 	}
 	export class ExpressionAnd extends BaseExpressionBin {
 		ntype = NType.ExpressionAnd;
@@ -170,6 +217,7 @@ export namespace Node {
 		static 'zh-CN' = '同或表达式';
 	}
 	export type Expression =
+		| SimData
 		| ExpressionAnd
 		| ExpressionOr
 		| ExpressionNot
@@ -177,10 +225,6 @@ export namespace Node {
 		| ExpressionNor
 		| ExpressionXor
 		| ExpressionXnor
-		;
-	export type MagExpression =
-		| Expression
-		| SimTag
 		;
 }
 const signCls = {
@@ -195,8 +239,8 @@ const signCls = {
 	xor: Node.ExpressionXor,
 	xnor: Node.ExpressionXnor,
 } as const;
-export function getExpression(operm: Operator, expr: Exclude<GameExpr, null>): Node.MagExpression {
-	if ('tid' in expr) return expr;
+export function getExpression(operm: Operator, expr: GameExpr.Calcable): Node.Expression {
+	if ('tid' in expr) return new Node.SimData(operm, expr);
 	if (expr.length === 2) return new signCls[expr[0]](
 		operm,
 		getExpression(operm, expr[1]),
@@ -209,7 +253,7 @@ export function getExpression(operm: Operator, expr: Exclude<GameExpr, null>): N
 	return throwErr(EType.ErrIllegalParameter, Error(), expr);
 }
 
-export const NType = Enum.from(Object.keys(Node) as KeyArrayOf<typeof Node>);
+export const NType = Enum.from(listKeyOf(Node));
 type NTypeObj = typeof NType;
 type NTypeStrKey = Enum.KeyOf<NTypeObj>;
 export type NType<T extends NTypeStrKey = NTypeStrKey> = Enum.ValueOf<NTypeObj, T>;

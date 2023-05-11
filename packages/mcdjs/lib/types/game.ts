@@ -1,7 +1,7 @@
 /**
  * 游戏相关类型定义模块
  * @module mcdjs/lib/types/game
- * @version 1.3.7
+ * @version 1.3.8
  * @license GPL-3.0-or-later
  */
 declare module './game';
@@ -38,7 +38,7 @@ export interface CommandRslt {
 	tid: TypeId.CommandRslt;
 }
 
-export import Sim = Sim.Base;
+export import Sim = Sim.All;
 export import SimTag = Sim.Tag;
 export namespace Sim {
 	/**形式数据 */
@@ -52,6 +52,11 @@ export namespace Sim {
 		toString(): string;
 		tid: TypeId.SimTag;
 	}
+
+	/**所有形式数据 */
+	export type All =
+		| SimTag
+		;
 }
 
 export import Expression = Expression.Any;
@@ -83,7 +88,7 @@ export namespace Expression {
 	/**可操作类型 */
 	export type Calcable =
 		| Sub
-		| SimTag
+		| Sim
 		;
 
 	/**单目表达式 */

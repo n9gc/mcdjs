@@ -1,7 +1,7 @@
 /**
  * 工具类型定义模块
  * @module mcdjs/lib/types/tool
- * @version 1.4.5
+ * @version 1.4.6
  * @license GPL-3.0-or-later
  */
 declare module './tool';
@@ -11,6 +11,9 @@ export type AnyKey = keyof any;
 
 /**空回调 */
 export type Vcb = () => void;
+
+/**获取数组 {@link T} 的元素的类型 */
+export type InArr<T extends AnyArr> = T extends AnyArr<infer N> ? N : never;
 
 /**联合类型 {@link T} 中被 {@link B} 包含的那些类型 */
 export type BInT<T, B> = T extends B ? T : never;

@@ -1,15 +1,14 @@
 /**
  * 错误类型定义模块
  * @module mcdjs/lib/errlib/errors
- * @version 1.5.0
+ * @version 1.5.1
  * @license GPL-3.0-or-later
  */
 declare module './errors';
 
 import { throwErr } from '../errlib';
 import type { Node } from '../magast/nodes';
-import { Enum } from '../types/base';
-import type { KeyArrayOf } from '../types/tool';
+import { Enum, listKeyOf } from '../types/base';
 
 export interface ErrBase {
 	type: EType;
@@ -54,7 +53,7 @@ export const errs = {
 	}),
 } as const;
 
-export const EType = Enum.from(Object.keys(errs) as KeyArrayOf<typeof errs>);
+export const EType = Enum.from(listKeyOf(errs));
 type ETypeObj = typeof EType;
 type ETypeStrKey = Enum.KeyOf<ETypeObj>;
 export type EType<T extends ETypeStrKey = ETypeStrKey> = Enum.ValueOf<ETypeObj, T>;
