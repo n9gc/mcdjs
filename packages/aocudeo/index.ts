@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 2.7.5
+ * @version 2.8.0
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -75,9 +75,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static START = Symbol('load start');
 	static END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
-	constructor(
-		n?: T,
-	) {
+	constructor(n?: T) {
 		this.n = n!;
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
@@ -177,7 +175,6 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
 	}
 	walk() {
-		if (this.loaded) return [];
 		this.checkLost();
 		this.checkCircle();
 		const countMap = this.getCount();
@@ -186,6 +183,15 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return path;
 	}
 	abstract load(): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
+	protected copyAttr<C extends Loader<T, F>>(loader: C) {
+		loader.reuse = this.reuse;
+		loader.actMap = this.actMap;
+		loader.countMap = this.countMap;
+		loader.postListMap = this.postListMap;
+		loader.idSign = this.idSign;
+		return loader;
+	}
+	abstract create(n?: T): Loader<T, F>;
 }
 namespace Loader {
 	export import Types = Ts;
@@ -210,6 +216,9 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 		this.loaded = true;
 		return this.loadSub(Loader.START, this.getCount());
 	}
+	override create(...n: T extends void ? [] : [n: T]): LoaderAsync<T> {
+		return this.copyAttr(new LoaderAsync(n[0]));
+	}
 }
 export namespace LoaderAsync {
 	export import Types = Ts;
@@ -221,6 +230,9 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 		this.loaded = true;
 		path.forEach(id => this.actMap[id]?.forEach(fn => this.n = fn(this.n)));
 		return this.n;
+	}
+	override create(...n: T extends void ? [] : [n: T]): LoaderSync<T> {
+		return this.copyAttr(new LoaderSync(n[0]));
 	}
 }
 export namespace LoaderSync {

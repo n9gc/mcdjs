@@ -12,7 +12,6 @@ function log<T>(n: T) {
 const loader = new Loader();
 loader.reuse = true;
 
-const a = new Loader();
 
 loader.insert(0, {}, log(0))
 loader.insert(1, {after:[0, 2]}, log(1))
@@ -22,6 +21,7 @@ loader.addAct(Loader.END, log('end'))
 loader.insert(8, { postOf: 2 }, log(8))
 loader.checkCircle()
 
+const a = new Loader<number>;
 const s0 = Symbol(0);
 const s1 = Symbol(1);
 const s2 = Symbol(2);
@@ -33,6 +33,6 @@ a.insert(s1, { before: s2 });
 
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
+
 loader.load();
-loader.load();
-loader.load();
+loader.create().load().then(() => loader.create().load());
