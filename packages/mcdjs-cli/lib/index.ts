@@ -1,15 +1,16 @@
 /**
  * 命令行工具模块
  * @module mcdjs-cli
- * @version 1.0.7
+ * @version 1.0.8
  * @license GPL-3.0-or-later
  */
 declare module '.';
 
-import run, { out, RunInfos } from './hfile';
+import 'mcdjs';
 import * as path from 'path';
+import run, { out, RunInfos } from './hfile';
 
-export function getVersion(){
+export function getVersion() {
 	const pinfo = path.join(require.resolve('mcdjs'), '../../package.json');
 	return require(pinfo).version as string;
 }
