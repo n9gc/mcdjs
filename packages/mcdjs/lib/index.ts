@@ -7,10 +7,6 @@
  */
 declare module '.';
 
-export const versions = {
-	mcdjs: '0.9.4',
-} as const;
-
 export * as default from '.';
 export * as alload from './alload';
 export * as appinf from './appinf';
