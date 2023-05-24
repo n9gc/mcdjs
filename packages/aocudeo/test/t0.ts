@@ -13,11 +13,11 @@ const loader = new Loader();
 
 
 loader.insert(0, {}, log(0))
-loader.insert(1, {after:[0, 2]}, log(1))
+loader.insert(1, {after:[0, 2, Loader.END]}, log(1))
 loader.insert(2, {}, log(2))
 loader.addAct(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
-loader.insert(8, { postOf: 2 }, log(8))
+loader.insert(8, { postOf: [2, 2] }, log(8))
 loader.checkCircle()
 
 const a = new Loader<number>;

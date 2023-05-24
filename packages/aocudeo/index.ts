@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.0.1
+ * @version 3.0.2
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -11,76 +11,58 @@ type MayArr<T> = AnyArr<T> | T;
 type Cb<T> = (n: T) => T;
 type ACb<T> = (n: T) => PromiseLike<T>;
 type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
-namespace Ts {
-	export type Hokab = string | number;
-	export type Id = symbol | Hokab;
-	export interface PosInfo {
-		after?: MayArr<Id>;
-		before?: MayArr<Id>;
-		preOf?: MayArr<Hokab>;
-		postOf?: MayArr<Hokab>;
-	}
-	export namespace PosInfo {
-		export const keys = [
-			'after',
-			'before',
-			'preOf',
-			'postOf',
-		] as const;
-	}
-	export type MapObj<T, K extends Id = Id> = { [I in K]: T };
-	export enum ErrorType {
-		InsertBeforeStart,
-		InsertAfterEnd,
-		CircularReference,
-		UnregistedCodeUnits,
-	}
-	export interface AocudeoError {
-		type: keyof typeof ErrorType;
-		tracker: Error;
-	}
-	export class AocudeoError {
-		constructor(
-			type: ErrorType,
-			public tracker: Error,
-			infos?: any
-		) {
-			this.type = ErrorType[type] as any;
-			Object.assign(this, infos);
-		}
-	}
+export type Hokab = string | number;
+export type Id = symbol | Hokab;
+export interface PosInfo {
+	after?: MayArr<Id>;
+	before?: MayArr<Id>;
+	preOf?: MayArr<Hokab>;
+	postOf?: MayArr<Hokab>;
 }
-import Id = Ts.Id;
-import MapObj = Ts.MapObj;
-import PosInfo = Ts.PosInfo;
-import ErrorType = Ts.ErrorType;
+export namespace PosInfo {
+	export const keys = [
+		'after',
+		'before',
+		'preOf',
+		'postOf',
+	] as const;
+}
+type MapObj<T, K extends Id = Id> = { [I in K]: T };
+export enum ErrorType {
+	InsertBeforeStart,
+	InsertAfterEnd,
+	CircularReference,
+	UnregistedCodeUnits,
+}
+export class AocudeoError {
+	constructor(
+		type: ErrorType,
+		tracker: Error,
+		infos?: any,
+	) {
+		this.type = ErrorType[type] as keyof typeof ErrorType;
+		this.tracker = tracker
+		Object.assign(this, infos);
+	}
+	type;
+	tracker;
+}
 function isSym(n: any): n is symbol {
 	return typeof n === 'symbol';
 }
 function getArr<T>(mayArr?: MayArr<T>) {
 	return typeof mayArr === 'undefined' ? [] : mayArr instanceof Array ? mayArr : [mayArr];
 }
+function throwError(type: ErrorType, tracker: Error, infos?: any): never {
+	throw new AocudeoError(type, tracker, infos);
+}
 abstract class Loader<T, F extends Cb<T> | ACb<T>> {
-	static throwError(type: ErrorType, tracker: Error, infos?: any): never {
-		throw new Ts.AocudeoError(type, tracker, infos);
-	}
 	protected static EXIST = Symbol('exist');
 	protected static EXISTING = Symbol('existing');
-	protected static noMulti<T extends Id>(arr: MayArr<T> = [], rslt: T[] = [], chkType?: 0 | 1) {
-		const map: MapObj<symbol> = {};
-		rslt.forEach(n => map[n] = this.EXIST);
-		getArr(arr).forEach(n => map[n] === this.EXIST || (map[n] = this.EXIST, rslt.push(n)));
-		if (typeof chkType === 'number' && map[chkType ? this.END : this.START] === this.EXIST) {
-			this.throwError(chkType, Error(`不能在 ${chkType ? 'START 前' : 'END 后'}插入东西`));
-		}
-		return rslt;
-	}
 	static START = Symbol('load start');
 	static END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
-	constructor(
-		public reuse = false,
-	) {
+	constructor(public reuse = false) {
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
 		this.postListMap[Loader.START] = [Loader.END];
@@ -93,26 +75,30 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected getCount(): MapObj<number> {
 		return Object.create(this.countMap);
 	}
-	protected tidy(odName: 'after' | 'before', pos: PosInfo) {
-		const order = odName === 'after' ? 1 : 0;
-		const odSign = Loader.HOOK_NAME[order];
+	private tidyHook(pos: PosInfo, kn: 'preOf' | 'postOf', order: boolean) {
 		const odUnsign = Loader.HOOK_NAME[Number(!order)];
-		let preOf = Loader.noMulti(pos.preOf);
-		let postOf = Loader.noMulti(pos.postOf);
-		if (order) {
-			preOf = preOf.map(n => odUnsign + n);
-		} else {
-			postOf = postOf.map(n => odUnsign + n);
+		return order === (kn === 'postOf')
+			? getArr(pos[kn])
+			: getArr(pos[kn]).map(n => odUnsign + n);
+	}
+	private tidyMain(arr: AnyArr<Id>, order: boolean) {
+		if (arr.includes(order ? Loader.END : Loader.START)) {
+			throwError(Number(order), Error(`不能在 ${order ? 'END 后' : 'START 前'}插入东西`));
 		}
+		const odSign = Loader.HOOK_NAME[Number(order)];
+		return arr.map(n => isSym(n) ? n : odSign + n);
+	}
+	protected tidy(odName: 'after' | 'before', pos: PosInfo) {
+		const order = odName === 'after';
 		return [
 			order ? Loader.START : Loader.END,
-			...preOf,
-			...Loader.noMulti(pos[odName], [], order).map(n => isSym(n) ? n : odSign + n),
-			...postOf,
+			...this.tidyHook(pos, 'preOf', order),
+			...this.tidyMain(getArr(pos[odName]), order),
+			...this.tidyHook(pos, 'postOf', order),
 		];
 	}
-	private putInList(id: Id, lazy: boolean, ...ids: Id[]) {
-		(this.postListMap[id] || (this.postListMap[id] = []))[lazy ? 'push' : 'unshift'](...ids);
+	private putInList(id: Id, lazy: boolean, ids: MayArr<Id>) {
+		(this.postListMap[id] || (this.postListMap[id] = []))[lazy ? 'push' : 'unshift'](...getArr(ids));
 	}
 	private plusCount(id: Id, num = 1) {
 		this.countMap[id] = (this.countMap[id] || 0) + num;
@@ -123,7 +109,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	}
 	protected regBefore(id: Id, befores: Id[], lazy = false) {
 		befores.forEach(n => this.plusCount(n));
-		this.putInList(id, lazy, ...befores);
+		this.putInList(id, lazy, befores);
 	}
 	addAct(id: Id, act: MayArr<F>, noInsert = false) {
 		if (!noInsert && this.idSign[id] !== Loader.EXIST) {
@@ -149,7 +135,10 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		}
 		return this;
 	}
-	private idSign: MapObj<symbol> = {};
+	private idSign: MapObj<symbol> = {
+		[Loader.START]: Loader.EXIST,
+		[Loader.END]: Loader.EXIST,
+	};
 	protected regSign(method: true, id: Id): void;
 	protected regSign(method: false, n: PosInfo | Id): void;
 	protected regSign(...args: [true, Id] | [false, PosInfo | Id]): void {
@@ -167,10 +156,10 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	checkLost() {
 		const list = Reflect.ownKeys(this.idSign).filter(id => this.idSign[id] === Loader.EXISTING);
 		if (list.length) {
-			Loader.throwError(3, Error('出现了未注册的模块'), { list });
+			throwError(3, Error('出现了未注册的模块'), { list });
 		}
 	}
-	protected checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
+	private checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
 		if (statMap[id] === Loader.EXIST) return false;
 		if (statMap[id] === Loader.EXISTING) {
 			circle.splice(0, circle.indexOf(id));
@@ -186,10 +175,10 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	checkCircle(id: Id = Loader.START, statMap: MapObj<symbol> = {}) {
 		const circle: Id[] = [];
 		if (this.checkCircleSub(id, statMap, circle)) {
-			Loader.throwError(2, Error('出现环形引用'), { circle });
+			throwError(2, Error('出现环形引用'), { circle });
 		}
 	}
-	protected walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
+	private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
 		if (--countMap[id]) return;
 		path.push(id);
 		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
@@ -204,11 +193,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
 }
-namespace Loader {
-	export import Types = Ts;
-}
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	protected async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
+	private async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
 		if (--countMap[id]) return;
 		if (id in this.actMap) {
 			let waiter = new Promise<T>(res => res(r.n));
@@ -229,9 +215,6 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 		return r.n;
 	}
 }
-export namespace LoaderAsync {
-	export import Types = Ts;
-}
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	override load(...n: T extends void ? [] : [n: T]) {
 		if (!this.reuse && this.loaded) return n[0]!;
@@ -240,8 +223,5 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 		path.forEach(id => this.actMap[id]?.forEach(fn => n[0] = fn(n[0]!)));
 		return n[0]!;
 	}
-}
-export namespace LoaderSync {
-	export import Types = Ts;
 }
 export default LoaderSync;
