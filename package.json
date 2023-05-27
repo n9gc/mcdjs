@@ -1,14 +1,14 @@
 {
 	"private": true,
 	"devDependencies": {
-		"turbo": "^1.9.3",
-		"typescript": "^5.0.4",
-		"ts-node": "^10.9.1"
+		"lage": "2.5.0",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.0.4"
 	},
 	"scripts": {
-		"build": "pnpm turbo build",
-		"clear": "pnpm turbo clear",
-		"test:cli": "pnpm turbo test:cli",
-		"test": "pnpm turbo test"
+		"build": "pnpm lage build",
+		"clear": "pnpm lage clear",
+		"test:cli": "pnpm lage test:cli",
+		"test": "pnpm lage test"
 	}
 }

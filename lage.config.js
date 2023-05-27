@@ -1,9 +1,9 @@
-{
-	"$schema": "https://turborepo.org/schema.json",
+// @ts-check
+/**@type {import('lage').ConfigOptions} */
+module.exports = {
+	"npmClient": "pnpm",
+	"concurrency": 8,
 	"pipeline": {
-		"dev": {
-			"persistent": true
-		},
 		"test": {
 			"dependsOn": [
 				"^test"
@@ -24,6 +24,7 @@
 				"./**/*.js.map",
 				"./**/*.d.ts"
 			],
+			"cache": false,
 			"outputs": [
 				"./**/*.js",
 				"./**/*.js.map",
@@ -34,6 +35,7 @@
 			"dependsOn": [
 				"^f-clear"
 			],
+			"cache": false,
 			"inputs": [
 				"./**/*.js",
 				"./**/*.js.map",
