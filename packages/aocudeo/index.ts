@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.1.0
+ * @version 3.1.2
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -11,7 +11,7 @@ type MayArr<T> = AnyArr<T> | T;
 type Cb<T> = (n: T) => T;
 type ACb<T> = (n: T) => PromiseLike<T>;
 type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
-type InitMap<T> = Map<Id, T> | { [id: Id]: T; };
+type InitMap<T> = Map<Id, T> | MapObj<T>;
 export type Hokab = string | number;
 export type Id = symbol | Hokab;
 interface PosInfoObj {
@@ -34,7 +34,7 @@ export type PosInfo = PosInfoObj | PosInfoArr | Id;
 type MapObj<T, K extends Id = Id> = { [I in K]: T };
 type Act<T, F extends Cb<T> | ACb<T>> = { run: F; } | MayArr<F>;
 export type Acts<T, F extends Cb<T> | ACb<T>> = InitMap<Act<T, F>>;
-export type PosMap = InitMap<PosInfo>;
+export type PosMap = InitMap<PosInfo> | AnyArr<AnyArr<Id>>;
 export enum ErrorType {
 	InsertBeforeStart,
 	InsertAfterEnd,
@@ -145,7 +145,12 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	insert(id: Id, pos?: PosInfo, act?: Act<T, F> | null): this;
 	insert(id: Id | PosMap, pos: PosInfo = {}, act: Act<T, F> | null = null) {
 		if (typeof id === 'object') {
-			mapMap(id, (pos, id) => this.insert(id, pos));
+			id instanceof Array
+				? id.forEach(pl => {
+					if (pl.length < 2) return;
+					pl.reduce((p, t) => (this.insert(t, p), t));
+				})
+				: mapMap(id, (pos, id) => this.insert(id, pos));
 			return this;
 		}
 		if (typeof pos !== 'object') pos = [pos];

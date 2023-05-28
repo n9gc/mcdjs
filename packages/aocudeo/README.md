@@ -5,7 +5,7 @@ It can also be used to organize your pipelining work.
 
 ## Usage
 
-### Basic Useful
+### Basic Usage
 
 1. Get a public loader for your modules.
 
@@ -51,13 +51,13 @@ const actMap = new Map([
   ["tieShoes", { run: () => Promise.resolve("tie your shoes") }],
 ]);
 
-const dependencies: PosMap = {
+const dependencies: PosMap = [
   // You need to put your shoes on before you tie them!
-  "putOnShoes": { before: "tieShoes" },
-  "putOnShirt": { before: "putOnJacket" },
-  "putOnJacket": { after: "putOnShorts" },
-  "putOnShorts": { before: "putOnShoes" },
-};
+  ["putOnShoes", "tieShoes"],
+  ["putOnShirt", "putOnJacket"],
+  ["putOnShorts", "putOnJacket"],
+  ["putOnShorts", "putOnShoes"],
+];
 
 await new LoaderAsync<void>(actMap, dependencies).load();
 ```
