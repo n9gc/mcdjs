@@ -1,29 +1,32 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 2.2.0
+ * @version 2.2.2
  * @license GPL-3.0-or-later
  */
 declare module './operator';
 
 import { chCommand } from '../cmdobj';
-import { Shifted } from '../types/tool';
+import Metcls from './metcls';
 import * as Types from './nodes';
 import {
 	AST,
-	NType,
-	NTypeKey,
 	Node,
 } from './nodes';
+import PathInfo from './pathinfo';
 import { Plugin, PluginEmiter } from './transf';
 
-export default class Operator {
+export default class Operator extends Metcls {
 	constructor(tips: string) {
-		this.scope = this.ast = new Node.System(this, tips);
+		super();
+		this.top = new Node.Top(this,
+			this.scope = this.ast = new Node.System(this, tips)
+		);
 	}
-	info: { [num: number]: null; } = {};
+	override operm = this;
 	scope: Node.CodeBlock | Node.System;
 	ast: AST;
+	private top: Node.Top;
 	nodeNum = 0;
 	Types = Types;
 	come() {
@@ -38,11 +41,11 @@ export default class Operator {
 		this.scope.nodes.push(node);
 		return node.index;
 	}
-	getCls<T extends NTypeKey>(name: T, ...args: Shifted<ConstructorParameters<typeof Node[T]>>): Node<NType<T>> {
-		const cls = Node[name] as new (operm: Operator, ...n: typeof args) => any;
-		return new cls(this, ...args);
-	}
-	walk(plugin: Plugin) {
-		this.ast.walk(new PluginEmiter(plugin));
+	override walk(emiter: Plugin | PluginEmiter) {
+		new PathInfo(
+			this, this.ast, this.top,
+			false, 0,
+			'system',
+		).walk(emiter);
 	}
 }

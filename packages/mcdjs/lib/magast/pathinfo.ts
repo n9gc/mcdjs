@@ -1,39 +1,65 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.1.0
+ * @version 2.2.0
  * @license GPL-3.0-or-later
  */
 declare module './pathinfo';
 
-import type {
-	NType,
-	Node,
-} from './nodes';
+import { InArr } from '../types/tool';
+import Metcls from './metcls';
+import { NType, NTypeKey, NTypeObj, Node } from './nodes';
+import Operator from './operator';
+import { Plugin, PluginEmiter } from './transf';
 
-export default class PathInfo<T extends NType = NType> {
+export interface Asserts {
+	dad: NType;
+}
+export default class PathInfo<T extends NType = NType, A extends Asserts = Asserts> extends Metcls {
 	constructor(
+		operm: Operator,
 		public node: Node<T>,
+		public dad: Node<A['dad']>,
+		public inList: boolean,
+		public listIndex: number,
+		public dadKey: InArr<typeof Node[NTypeObj[A['dad']]]['nodeAttr']>,
 	) {
-		/*
-		this.parent = node;
-		const pk = (parent as any)[key];
-		if (this.inList = Array.isArray(pk)) {
-			this.posInList = (this.listIn = pk).push(node) - 1;
-		} else {
-			this.posInList = -1;
-			(parent as any)[key] = node;
-			this.listIn = null;
+		super();
+		this.operm = operm;
+		this.listIn = inList ? (dad as any)[dadKey] : null;
+	}
+	override operm;
+	listIn: Node[] | null;
+	sureDad<K extends NType>(ntype: K): this is PathInfo<T, A & { dad: K; }> {
+		return ntype === this.dad?.ntype;
+	}
+	private useNodeAttr(attr: InArr<typeof Node[NTypeKey]['nodeAttr']>): Node | Node[] | null {
+		return (this.node as any)[attr];
+	}
+	private walkEmiter(emiter: PluginEmiter) {
+		emiter.entry(this);
+		for (const attrName of Node[NType[this.node.ntype as NType]].nodeAttr) {
+			let attr = this.useNodeAttr(attrName);
+			if (attr === null) continue;
+			let idx, inList = true;
+			if (!('length' in attr)) attr = [attr], inList = false;
+			for (idx = 0; idx; ++idx) {
+				const path: PathInfo = new PathInfo(
+					this.operm, attr[idx], this.node,
+					inList, idx,
+					attrName,
+				);
+				emiter.entry(path);
+				path.walkEmiter(emiter);
+				emiter.exit(path);
+			}
 		}
-		node.endTimer?.();
-		operm.paths[node.index] = this
-		*/
+		emiter.exit(this);
+	}
+	override walk(emiter: Plugin | PluginEmiter) {
+		this.walkEmiter(new PluginEmiter(emiter));
 	}
 	/*
-	parent: T extends typeof NType.System ? null : Node;
-	posInList: number;
-	inList: boolean;
-	listIn: Node[] | null;
 	replace<N extends NType>(n: GotSelNode<N>, tips?: string) {
 		const npi: PathInfo<N, D> = this as any;
 		n.endTimer();
@@ -41,15 +67,6 @@ export default class PathInfo<T extends NType = NType> {
 		n.index = npi.node.index;
 		npi.listIn ? npi.listIn[npi.posInList] = n : (npi.parent[npi.key] as any) = n;
 		return npi;
-	}
-	getNode<N extends NType>(ntype: N): GotSelNode<N>;
-	getNode<N extends NType>(ntype: N, body: Omit<SelNode<N>, InitedNodeAttr>): GotSelNode<N>;
-	getNode<N extends NType>(ntype: N, body: Partial<Omit<SelNode<N>, InitedNodeAttr>>, init: true): GotSelNode<N>;
-	getNode(ntype: NType, body: any = {}) {
-		const node = body as GotSelNode;
-		node.ntype = ntype;
-		node.endTimer = holdErr(EType.ErrForgetPathInfo, getTracker(), node).addKey('endTimer');
-		return node;
 	}
 	*/
 }

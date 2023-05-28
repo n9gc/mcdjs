@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.3.0
+ * @version 1.3.3
  * @license GPL-3.0-or-later
  */
 declare module './nodes';
@@ -20,14 +20,11 @@ import {
 } from '../types/game';
 import type { Vcb } from '../types/tool';
 import type Operator from './operator';
-import PathInfo from './pathinfo';
-import { PluginEmiter } from './transf';
 
 export interface NodeBase {
 	ntype: NType;
 	index: number;
 	tips?: string;
-	walk(emiter: PluginEmiter): void;
 }
 abstract class Base implements NodeBase {
 	constructor(
@@ -37,16 +34,22 @@ abstract class Base implements NodeBase {
 		this.tips || delete this.tips;
 	}
 	abstract ntype: NType;
-	abstract getEles(): Node[];
-	walk(emiter: PluginEmiter) {
-		emiter.entry(this.ntype, new PathInfo(this as any));
-		this.getEles().forEach(node => node.walk(emiter));
-		emiter.exit(this.ntype, new PathInfo(this as any));
-	};
 	index: number;
 	tips?= Temp.tip.getTip();
 }
+function sa<T extends string[]>(...n: T): Readonly<T> {
+	return n;
+}
 export namespace Node {
+	export class Top extends Base {
+		ntype = NType.Top;
+		static 'zh-CN' = '树顶空位';
+		constructor(
+			operm: Operator,
+			public system: System,
+		) { super(operm); }
+		static nodeAttr = sa('system');
+	}
 	export class System extends Base {
 		ntype = NType.System;
 		static 'zh-CN' = '指令系统';
@@ -55,9 +58,7 @@ export namespace Node {
 			public tips: string,
 		) { super(operm); }
 		nodes: Node[] = [];
-		getEles() {
-			return this.nodes;
-		}
+		static nodeAttr = sa('nodes');
 	}
 	export class CodeBlock extends Base {
 		ntype = NType.CodeBlock;
@@ -70,9 +71,7 @@ export namespace Node {
 			operm.scope = dadScope;
 		}
 		nodes: Node[] = [];
-		getEles() {
-			return this.nodes;
-		}
+		static nodeAttr = sa('nodes');
 	}
 	export class Command extends Base {
 		ntype = NType.Command;
@@ -81,9 +80,7 @@ export namespace Node {
 			operm: Operator,
 			public exec: string,
 		) { super(operm); }
-		getEles() {
-			return [];
-		}
+		static nodeAttr = sa();
 	}
 	export class Branch extends Base {
 		ntype = NType.Branch;
@@ -97,21 +94,17 @@ export namespace Node {
 		cond;
 		tdo;
 		fdo;
-		getEles() {
-			return [this.cond, this.tdo, this.fdo];
-		}
+		static nodeAttr = sa('cond', 'tdo', 'fdo');
 	}
-	export class Block extends Base {
-		ntype = NType.Block;
+	export class CBlock extends Base {
+		ntype = NType.CBlock;
 		static 'zh-CN' = '命令方块';
 		constructor(
 			operm: Operator,
 			public con: boolean,
 			public cbtype: CbType,
 		) { super(operm); }
-		getEles() {
-			return [];
-		}
+		static nodeAttr = sa();
 	}
 }
 
@@ -123,9 +116,7 @@ export namespace Node {
 			operm: Operator,
 			public pos: number,
 		) { super(operm); }
-		getEles() {
-			return [];
-		}
+		static nodeAttr = sa();
 	}
 	export class ConditionSelector extends Base {
 		ntype = NType.ConditionSelector;
@@ -135,9 +126,7 @@ export namespace Node {
 			public range: Select.At,
 			public expr: Expression | null,
 		) { super(operm); }
-		getEles() {
-			return this.expr ? [this.expr] : [];
-		}
+		static nodeAttr = sa('expr');
 	}
 	export type Condition =
 		| ConditionCommand
@@ -165,18 +154,14 @@ export namespace Node {
 			operm: Operator,
 			public data: Sim,
 		) { super(operm); }
-		getEles() {
-			return [];
-		}
+		static nodeAttr = sa();
 	}
 	abstract class BaseExpressionSig extends Base {
 		constructor(
 			operm: Operator,
 			public a: Expression,
 		) { super(operm); }
-		getEles() {
-			return [this.a];
-		}
+		static nodeAttr = sa('a');
 	}
 	abstract class BaseExpressionBin extends Base {
 		constructor(
@@ -184,9 +169,7 @@ export namespace Node {
 			public a: Expression,
 			public b: Expression,
 		) { super(operm); }
-		getEles() {
-			return [this.a, this.b];
-		}
+		static nodeAttr = sa('a', 'b');
 	}
 	export class ExpressionAnd extends BaseExpressionBin {
 		ntype = NType.ExpressionAnd;
@@ -254,7 +237,7 @@ export function getExpression(operm: Operator, expr: GameExpr.Calcable): Node.Ex
 }
 
 export const NType = Enum.from(listKeyOf(Node));
-type NTypeObj = typeof NType;
+export type NTypeObj = typeof NType;
 type NTypeStrKey = Enum.KeyOf<NTypeObj>;
 export type NType<T extends NTypeStrKey = NTypeStrKey> = Enum.ValueOf<NTypeObj, T>;
 export type NTypeKey<V extends NType = NType> = Enum.KeyOf<NTypeObj, V>;
