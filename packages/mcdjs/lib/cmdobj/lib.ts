@@ -1,7 +1,7 @@
 /**
  * 命令集通用库
  * @version 0.1.5
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 "use strict";
 

@@ -2,7 +2,7 @@
  * 命令行工具模块
  * @module mcdjs-cli
  * @version 1.0.8
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module '.';
 

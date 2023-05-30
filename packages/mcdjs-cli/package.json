@@ -33,7 +33,7 @@
 		"mcdjs"
 	],
 	"author": "e0selmy4v",
-	"license": "GPL-3.0-or-later",
+	"license": "GPL-2.0-or-later",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/n9gc/mcdjs.git"

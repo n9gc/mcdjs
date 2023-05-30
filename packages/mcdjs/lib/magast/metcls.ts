@@ -2,7 +2,7 @@
  * 与操作器绑定的各种实用函数类
  * @module mcdjs/lib/magast/metcls
  * @version 1.0.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './metcls';
 

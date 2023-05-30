@@ -2,7 +2,7 @@
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
  * @version 2.2.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
 

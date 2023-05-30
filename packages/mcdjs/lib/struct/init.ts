@@ -2,7 +2,7 @@
  * 程序结构工具初始化
  * @module mcdjs/lib/struct/init
  * @version 1.1.1
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 /// <reference path="./grammer.ts" />
 /// <reference path="./util.ts" />

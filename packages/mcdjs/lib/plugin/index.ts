@@ -2,7 +2,7 @@
  * 转译流程模块
  * @module mcdjs/lib/plugin
  * @version 1.0.1
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module '.';
 

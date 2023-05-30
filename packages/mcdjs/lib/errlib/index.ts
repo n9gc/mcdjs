@@ -2,7 +2,7 @@
  * 错误处理模块
  * @module mcdjs/lib/errlib
  * @version 2.1.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module '.';
 

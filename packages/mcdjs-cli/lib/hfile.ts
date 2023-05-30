@@ -2,7 +2,7 @@
  * 文件解析处理模块
  * @module mcdjs-cli/lib/hfile
  * @version 1.1.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './hfile';
 

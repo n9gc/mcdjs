@@ -2,7 +2,7 @@
  * 转译相关定义模块
  * @module mcdjs/lib/magast/transf
  * @version 2.2.1
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './transf';
 

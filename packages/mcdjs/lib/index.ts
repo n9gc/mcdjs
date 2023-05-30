@@ -2,7 +2,7 @@
  * *McdJS* - 用 JS 编写你的指令！
  * @module mcdjs
  * @version 0.9.4
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  * @see https://github.com/n9gc/mcdjs 在线代码仓库
  */
 declare module '.';

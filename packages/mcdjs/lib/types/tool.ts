@@ -2,7 +2,7 @@
  * 工具类型定义模块
  * @module mcdjs/lib/types/tool
  * @version 1.4.6
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './tool';
 

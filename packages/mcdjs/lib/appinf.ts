@@ -2,7 +2,7 @@
  * 应用包装模块
  * @module mcdjs/lib/appinf
  * @version 1.1.3
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './appinf';
 

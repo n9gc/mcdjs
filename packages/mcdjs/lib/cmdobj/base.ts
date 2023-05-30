@@ -1,7 +1,7 @@
 /**
  * 命令集初始化
  * @version 0.1.10
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 "use strict";
 

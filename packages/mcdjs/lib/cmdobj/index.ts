@@ -2,7 +2,7 @@
  * 命令集模块
  * @module mcdjs/lib/cmdobj
  * @version 1.1.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module '.';
 

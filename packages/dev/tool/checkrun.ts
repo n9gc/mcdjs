@@ -2,7 +2,7 @@
  * 自动运行
  * @module @mcdjs/dev/tool/checkrun
  * @version 1.0.0
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './checkrun';
 

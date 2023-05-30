@@ -2,7 +2,7 @@
  * 配置相关辅助模块
  * @module mcdjs/lib/config/tool
  * @version 1.0.2
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './tool';
 

@@ -2,7 +2,7 @@
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
  * @version 2.2.2
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 declare module './operator';
 

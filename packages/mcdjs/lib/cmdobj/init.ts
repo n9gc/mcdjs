@@ -2,7 +2,7 @@
  * 命令集初始化信息
  * @module mcdjs/lib/cmdobj/init
  * @version 1.0.1
- * @license GPL-3.0-or-later
+ * @license GPL-2.0-or-later
  */
 /// <reference path="./base.ts" />
 /// <reference path="./lib.ts" />
@@ -11,7 +11,7 @@ declare global {
 	namespace McdJSTemp {
 		/**
 		 * McdJS 命令集
-		 * @license GPL-3.0-or-later
+		 * @license GPL-2.0-or-later
 		 */
 		namespace Command {
 			/**版本信息 */
