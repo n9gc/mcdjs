@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.1.2
+ * @version 3.1.4
  * @license GPL-3.0-or-later
  */
 declare module '.';
@@ -64,8 +64,9 @@ function throwError(type: ErrorType, tracker: Error, infos?: any): never {
 	throw new AocudeoError(type, tracker, infos);
 }
 function mapMap<N>(map: { [id: Id]: N; } | Map<Id, N>, cb: (value: N, id: Id) => void) {
-	if (map instanceof Map) map.forEach(cb);
-	else Reflect.ownKeys(map).forEach(id => cb(map[id], id));
+	map instanceof Map
+		? map.forEach(cb)
+		: Reflect.ownKeys(map).forEach(id => cb(map[id], id));
 }
 abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected static EXIST = Symbol('exist');
@@ -81,7 +82,6 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
 		this.postListMap[Loader.START] = [Loader.END];
-		this.postListMap[Loader.END] = [];
 		this.addAct(acts);
 		this.insert(posMap);
 	}
@@ -100,9 +100,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			: getArr(pos[kn]).map(n => odUnsign + n);
 	}
 	private tidyMain(arr: AnyArr<Id>, order: boolean) {
-		if (arr.includes(order ? Loader.END : Loader.START)) {
-			throwError(Number(order), Error(`不能在 ${order ? 'END 后' : 'START 前'}插入东西`));
-		}
+		if (arr.includes(order ? Loader.END : Loader.START)) throwError(Number(order), Error(`不能在 ${order ? 'END 后' : 'START 前'}插入东西`));
 		const odSign = Loader.HOOK_NAME[Number(order)];
 		return arr.map(n => isSym(n) ? n : odSign + n);
 	}
@@ -148,6 +146,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			id instanceof Array
 				? id.forEach(pl => {
 					if (pl.length < 2) return;
+					this.insert(pl[0]);
 					pl.reduce((p, t) => (this.insert(t, p), t));
 				})
 				: mapMap(id, (pos, id) => this.insert(id, pos));
@@ -178,22 +177,15 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected regSign(method: true, id: Id): void;
 	protected regSign(method: false, n: PosInfoObj | Id): void;
 	protected regSign(...args: [true, Id] | [false, PosInfoObj | Id]): void {
-		if (args[0]) {
-			this.idSign[args[1]] = Loader.EXIST;
-			return;
-		}
+		if (args[0]) return void (this.idSign[args[1]] = Loader.EXIST);
 		const n = args[1];
-		if (typeof n !== 'object') {
-			this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING);
-		} else {
-			PosInfoObj.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
-		}
+		typeof n !== 'object'
+			? this.idSign[n] === Loader.EXIST || (this.idSign[n] = Loader.EXISTING)
+			: PosInfoObj.keys.forEach(key => getArr(n[key]).forEach(id => this.regSign(false, id)));
 	}
 	checkLost() {
 		const list = Reflect.ownKeys(this.idSign).filter(id => this.idSign[id] === Loader.EXISTING);
-		if (list.length) {
-			throwError(3, Error('出现了未注册的模块'), { list });
-		}
+		if (list.length) throwError(3, Error('出现了未注册的模块'), { list });
 	}
 	private checkCircleSub(id: Id, statMap: MapObj<symbol>, circle: Id[]) {
 		if (statMap[id] === Loader.EXIST) return false;
@@ -210,9 +202,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	}
 	checkCircle(id: Id = Loader.START, statMap: MapObj<symbol> = {}) {
 		const circle: Id[] = [];
-		if (this.checkCircleSub(id, statMap, circle)) {
-			throwError(2, Error('出现环形引用'), { circle });
-		}
+		if (this.checkCircleSub(id, statMap, circle)) throwError(2, Error('出现环形引用'), { circle });
 	}
 	private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
 		if (--countMap[id]) return;
@@ -222,9 +212,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	walk() {
 		this.checkLost();
 		this.checkCircle();
-		const countMap = this.getCount();
 		const path: Id[] = [];
-		this.walkAt(Loader.START, countMap, path);
+		this.walkAt(Loader.START, this.getCount(), path);
 		return path;
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
@@ -237,9 +226,7 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
 			r.n = await waiter;
 		}
-		if (id in this.postListMap) {
-			await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, r)));
-		}
+		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, r)));
 	}
 	override async load(...n: T extends void ? [] : [n: T]) {
 		if (!this.reuse && this.loaded) return n[0]!;

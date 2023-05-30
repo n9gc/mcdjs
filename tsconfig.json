@@ -13,6 +13,7 @@
 		"alwaysStrict": true,
 		"noImplicitThis": true,
 		"noEmitOnError": true,
+		"experimentalDecorators": true,
 		"declaration": true
 	}
 }
