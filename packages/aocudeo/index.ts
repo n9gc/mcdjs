@@ -1,15 +1,15 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.3.0
+ * @version 3.3.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
 
 type AnyArr<T = any> = readonly T[];
 type MayArr<T> = AnyArr<T> | T;
-type Cb<T> = (n: T) => T;
-type ACb<T> = (n: T) => PromiseLike<T>;
+type Cb<T> = (n: T) => T | void;
+type ACb<T> = (n: T) => PromiseLike<T | void>;
 type Judger<T> = (n: T) => boolean;
 type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
 type InitMap<T> = Map<Id, T> | MapObj<T>;
@@ -260,7 +260,7 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 		if (this.posObjMap[id]?.preJudger?.(r.n) === false) return;
 		if (id in this.actMap) {
 			let waiter = new Promise<T>(res => res(r.n));
-			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
+			this.actMap[id].forEach(fn => waiter = waiter.then(fn).then(n => n || r.n));
 			r.n = await waiter;
 		}
 		if (this.posObjMap[id]?.postJudger?.(r.n) === false) return;
@@ -280,7 +280,7 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	private loadSub(id: Id, countMap: MapObj<number>, n: T) {
 		if (--countMap[id]) return n;
 		if (this.posObjMap[id]?.preJudger?.(n) === false) return n;
-		this.actMap[id]?.forEach(fn => n = fn(n));
+		this.actMap[id]?.forEach(fn => n = fn(n) || n);
 		if (this.posObjMap[id]?.postJudger?.(n) === false) return n;
 		this.postListMap[id]?.forEach(id => n = this.loadSub(id, countMap, n));
 		return n;
