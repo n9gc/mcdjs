@@ -19,7 +19,7 @@ loader.insert(2, {}, log(2))
 loader.addAct(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
 loader.insert(8, { postOf: [2] }, log(8))
-loader.insert(5, { after: 2, preJudger() { return true; } }, log(5))
+loader.insert(5, { after: 2, preJudger() { return false; } }, log(5))
 loader.checkCircle()
 loader.checkLost();
 
@@ -36,7 +36,7 @@ a.insert(s1, { before: s2 });
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
 
-//loader.show();
+loader.show();
 
 loader.load();
 //loader.load().then(() => loader.load());

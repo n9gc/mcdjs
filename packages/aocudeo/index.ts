@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.3.1
+ * @version 3.3.2
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -86,7 +86,6 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.reuse = reuse;
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
-		this.postListMap[Loader.START] = [Loader.END];
 		this.addAct(acts);
 		this.insert(posMap);
 	}
@@ -115,7 +114,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	protected tidy(odName: 'after' | 'before', pos: PosInfoObj<T>) {
 		const order = odName === 'after';
 		return [
-			order ? Loader.START : Loader.END,
+			...(order ? [Loader.START] : []),
 			...this.tidyHook(pos, 'preOf', order),
 			...this.tidyMain(getArr(pos[odName]), order),
 			...this.tidyHook(pos, 'postOf', order),
@@ -236,14 +235,22 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return path;
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
+	private dotLine(a: Id, b: Id, n = false) {
+		return `\t"${a.toString()}" -> "${b.toString()}"${n ? ' [style = dashed]' : ''}`;
+	}
 	showDot() {
 		return [
 			'digraph loader {',
+			...Reflect.ownKeys(this.idSign)
+				.filter(id => this.idSign[id] === Loader.EXIST && id !== Loader.END)
+				.map(id => isSym(id)
+					? id.toString()
+					: Loader.HOOK_NAME[1] + id
+				)
+				.map(id => this.dotLine(id, Loader.END)),
 			...Reflect.ownKeys(this.postListMap)
-				.map(from => this.postListMap[from].map(
-					to => `\t"${from.toString()}" -> "${to.toString()}"${(
-						this.postJudgerSign[from] === Loader.EXIST || this.preJudgerSign[to] === Loader.EXIST
-						) ? ' [style = dashed]' : ''}`
+				.map(a => this.postListMap[a].map(
+					b => this.dotLine(a, b, this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST)
 				))
 				.flat(),
 			'}',
@@ -272,7 +279,9 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 		this.checkCircle();
 		this.loaded = true;
 		const r = { n: n[0]! };
-		await this.loadSub(Loader.START, this.getCount(), r);
+		const countMap = this.getCount()
+		await this.loadSub(Loader.START, countMap, r);
+		await this.loadSub(Loader.END, countMap, r);
 		return r.n;
 	}
 }
@@ -285,12 +294,15 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 		this.postListMap[id]?.forEach(id => n = this.loadSub(id, countMap, n));
 		return n;
 	}
-	override load(...n: T extends void ? [] : [n: T]) {
+	override load(...n: T extends void ? [] : [n: T]): T {
 		if (!this.reuse && this.loaded) return n[0]!;
 		this.checkLost();
 		this.checkCircle();
 		this.loaded = true;
-		return this.loadSub(Loader.START, this.getCount(), n[0]!);
+		const countMap = this.getCount();
+		n[0] = this.loadSub(Loader.START, countMap, n[0]!);
+		n[0] = this.loadSub(Loader.END, countMap, n[0]);
+		return n[0];
 	}
 }
 export default LoaderSync;
