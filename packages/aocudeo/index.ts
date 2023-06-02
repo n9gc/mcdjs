@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.1.4
+ * @version 3.2.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -217,6 +217,27 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return path;
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
+	private jsonfilter(n: Id): string;
+	private jsonfilter(n: MapObj<Id[]>): MapObj<Id[], string>;
+	private jsonfilter(n: Id[]): Id[];
+	private jsonfilter(n: Id | MapObj<Id[]> | Id[]) {
+		switch (typeof n) {
+			case 'string':
+			case 'number':
+			case 'symbol':
+			return n.toString();
+		}
+		if (Array.isArray(n)) return n;
+		const r: MapObj<Id[], string> = {};
+		Reflect.ownKeys(n).forEach(t => r[this.jsonfilter(t)] = n[t]);
+		return r;
+	}
+	show() {
+		const info = JSON.stringify(this.postListMap,(_, n) => this.jsonfilter(n));
+		const web = 'https://n9gc.github.io/mcdjs/packages/aocudeo/graph.html?';
+		if (typeof window !== 'undefined') return window.open(web + info), true;
+		return false;
+	}
 }
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 	private async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
