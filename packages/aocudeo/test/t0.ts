@@ -34,7 +34,7 @@ a.insert(s1, { before: s2 });
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
 
-console.log(loader.show());
+loader.show();
 throw 23;
 
 loader.load();
