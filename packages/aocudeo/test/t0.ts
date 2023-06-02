@@ -1,7 +1,8 @@
-import { LoaderAsync as Loader } from '..';
+import { LoaderSync as Loader } from '..';
 
 const timeout = (n: number) => new Promise(res => setTimeout(res, n));
 function log<T>(n: T) {
+	return () => console.log(n)
 	return async () => {
 		console.log('go', n);
 		await timeout(200);
@@ -18,6 +19,7 @@ loader.insert(2, {}, log(2))
 loader.addAct(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
 loader.insert(8, { postOf: [2] }, log(8))
+loader.insert(5, { after: 2, preJudger() { return true; } }, log(5))
 loader.checkCircle()
 loader.checkLost();
 
@@ -34,8 +36,7 @@ a.insert(s1, { before: s2 });
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
 
-loader.show();
-throw 23;
+//loader.show();
 
 loader.load();
-loader.load().then(() => loader.load());
+//loader.load().then(() => loader.load());

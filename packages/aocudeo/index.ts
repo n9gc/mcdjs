@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.2.2
+ * @version 3.3.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -10,11 +10,16 @@ type AnyArr<T = any> = readonly T[];
 type MayArr<T> = AnyArr<T> | T;
 type Cb<T> = (n: T) => T;
 type ACb<T> = (n: T) => PromiseLike<T>;
+type Judger<T> = (n: T) => boolean;
 type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
 type InitMap<T> = Map<Id, T> | MapObj<T>;
 export type Hokab = string | number;
 export type Id = symbol | Hokab;
-interface PosInfoObj {
+interface JudgerObj<T> {
+	preJudger?: Judger<T>;
+	postJudger?: Judger<T>;
+}
+interface PosInfoObj<T> extends JudgerObj<T> {
 	after?: MayArr<Id>;
 	before?: MayArr<Id>;
 	preOf?: MayArr<Hokab>;
@@ -30,11 +35,11 @@ namespace PosInfoObj {
 }
 /**@see {@link PosInfoObj.after|`PosInfoObj#after`} */
 type PosInfoArr = AnyArr<Id>;
-export type PosInfo = PosInfoObj | PosInfoArr | Id;
+export type PosInfo<T> = PosInfoObj<T> | PosInfoArr | Id;
 type MapObj<T, K extends Id = Id> = { [I in K]: T };
 type Act<T, F extends Cb<T> | ACb<T>> = { run: F; } | MayArr<F>;
 export type Acts<T, F extends Cb<T> | ACb<T>> = InitMap<Act<T, F>>;
-export type PosMap = InitMap<PosInfo> | AnyArr<AnyArr<Id>>;
+export type PosMap<T> = InitMap<PosInfo<T>> | MayArr<AnyArr<Id>>;
 export enum ErrorType {
 	InsertBeforeStart,
 	InsertAfterEnd,
@@ -75,8 +80,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	static END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
 	constructor(reuse?: boolean);
-	constructor(acts: Acts<T, F>, posMap?: PosMap, reuse?: boolean);
-	constructor(...args: [Acts<T, F>, PosMap?, boolean?] | [boolean?]) {
+	constructor(acts: Acts<T, F>, posMap?: PosMap<T>, reuse?: boolean);
+	constructor(...args: [Acts<T, F>, PosMap<T>?, boolean?] | [boolean?]) {
 		const [acts, posMap = {}, reuse = false] = typeof args[0] === 'object' ? args : [{}, {}, args[0]];
 		this.reuse = reuse;
 		this.countMap[Loader.START] = 1;
@@ -89,11 +94,14 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	loaded = false;
 	protected actMap: MapObj<F[]> = Object.create(null);
 	protected postListMap: MapObj<Id[]> = Object.create(null);
+	protected posObjMap: MapObj<JudgerObj<T>> = Object.create(null);
+	protected preJudgerSign: MapObj<symbol> = {};
+	protected postJudgerSign: MapObj<symbol> = {};
 	private countMap: MapObj<number> = Object.create(null);
 	protected getCount(): MapObj<number> {
 		return Object.create(this.countMap);
 	}
-	private tidyHook(pos: PosInfoObj, kn: 'preOf' | 'postOf', order: boolean) {
+	private tidyHook(pos: PosInfoObj<T>, kn: 'preOf' | 'postOf', order: boolean) {
 		const odUnsign = Loader.HOOK_NAME[Number(!order)];
 		return order === (kn === 'postOf')
 			? getArr(pos[kn])
@@ -104,7 +112,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		const odSign = Loader.HOOK_NAME[Number(order)];
 		return arr.map(n => isSym(n) ? n : odSign + n);
 	}
-	protected tidy(odName: 'after' | 'before', pos: PosInfoObj) {
+	protected tidy(odName: 'after' | 'before', pos: PosInfoObj<T>) {
 		const order = odName === 'after';
 		return [
 			order ? Loader.START : Loader.END,
@@ -130,21 +138,25 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	addAct(actMap: Acts<T, F>, noInsert?: boolean): this;
 	addAct(id: Id, act: Act<T, F>, noInsert?: boolean): this;
 	addAct(id: Id | Acts<T, F>, act?: Act<T, F> | boolean, noInsert: boolean = false) {
-		if (typeof id === 'object' || typeof act === 'boolean') {
-			mapMap(id as Acts<T, F>, (acti, id) => this.addAct(id, acti, typeof act === 'boolean' ? act : void 0));
+		if (typeof id === 'object') {
+			mapMap(id, (acti, id) => this.addAct(id, acti, typeof act === 'boolean' ? act : void 0));
 			return this;
 		}
+		switch (typeof act) { case 'boolean': case 'undefined': return this; }
 		if (!noInsert && this.idSign[id] !== Loader.EXIST) this.insert(id);
 		if (act && 'run' in act) act = act.run;
 		(this.actMap[id] || (this.actMap[id] = [])).push(...getArr(act));
 		return this;
 	}
-	insert(posMap: PosMap): this;
-	insert(id: Id, pos?: PosInfo, act?: Act<T, F> | null): this;
-	insert(id: Id | PosMap, pos: PosInfo = {}, act: Act<T, F> | null = null) {
+	insert(posMap: PosMap<T>): this;
+	insert(id: Id, pos?: PosInfo<T>, act?: Act<T, F> | null): this;
+	insert(id: Id | PosMap<T>, pos: PosInfo<T> = {}, act: Act<T, F> | null = null) {
 		if (typeof id === 'object') {
 			id instanceof Array
-				? id.forEach(pl => {
+				? ((typeof id[0] === 'object'
+					? id
+					: [id]
+				) as AnyArr<AnyArr<Id>>).forEach(pl => {
 					if (pl.length < 2) return;
 					this.insert(pl[0]);
 					pl.reduce((p, t) => (this.insert(t, p), t));
@@ -160,6 +172,9 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		if (isSym(id)) {
 			this.regAfter(id, this.tidy('after', pos));
 			this.regBefore(id, this.tidy('before', pos));
+			this.posObjMap[id] = pos;
+			if (pos.preJudger) this.preJudgerSign[id] = Loader.EXIST;
+			if (pos.postJudger) this.postJudgerSign[id] = Loader.EXIST;
 		} else {
 			const preId = Loader.HOOK_NAME[0] + id;
 			const postId = Loader.HOOK_NAME[1] + id;
@@ -167,6 +182,10 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			this.regAfter(id, [preId], true);
 			this.regBefore(id, [postId], true);
 			this.regBefore(postId, this.tidy('before', pos));
+			this.posObjMap[preId] = { preJudger: pos.preJudger };
+			this.posObjMap[postId] = { postJudger: pos.postJudger };
+			if (pos.preJudger) this.preJudgerSign[preId] = Loader.EXIST;
+			if (pos.postJudger) this.postJudgerSign[postId] = Loader.EXIST;
 		}
 		return this;
 	}
@@ -175,8 +194,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		[Loader.END]: Loader.EXIST,
 	};
 	protected regSign(method: true, id: Id): void;
-	protected regSign(method: false, n: PosInfoObj | Id): void;
-	protected regSign(...args: [true, Id] | [false, PosInfoObj | Id]): void {
+	protected regSign(method: false, n: PosInfoObj<T> | Id): void;
+	protected regSign(...args: [true, Id] | [false, PosInfoObj<T> | Id]): void {
 		if (args[0]) return void (this.idSign[args[1]] = Loader.EXIST);
 		const n = args[1];
 		typeof n !== 'object'
@@ -221,7 +240,11 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return [
 			'digraph loader {',
 			...Reflect.ownKeys(this.postListMap)
-				.map(from => this.postListMap[from].map(to => `\t"${from.toString()}" -> "${to.toString()}"`))
+				.map(from => this.postListMap[from].map(
+					to => `\t"${from.toString()}" -> "${to.toString()}"${(
+						this.postJudgerSign[from] === Loader.EXIST || this.preJudgerSign[to] === Loader.EXIST
+						) ? ' [style = dashed]' : ''}`
+				))
 				.flat(),
 			'}',
 		].join('\n');
@@ -234,11 +257,13 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 	private async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
 		if (--countMap[id]) return;
+		if (this.posObjMap[id]?.preJudger?.(r.n) === false) return;
 		if (id in this.actMap) {
 			let waiter = new Promise<T>(res => res(r.n));
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn));
 			r.n = await waiter;
 		}
+		if (this.posObjMap[id]?.postJudger?.(r.n) === false) return;
 		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, r)));
 	}
 	override async load(...n: T extends void ? [] : [n: T]) {
@@ -252,12 +277,20 @@ export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
 	}
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
+	private loadSub(id: Id, countMap: MapObj<number>, n: T) {
+		if (--countMap[id]) return n;
+		if (this.posObjMap[id]?.preJudger?.(n) === false) return n;
+		this.actMap[id]?.forEach(fn => n = fn(n));
+		if (this.posObjMap[id]?.postJudger?.(n) === false) return n;
+		this.postListMap[id]?.forEach(id => n = this.loadSub(id, countMap, n));
+		return n;
+	}
 	override load(...n: T extends void ? [] : [n: T]) {
 		if (!this.reuse && this.loaded) return n[0]!;
-		const path = this.walk();
+		this.checkLost();
+		this.checkCircle();
 		this.loaded = true;
-		path.forEach(id => this.actMap[id]?.forEach(fn => n[0] = fn(n[0]!)));
-		return n[0]!;
+		return this.loadSub(Loader.START, this.getCount(), n[0]!);
 	}
 }
 export default LoaderSync;
