@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "3.3.2",
+	"version": "3.3.3",
 	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
 	"main": "./index",
 	"module": "./index",

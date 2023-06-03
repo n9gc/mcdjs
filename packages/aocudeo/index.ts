@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.3.2
+ * @version 3.3.3
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -35,11 +35,11 @@ namespace PosInfoObj {
 }
 /**@see {@link PosInfoObj.after|`PosInfoObj#after`} */
 type PosInfoArr = AnyArr<Id>;
-export type PosInfo<T> = PosInfoObj<T> | PosInfoArr | Id;
+export type PosInfo<T = unknown> = PosInfoObj<T> | PosInfoArr | Id;
 type MapObj<T, K extends Id = Id> = { [I in K]: T };
 type Act<T, F extends Cb<T> | ACb<T>> = { run: F; } | MayArr<F>;
 export type Acts<T, F extends Cb<T> | ACb<T>> = InitMap<Act<T, F>>;
-export type PosMap<T> = InitMap<PosInfo<T>> | MayArr<AnyArr<Id>>;
+export type PosMap<T = unknown> = InitMap<PosInfo<T>> | MayArr<AnyArr<Id>>;
 export enum ErrorType {
 	InsertBeforeStart,
 	InsertAfterEnd,
@@ -235,29 +235,39 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return path;
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
-	private dotLine(a: Id, b: Id, n = false) {
-		return `\t"${a.toString()}" -> "${b.toString()}"${n ? ' [style = dashed]' : ''}`;
-	}
-	showDot() {
+	private dotLine(a: Id, b: Id, sign?: boolean) {
 		return [
+			'\t',
+			!sign && new Set([a, b, Loader.END, Loader.START]).size < 4 && '// ',
+			`"${a.toString()}" -> "${b.toString()}"`,
+			this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST && ' [style = dashed]',
+		].filter(n => n).join('');
+	}
+	showDot(sign?: boolean) {
+		return [...new Set([
 			'digraph loader {',
 			...Reflect.ownKeys(this.idSign)
 				.filter(id => this.idSign[id] === Loader.EXIST && id !== Loader.END)
-				.map(id => isSym(id)
-					? id.toString()
-					: Loader.HOOK_NAME[1] + id
-				)
-				.map(id => this.dotLine(id, Loader.END)),
+				.map(id => isSym(id) ? id.toString() : Loader.HOOK_NAME[1] + id)
+				.map(id => this.dotLine(id, Loader.END, sign)),
 			...Reflect.ownKeys(this.postListMap)
-				.map(a => this.postListMap[a].map(
-					b => this.dotLine(a, b, this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST)
-				))
+				.map(a => this.postListMap[a].map(b => this.dotLine(a, b, sign)))
 				.flat(),
+			// Object.keys(this.idSign)
+			// 	.map(n => [
+			// 		`subgraph cluster_${n} {`,
+			// 		`\t"${n}";`,
+			// 		Loader.HOOK_NAME.map(p => `\t"${p}${n}";`),
+			// 		'}',
+			// 	])
+			// 	.flat(2)
+			// 	.map(n => '\t' + n)
+			// 	.join('\n'),
 			'}',
-		].join('\n');
+		])].join('\n');
 	}
-	show() {
-		const url = `http://dreampuf.github.io/GraphvizOnline/#${encodeURIComponent(this.showDot())}`;
+	show(sign?: boolean) {
+		const url = `http://dreampuf.github.io/GraphvizOnline/#${encodeURIComponent(this.showDot(sign))}`;
 		typeof window === 'undefined' ? console.log(url) : window.open(url);
 	}
 }

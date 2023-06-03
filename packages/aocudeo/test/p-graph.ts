@@ -18,8 +18,7 @@ const dependencies: PosMap = [
 	["putOnShorts", "putOnJacket"],
 	["putOnShorts", "putOnShoes"],
 ];
-
 const loader = new LoaderAsync<void>(actMap, dependencies);
-console.log(loader);
-loader.load().catch(n => console.log(n))
+loader.show();
+//loader.load().catch(n => console.log(n))
 
