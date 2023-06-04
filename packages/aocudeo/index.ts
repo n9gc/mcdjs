@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.3.3
+ * @version 3.3.4
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -234,6 +234,16 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		this.walkAt(Loader.START, this.getCount(), path);
 		return path;
 	}
+	protected preLoad() {
+		if (!this.reuse && this.loaded) return null;
+		this.checkLost();
+		this.checkCircle();
+		this.loaded = true;
+		return this.getCount();
+	}
+	protected judge(pos: 'pre' | 'post', id: Id, n: T) {
+		return this.posObjMap[id]?.[`${pos}Judger`]?.(n) === false; 
+	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
 	private dotLine(a: Id, b: Id, sign?: boolean) {
 		return [
@@ -272,47 +282,43 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	}
 }
 export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	private async loadSub(id: Id, countMap: MapObj<number>, r: { n: T; }) {
-		if (--countMap[id]) return;
-		if (this.posObjMap[id]?.preJudger?.(r.n) === false) return;
+	private async loadSub(id: Id, countMap: MapObj<number>, n: T): Promise<T> {
+		if (--countMap[id]) return n;
+		if (this.judge('pre', id, n)) return n;
 		if (id in this.actMap) {
-			let waiter = new Promise<T>(res => res(r.n));
-			this.actMap[id].forEach(fn => waiter = waiter.then(fn).then(n => n || r.n));
-			r.n = await waiter;
+			let waiter = new Promise<T>(res => res(n));
+			this.actMap[id].forEach(fn => waiter = waiter.then(fn).then(r => r || n));
+			n = await waiter;
 		}
-		if (this.posObjMap[id]?.postJudger?.(r.n) === false) return;
-		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, r)));
+		if (this.judge('post', id, n)) return n;
+		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, n).then(r => n = r)));
+		return n;
 	}
-	override async load(...n: T extends void ? [] : [n: T]) {
-		if (!this.reuse && this.loaded) return n[0]!;
-		this.checkLost();
-		this.checkCircle();
-		this.loaded = true;
-		const r = { n: n[0]! };
-		const countMap = this.getCount()
-		await this.loadSub(Loader.START, countMap, r);
-		await this.loadSub(Loader.END, countMap, r);
-		return r.n;
+	override async load(...arg: T extends void ? [] : [n: T]): Promise<T>;
+	override async load(n?: T) {
+		const countMap = this.preLoad();
+		if (!countMap) return n;
+		n = await this.loadSub(Loader.START, countMap, n!);
+		n = await this.loadSub(Loader.END, countMap, n);
+		return n;
 	}
 }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	private loadSub(id: Id, countMap: MapObj<number>, n: T) {
 		if (--countMap[id]) return n;
-		if (this.posObjMap[id]?.preJudger?.(n) === false) return n;
+		if (this.judge('pre', id, n)) return n;
 		this.actMap[id]?.forEach(fn => n = fn(n) || n);
-		if (this.posObjMap[id]?.postJudger?.(n) === false) return n;
+		if (this.judge('post', id, n)) return n;
 		this.postListMap[id]?.forEach(id => n = this.loadSub(id, countMap, n));
 		return n;
 	}
-	override load(...n: T extends void ? [] : [n: T]): T {
-		if (!this.reuse && this.loaded) return n[0]!;
-		this.checkLost();
-		this.checkCircle();
-		this.loaded = true;
-		const countMap = this.getCount();
-		n[0] = this.loadSub(Loader.START, countMap, n[0]!);
-		n[0] = this.loadSub(Loader.END, countMap, n[0]);
-		return n[0];
+	override load(...arg: T extends void ? [] : [n: T]): T;
+	override load(n?: T) {
+		const countMap = this.preLoad();
+		if (!countMap) return n;
+		n = this.loadSub(Loader.START, countMap, n!);
+		n = this.loadSub(Loader.END, countMap, n);
+		return n;
 	}
 }
 export default LoaderSync;
