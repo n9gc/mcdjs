@@ -13,5 +13,5 @@ new Loader({
 	4: log(4),
 	5: log(5),
 	6: log(6),
-}).load();
+}, 2).load();
 

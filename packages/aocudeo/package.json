@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "3.3.4",
+	"version": "3.4.1",
 	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -40,6 +40,9 @@
 	},
 	"devDependencies": {
 		"devok": "workspace:^"
+	},
+	"dependencies": {
+		"queue": "^6.0.2"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/aocudeo#readme"
 }

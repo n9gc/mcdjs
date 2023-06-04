@@ -1,8 +1,8 @@
-import { LoaderSync as Loader } from '..';
+import { LoaderAsync as Loader } from '..';
 
 const timeout = (n: number) => new Promise(res => setTimeout(res, n));
 function log<T>(n: T) {
-	return () => console.log(n)
+	//return () => console.log(n)
 	return async () => {
 		console.log('go', n);
 		await timeout(200);
@@ -10,7 +10,7 @@ function log<T>(n: T) {
 	}
 }
 
-const loader = new Loader();
+const loader = new Loader(1);
 
 
 loader.insert(0, {}, log(0))

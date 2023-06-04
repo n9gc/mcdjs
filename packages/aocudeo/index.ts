@@ -1,10 +1,12 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.3.4
+ * @version 3.4.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
+
+import Queue from "queue";
 
 type AnyArr<T = any> = readonly T[];
 type MayArr<T> = AnyArr<T> | T;
@@ -56,8 +58,8 @@ export class AocudeoError {
 		Object.assign(this, infos);
 		this.tracker = tracker;
 	}
-	type;
-	declare tracker;
+	readonly type;
+	declare readonly tracker;
 }
 function isSym(n: any): n is symbol {
 	return typeof n === 'symbol';
@@ -74,15 +76,19 @@ function mapMap<N>(map: { [id: Id]: N; } | Map<Id, N>, cb: (value: N, id: Id) =>
 		: Reflect.ownKeys(map).forEach(id => cb(map[id], id));
 }
 abstract class Loader<T, F extends Cb<T> | ACb<T>> {
-	protected static EXIST = Symbol('exist');
-	protected static EXISTING = Symbol('existing');
-	static START = Symbol('load start');
-	static END = Symbol('load end');
+	protected static readonly EXIST = Symbol('exist');
+	protected static readonly EXISTING = Symbol('existing');
+	static readonly START = Symbol('load start');
+	static readonly END = Symbol('load end');
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
-	constructor(reuse?: boolean);
-	constructor(acts: Acts<T, F>, posMap?: PosMap<T>, reuse?: boolean);
-	constructor(...args: [Acts<T, F>, PosMap<T>?, boolean?] | [boolean?]) {
-		const [acts, posMap = {}, reuse = false] = typeof args[0] === 'object' ? args : [{}, {}, args[0]];
+	constructor(...args:
+		| [reuse?: boolean]
+		| [acts: Acts<T, F>, reuse?: boolean]
+		| [acts: Acts<T, F>, posMap: PosMap<T>, reuse?: boolean]
+	) {
+		if (typeof args[0] !== 'object') args = [{}, ...args];
+		if (typeof args[1] !== 'object') args = [args[0], {}, args[1]];
+		const [acts, posMap, reuse = false] = args;
 		this.reuse = reuse;
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
@@ -91,24 +97,22 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	}
 	reuse: boolean;
 	loaded = false;
-	protected actMap: MapObj<F[]> = Object.create(null);
-	protected postListMap: MapObj<Id[]> = Object.create(null);
-	protected posObjMap: MapObj<JudgerObj<T>> = Object.create(null);
-	protected preJudgerSign: MapObj<symbol> = {};
-	protected postJudgerSign: MapObj<symbol> = {};
-	private countMap: MapObj<number> = Object.create(null);
+	protected readonly actMap: MapObj<F[]> = Object.create(null);
+	protected readonly postListMap: MapObj<Id[]> = Object.create(null);
+	protected readonly posObjMap: MapObj<PosInfoObj<T>> = Object.create(null);
+	private readonly countMap: MapObj<number> = Object.create(null);
 	protected getCount(): MapObj<number> {
 		return Object.create(this.countMap);
 	}
 	private tidyHook(pos: PosInfoObj<T>, kn: 'preOf' | 'postOf', order: boolean) {
-		const odUnsign = Loader.HOOK_NAME[Number(!order)];
+		const odUnsign = Loader.HOOK_NAME[order ? 0 : 1];
 		return order === (kn === 'postOf')
 			? getArr(pos[kn])
 			: getArr(pos[kn]).map(n => odUnsign + n);
 	}
 	private tidyMain(arr: AnyArr<Id>, order: boolean) {
 		if (arr.includes(order ? Loader.END : Loader.START)) throwError(Number(order), Error(`不能在 ${order ? 'END 后' : 'START 前'}插入东西`));
-		const odSign = Loader.HOOK_NAME[Number(order)];
+		const odSign = Loader.HOOK_NAME[order ? 1 : 0];
 		return arr.map(n => isSym(n) ? n : odSign + n);
 	}
 	protected tidy(odName: 'after' | 'before', pos: PosInfoObj<T>) {
@@ -143,7 +147,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		}
 		switch (typeof act) { case 'boolean': case 'undefined': return this; }
 		if (!noInsert && this.idSign[id] !== Loader.EXIST) this.insert(id);
-		if (act && 'run' in act) act = act.run;
+		if ('run' in act) act = act.run;
 		(this.actMap[id] || (this.actMap[id] = [])).push(...getArr(act));
 		return this;
 	}
@@ -152,14 +156,14 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	insert(id: Id | PosMap<T>, pos: PosInfo<T> = {}, act: Act<T, F> | null = null) {
 		if (typeof id === 'object') {
 			id instanceof Array
-				? ((typeof id[0] === 'object'
-					? id
-					: [id]
-				) as AnyArr<AnyArr<Id>>).forEach(pl => {
-					if (pl.length < 2) return;
-					this.insert(pl[0]);
-					pl.reduce((p, t) => (this.insert(t, p), t));
-				})
+				? id.forEach((pl, idx) => 
+					typeof pl !== 'object'
+						? this.insert(pl, idx ? id[idx - 1] : {})
+						: (
+							this.insert(pl[0]),
+							pl.length < 2 || pl.reduce((p, t) => (this.insert(t, p), t))
+						)
+				)
 				: mapMap(id, (pos, id) => this.insert(id, pos));
 			return this;
 		}
@@ -175,8 +179,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 			if (pos.preJudger) this.preJudgerSign[id] = Loader.EXIST;
 			if (pos.postJudger) this.postJudgerSign[id] = Loader.EXIST;
 		} else {
-			const preId = Loader.HOOK_NAME[0] + id;
-			const postId = Loader.HOOK_NAME[1] + id;
+			const [preId, postId] = Loader.HOOK_NAME.map(n => n + id);
 			this.regAfter(preId, this.tidy('after', pos));
 			this.regAfter(id, [preId], true);
 			this.regBefore(id, [postId], true);
@@ -188,7 +191,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		}
 		return this;
 	}
-	private idSign: MapObj<symbol> = {
+	private readonly idSign: MapObj<symbol> = {
 		[Loader.START]: Loader.EXIST,
 		[Loader.END]: Loader.EXIST,
 	};
@@ -245,6 +248,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		return this.posObjMap[id]?.[`${pos}Judger`]?.(n) === false; 
 	}
 	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
+	private readonly preJudgerSign: MapObj<symbol> = {};
+	private readonly postJudgerSign: MapObj<symbol> = {};
 	private dotLine(a: Id, b: Id, sign?: boolean) {
 		return [
 			'\t',
@@ -281,28 +286,47 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		typeof window === 'undefined' ? console.log(url) : window.open(url);
 	}
 }
-export class LoaderAsync<T = void> extends Loader<T, Cb<T> | ACb<T>> {
-	private async loadSub(id: Id, countMap: MapObj<number>, n: T): Promise<T> {
+abstract class LoaderAsyncProto<T> extends Loader<T, Cb<T> | ACb<T>> {
+	constructor(...args: 
+		| [reuse?: boolean]
+		| [concurrency: number, reuse?: boolean]
+		| [acts: Acts<T, Cb<T> | ACb<T>>, concurrency: number, reuse?: boolean]
+		| [acts: Acts<T, Cb<T> | ACb<T>>, posMap?: PosMap<T>, reuse?: boolean]
+		| [acts: Acts<T, Cb<T> | ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean]
+	) {
+		if (typeof args[0] !== 'object') args = [{}, {}, ...args];
+		if (typeof args[1] === 'number') args = [args[0], {}, args[1], args[2]];
+		if (typeof args[2] !== 'number') args = [args[0], args[1] || {}, 0, args[2]];
+		const [acts, posMap, concurrency, reuse] = args;
+		super(acts, posMap, reuse)
+		this.concurrency = concurrency;
+	}
+	concurrency: number;
+	private async loadSub(id: Id, countMap: MapObj<number>, n: T, lmter: Queue): Promise<T> {
 		if (--countMap[id]) return n;
 		if (this.judge('pre', id, n)) return n;
 		if (id in this.actMap) {
+			const freer = await new Promise<Cb<void>>(run => lmter.push(() => new Promise(res => run(res))));
 			let waiter = new Promise<T>(res => res(n));
 			this.actMap[id].forEach(fn => waiter = waiter.then(fn).then(r => r || n));
 			n = await waiter;
+			freer();
 		}
 		if (this.judge('post', id, n)) return n;
-		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, n).then(r => n = r)));
+		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, n, lmter).then(r => n = r)));
 		return n;
 	}
 	override async load(...arg: T extends void ? [] : [n: T]): Promise<T>;
 	override async load(n?: T) {
 		const countMap = this.preLoad();
 		if (!countMap) return n;
-		n = await this.loadSub(Loader.START, countMap, n!);
-		n = await this.loadSub(Loader.END, countMap, n);
+		const lmter = new Queue({ concurrency: this.concurrency, autostart: true });
+		n = await this.loadSub(Loader.START, countMap, n!, lmter);
+		n = await this.loadSub(Loader.END, countMap, n, lmter);
 		return n;
 	}
 }
+export class LoaderAsync<T = void> extends LoaderAsyncProto<Awaited<T>> { }
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	private loadSub(id: Id, countMap: MapObj<number>, n: T) {
 		if (--countMap[id]) return n;
