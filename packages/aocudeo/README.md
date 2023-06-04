@@ -1,13 +1,18 @@
 # Aocudeo
 
+通过各个模块提供的位置信息，本包可用于自动以正确的流程加载加载相互依赖的模块。
+作为延伸，本包也能用来组织代码流程。
+
 *An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can load your interdependent modules with the correct order through the dependency list registered by each of modules.
 It can also be used to organize your pipelining work.
 
-## Usage
+## 用例 Usage
 
-### Basic Usage
+### 通常用法 Basic Usage
 
-1. Get a public loader for your modules.
+1. 弄个加载器用来加载模块。
+
+   Get a public loader for your modules.
 
    ```ts
    import Loader from 'aocudeo';
@@ -15,7 +20,9 @@ It can also be used to organize your pipelining work.
    export const loader = new Loader();
    ```
 
-2. Use loader's APIs to register the module ID and dependencies' ID in each of your modules.
+2. 根据模块标识符和位置信息插入模块。
+
+   Use loader's APIs to register the module ID and dependencies' ID in each of your modules.
 
    Such as:
 
@@ -30,13 +37,17 @@ It can also be used to organize your pipelining work.
      });
    ```
 
-3. Run modules all.
+3. 把模块都运行一遍，确保所有模块都已被插入。
+
+   Run modules all to make sure all of your modules have been registered.
 
 4. ```ts
    loader.load();
    ```
 
-### Pipeline
+### 流程工作 Pipeline
+
+借以 *p-graph* 的示例代码为例。
 
 Do what *p-graph*'s sample code do.
 
@@ -62,6 +73,10 @@ const dependencies: PosMap = [
 await new LoaderAsync<void>(actMap, dependencies).load();
 ```
 
-## Links
+## 链接 Links
 
-- [p-graph](https://github.com/microsoft/p-graph) - Functionally similar to this package.
+- [p-graph](https://github.com/microsoft/p-graph)
+  
+  功能上与本包类似。
+
+  Functionally similar to this package.
