@@ -1,4 +1,4 @@
-import { LoaderAsync as Loader } from '..';
+import { LoaderAsync as Loader, LoaderSync } from '..';
 
 const timeout = (n: number) => new Promise(res => setTimeout(res, n));
 function log<T>(n: T) {
@@ -35,8 +35,10 @@ a.insert(s1, { before: s2 });
 
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
-
+new Loader({a: async () => 123}).load(6)
 loader.show();
-
+new LoaderSync().load()
+new LoaderSync({a: () => 123}).load(6);
+new LoaderSync({a: async () => 123});
 loader.load();
 //loader.load().then(() => loader.load());

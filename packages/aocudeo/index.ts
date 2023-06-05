@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.4.2
+ * @version 3.4.3
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -11,11 +11,9 @@ import Queue from "queue";
 type AnyArr<T = any> = readonly T[];
 type MayArr<T> = AnyArr<T> | T;
 type Cb<T> = (n: T) => T | void;
-type ACb<T> = (n: T) => PromiseLike<T | void>;
+type ACb<T> = (n: T) => void | T | PromiseLike<void | T>;
 /**拦截器 */
 type Judger<T> = (n: T) => boolean;
-/**判断两个类型完全相等 */
-type EqualTo<A, B> = (<F>() => F extends A ? 1 : 0) extends (<F>() => F extends B ? 1 : 0) ? true : false;
 type InitMap<T> = Map<Id, T> | MapObj<T>;
 /**可挂钩子的标识符类型 */
 export type Hokab = string | number;
@@ -53,8 +51,8 @@ type PosInfoArr = AnyArr<Id>;
 export type PosInfo<T = unknown> = PosInfoObj<T> | PosInfoArr | Id;
 type MapObj<T, K extends Id = Id> = { [I in K]: T };
 /**模块的动作回调 */
-type Act<T, F extends Cb<T> | ACb<T>> = { run: F; } | MayArr<F>;
-export type Acts<T, F extends Cb<T> | ACb<T>> = InitMap<Act<T, F>>;
+type Act<T, F extends ACb<T>> = { run: F; } | MayArr<F>;
+export type Acts<T, F extends ACb<T>> = InitMap<Act<T, F>>;
 export type PosMap<T = unknown> = InitMap<PosInfo<T>> | MayArr<AnyArr<Id>>;
 /**错误类型 */
 export enum ErrorType {
@@ -95,7 +93,7 @@ function mapMap<N>(map: { [id: Id]: N; } | Map<Id, N>, cb: (value: N, id: Id) =>
 		? map.forEach(cb)
 		: Reflect.ownKeys(map).forEach(id => cb(map[id], id));
 }
-abstract class Loader<T, F extends Cb<T> | ACb<T>> {
+abstract class Loader<T, F extends ACb<T>> {
 	protected static readonly EXIST = Symbol('exist');
 	protected static readonly EXISTING = Symbol('existing');
 	/**“流程起点”符号 */
@@ -315,7 +313,7 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 	 * 加载！
 	 * @param n 初始运行参数
 	 */
-	abstract load(n?: T): EqualTo<F, Cb<T>> extends true ? T : Promise<T>;
+	abstract load(n: T): Promise<T> | T;
 	private readonly preJudgerSign: MapObj<symbol> = {};
 	private readonly postJudgerSign: MapObj<symbol> = {};
 	private dotLine(a: Id, b: Id, sign?: boolean) {
@@ -364,7 +362,8 @@ abstract class Loader<T, F extends Cb<T> | ACb<T>> {
 		typeof window === 'undefined' ? console.log(url) : window.open(url);
 	}
 }
-abstract class LoaderAsyncProto<T> extends Loader<T, Cb<T> | ACb<T>> {
+/**异步模块加载器 */
+export class LoaderAsync<T = void> extends Loader<T, ACb<T>> {
 	/**
 	 * @param reuse 是否可以重用
 	 */
@@ -379,26 +378,26 @@ abstract class LoaderAsyncProto<T> extends Loader<T, Cb<T> | ACb<T>> {
 	 * @param concurrency 最大同时任务数量
 	 * @param reuse 是否可以重用
 	 */
-	constructor(acts: Acts<T, Cb<T> | ACb<T>>, concurrency: number, reuse?: boolean);
+	constructor(acts: Acts<T, ACb<T>>, concurrency: number, reuse?: boolean);
 	/**
 	 * @param acts 各个模块的动作回调
 	 * @param posMap 各个模块的位置信息
 	 * @param reuse 是否可以重用
 	 */
-	constructor(acts: Acts<T, Cb<T> | ACb<T>>, posMap?: PosMap<T>, reuse?: boolean);
+	constructor(acts: Acts<T, ACb<T>>, posMap?: PosMap<T>, reuse?: boolean);
 	/**
 	 * @param acts 各个模块的动作回调
 	 * @param posMap 各个模块的位置信息
 	 * @param concurrency 最大同时任务数量
 	 * @param reuse 是否可以重用
 	 */
-	constructor(acts: Acts<T, Cb<T> | ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean);
+	constructor(acts: Acts<T, ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean);
 	constructor(...args: 
 		| [reuse?: boolean]
 		| [concurrency: number, reuse?: boolean]
-		| [acts: Acts<T, Cb<T> | ACb<T>>, concurrency: number, reuse?: boolean]
-		| [acts: Acts<T, Cb<T> | ACb<T>>, posMap?: PosMap<T>, reuse?: boolean]
-		| [acts: Acts<T, Cb<T> | ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean]
+		| [acts: Acts<T, ACb<T>>, concurrency: number, reuse?: boolean]
+		| [acts: Acts<T, ACb<T>>, posMap?: PosMap<T>, reuse?: boolean]
+		| [acts: Acts<T, ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean]
 	) {
 		if (typeof args[0] !== 'object') args = [{}, {}, ...args];
 		if (typeof args[1] === 'number') args = [args[0], {}, args[1], args[2]];
@@ -423,18 +422,15 @@ abstract class LoaderAsyncProto<T> extends Loader<T, Cb<T> | ACb<T>> {
 		if (id in this.postListMap) await Promise.all(this.postListMap[id].map(id => this.loadSub(id, countMap, n, lmter).then(r => n = r)));
 		return n;
 	}
-	override async load(...arg: T extends void ? [] : [n: T]): Promise<T>;
-	override async load(n?: T) {
+	override async load(n: T) {
 		const countMap = this.preLoad();
 		if (!countMap) return n;
 		const lmter = new Queue({ concurrency: this.concurrency, autostart: true });
-		n = await this.loadSub(Loader.START, countMap, n!, lmter);
+		n = await this.loadSub(Loader.START, countMap, n, lmter);
 		n = await this.loadSub(Loader.END, countMap, n, lmter);
 		return n;
 	}
 }
-/**异步模块加载器 */
-export class LoaderAsync<T = void> extends LoaderAsyncProto<Awaited<T>> { }
 /**模块加载器 */
 export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 	private loadSub(id: Id, countMap: MapObj<number>, n: T) {
@@ -445,11 +441,10 @@ export class LoaderSync<T = void> extends Loader<T, Cb<T>> {
 		this.postListMap[id]?.forEach(id => n = this.loadSub(id, countMap, n));
 		return n;
 	}
-	override load(...arg: T extends void ? [] : [n: T]): T;
-	override load(n?: T) {
+	override load(n: T) {
 		const countMap = this.preLoad();
 		if (!countMap) return n;
-		n = this.loadSub(Loader.START, countMap, n!);
+		n = this.loadSub(Loader.START, countMap, n);
 		n = this.loadSub(Loader.END, countMap, n);
 		return n;
 	}
