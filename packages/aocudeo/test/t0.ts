@@ -36,9 +36,16 @@ a.insert(s1, { before: s2 });
 // new Loader().addAct(Loader.END, log('hh')).load();
 // console.log(loader);
 new Loader({a: async () => 123}).load(6)
-loader.show();
 new LoaderSync().load()
 new LoaderSync({a: () => 123}).load(6);
 new LoaderSync({a: async () => 123});
+new LoaderSync({}, {
+	a: {},
+	'pre:a': {
+		postJudger() {
+			return true;
+		}
+	},
+}).show(true);
 loader.load();
 //loader.load().then(() => loader.load());

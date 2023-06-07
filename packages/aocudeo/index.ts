@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 3.4.3
+ * @version 3.4.4
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -118,9 +118,9 @@ abstract class Loader<T, F extends ACb<T>> {
 	 */
 	constructor(acts: Acts<T, F>, posMap: PosMap<T>, reuse?: boolean);
 	constructor(...args:
-		| [reuse?: boolean]
-		| [acts: Acts<T, F>, reuse?: boolean]
-		| [acts: Acts<T, F>, posMap: PosMap<T>, reuse?: boolean]
+		| [boolean?]
+		| [Acts<T, F>, boolean?]
+		| [Acts<T, F>, PosMap<T>, boolean?]
 	) {
 		if (typeof args[0] !== 'object') args = [{}, ...args];
 		if (typeof args[1] !== 'object') args = [args[0], {}, args[1]];
@@ -321,7 +321,7 @@ abstract class Loader<T, F extends ACb<T>> {
 			'\t',
 			!sign && new Set([a, b, Loader.END, Loader.START]).size < 4 && '// ',
 			`"${a.toString()}" -> "${b.toString()}"`,
-			this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST && ' [style = dashed]',
+			(this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST) && ' [style = dashed]',
 		].filter(n => n).join('');
 	}
 	/**
@@ -375,6 +375,11 @@ export class LoaderAsync<T = void> extends Loader<T, ACb<T>> {
 	constructor(concurrency: number, reuse?: boolean);
 	/**
 	 * @param acts 各个模块的动作回调
+	 * @param reuse 是否可以重用
+	 */
+	constructor(acts: Acts<T, ACb<T>>, reuse?: boolean);
+	/**
+	 * @param acts 各个模块的动作回调
 	 * @param concurrency 最大同时任务数量
 	 * @param reuse 是否可以重用
 	 */
@@ -384,7 +389,7 @@ export class LoaderAsync<T = void> extends Loader<T, ACb<T>> {
 	 * @param posMap 各个模块的位置信息
 	 * @param reuse 是否可以重用
 	 */
-	constructor(acts: Acts<T, ACb<T>>, posMap?: PosMap<T>, reuse?: boolean);
+	constructor(acts: Acts<T, ACb<T>>, posMap: PosMap<T>, reuse?: boolean);
 	/**
 	 * @param acts 各个模块的动作回调
 	 * @param posMap 各个模块的位置信息
@@ -393,15 +398,17 @@ export class LoaderAsync<T = void> extends Loader<T, ACb<T>> {
 	 */
 	constructor(acts: Acts<T, ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean);
 	constructor(...args: 
-		| [reuse?: boolean]
-		| [concurrency: number, reuse?: boolean]
-		| [acts: Acts<T, ACb<T>>, concurrency: number, reuse?: boolean]
-		| [acts: Acts<T, ACb<T>>, posMap?: PosMap<T>, reuse?: boolean]
-		| [acts: Acts<T, ACb<T>>, posMap: PosMap<T>, concurrency: number, reuse?: boolean]
+		| [boolean?]
+		| [number, boolean?]
+		| [Acts<T, ACb<T>>, boolean?]
+		| [Acts<T, ACb<T>>, number, boolean?]
+		| [Acts<T, ACb<T>>, PosMap<T>, boolean?]
+		| [Acts<T, ACb<T>>, PosMap<T>, number, boolean?]
 	) {
-		if (typeof args[0] !== 'object') args = [{}, {}, ...args];
+		if (typeof args[0] !== 'object') args = [{}, ...args];
 		if (typeof args[1] === 'number') args = [args[0], {}, args[1], args[2]];
-		if (typeof args[2] !== 'number') args = [args[0], args[1] || {}, 0, args[2]];
+		if (typeof args[1] !== 'object') args = [args[0], {}, args[1]];
+		if (typeof args[2] !== 'number') args = [args[0], args[1], 0, args[2]];
 		const [acts, posMap, concurrency, reuse] = args;
 		super(acts, posMap, reuse)
 		this.concurrency = concurrency;
