@@ -32,7 +32,7 @@ It can also be used to organize your pipelining work.
        after: ['toolMod', 'baseMod'],
        before: 'endMod',
      })
-     .addAct('myMod', () => {
+     .addAction('myMod', () => {
        console.log('Loading myMod');
      });
    ```
@@ -52,7 +52,7 @@ It can also be used to organize your pipelining work.
 Do what *p-graph*'s sample code do.
 
 ```ts
-import { LoaderAsync, PosMap } from 'aocudeo';
+import { LoaderAsync, Positions } from 'aocudeo';
 
 const actMap = new Map([
   ["putOnShirt", { run: () => Promise.resolve("put on your shirt") }],
@@ -62,7 +62,7 @@ const actMap = new Map([
   ["tieShoes", { run: () => Promise.resolve("tie your shoes") }],
 ]);
 
-const dependencies: PosMap = [
+const dependencies: Positions = [
   // You need to put your shoes on before you tie them!
   ["putOnShoes", "tieShoes"],
   ["putOnShirt", "putOnJacket"],

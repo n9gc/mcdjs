@@ -1,7 +1,7 @@
 const a = Promise.resolve.bind(Promise);
 Promise.resolve = <T>(n?: T) => a(n).then((a: any) => a && console.log(a));
 
-import {LoaderAsync, PosMap} from '..';
+import {LoaderAsync, Positions} from '..';
 
 const actMap = new Map([
 	["putOnShirt", {run: () => Promise.resolve("put on your shirt")}],
@@ -11,7 +11,7 @@ const actMap = new Map([
 	["tieShoes", {run: () => Promise.resolve("tie your shoes")}],
 ]);
 
-const dependencies: PosMap = [
+const dependencies: Positions = [
 	// You need to put your shoes on before you tie them!
 	["putOnShoes", "tieShoes"],
 	["putOnShirt", "putOnJacket"],

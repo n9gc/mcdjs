@@ -16,7 +16,7 @@ const loader = new Loader(1);
 loader.insert(0, {}, log(0))
 loader.insert(1, {after:[0, 2]}, log(1))
 loader.insert(2, {}, log(2))
-loader.addAct(Loader.END, log('end'))
+loader.addAction(Loader.END, log('end'))
 //loader.insert(9, { preOf: 0, after: 2 }, log(9))
 loader.insert(8, { postOf: [2] }, log(8))
 loader.insert(5, { after: 2, preJudger() { return true; } }, log(5))
