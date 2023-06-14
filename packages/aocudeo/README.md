@@ -54,7 +54,7 @@ Do what *p-graph*'s sample code do.
 ```ts
 import { LoaderAsync, Positions } from 'aocudeo';
 
-const actMap = new Map([
+const actions = new Map([
   ["putOnShirt", { run: () => Promise.resolve("put on your shirt") }],
   ["putOnShorts", { run: () => Promise.resolve("put on your shorts") }],
   ["putOnJacket", { run: () => Promise.resolve("put on your jacket") }],
@@ -62,7 +62,7 @@ const actMap = new Map([
   ["tieShoes", { run: () => Promise.resolve("tie your shoes") }],
 ]);
 
-const dependencies: Positions = [
+const positions: Positions = [
   // You need to put your shoes on before you tie them!
   ["putOnShoes", "tieShoes"],
   ["putOnShirt", "putOnJacket"],
@@ -70,7 +70,7 @@ const dependencies: Positions = [
   ["putOnShorts", "putOnShoes"],
 ];
 
-await new LoaderAsync<void>(actMap, dependencies).load();
+await new LoaderAsync<void>({ actions, positions }).load();
 ```
 
 ## 链接 Links

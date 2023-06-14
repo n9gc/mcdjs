@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.0
+ * @version 4.0.0-dev.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -52,7 +52,7 @@ export type Position<T = unknown> = PositionObj<T> | PositionArray | Id;
 type MapObj<T, K extends Id = Id> = { [I in K]: T };
 /**模块的动作回调 */
 type Action<T, F extends AsyncCallback<T>> = { run: F; } | MayArray<F>;
-export type Actions<T, F extends AsyncCallback<T>> = MapLike<Action<T, F>>;
+export type Actions<T, F extends AsyncCallback<T> = AsyncCallback<T>> = MapLike<Action<T, F>>;
 export type Positions<T = unknown> = MapLike<Position<T>> | MayArray<AnyArray<Id>>;
 /**错误类型 */
 export enum ErrorType {
@@ -93,6 +93,14 @@ function mapMap<N>(map: { [id: Id]: N; } | Map<Id, N>, walker: (value: N, id: Id
 		? map.forEach(walker)
 		: Reflect.ownKeys(map).forEach(id => walker(map[id], id));
 }
+export interface LoaderConfig<T = unknown, F extends AsyncCallback<T> = Callback<T>> {
+	/**是否可以重用 */
+	reusable?: boolean;
+	/**各个模块的动作回调 */
+	actions?: Actions<T, F>;
+	/**各个模块的位置信息 */
+	positions?: Positions<T>;
+}
 abstract class Loader<T, F extends AsyncCallback<T>> {
 	protected static readonly EXIST = Symbol('exist');
 	protected static readonly EXISTING = Symbol('existing');
@@ -102,29 +110,7 @@ abstract class Loader<T, F extends AsyncCallback<T>> {
 	static readonly END = Symbol('load end');
 	/**默认前后钩子模块的前缀 */
 	static HOOK_NAME: [pre: string, post: string] = ['pre:', 'post:'];
-	/**
-	 * @param reusable 是否可以重用
-	 */
-	constructor(reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param reusable 是否可以重用
-	 */
-	constructor(actions: Actions<T, F>, reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param positions 各个模块的位置信息
-	 * @param reuse 是否可以重用
-	 */
-	constructor(actions: Actions<T, F>, positions: Positions<T>, rensable?: boolean);
-	constructor(...args:
-		| [boolean?]
-		| [Actions<T, F>, boolean?]
-		| [Actions<T, F>, Positions<T>, boolean?]
-	) {
-		if (typeof args[0] !== 'object') args = [{}, ...args];
-		if (typeof args[1] !== 'object') args = [args[0], {}, args[1]];
-		const [actions, positions, reusable = false] = args;
+	constructor({ actions = {}, positions = {}, reusable = false }: LoaderConfig<T, F> = {}) {
 		this.reusable = reusable;
 		this.countMap[Loader.START] = 1;
 		this.countMap[Loader.END] = 1;
@@ -364,55 +350,14 @@ abstract class Loader<T, F extends AsyncCallback<T>> {
 		typeof window === 'undefined' ? console.log(url) : window.open(url);
 	}
 }
+export interface LoaderAsyncConfig<T = unknown> extends LoaderConfig<T> {
+	/**最大同时任务数量 */
+	concurrency?: number;
+}
 /**异步模块加载器 */
 export class LoaderAsync<T = void> extends Loader<T, AsyncCallback<T>> {
-	/**
-	 * @param reusable 是否可以重用
-	 */
-	constructor(reusable?: boolean);
-	/**
-	 * @param concurrency 最大同时任务数量
-	 * @param reusable 是否可以重用
-	 */
-	constructor(concurrency: number, reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param reusable 是否可以重用
-	 */
-	constructor(actions: Actions<T, AsyncCallback<T>>, reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param concurrency 最大同时任务数量
-	 * @param reusable 是否可以重用
-	 */
-	constructor(actions: Actions<T, AsyncCallback<T>>, concurrency: number, reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param positions 各个模块的位置信息
-	 * @param reusable 是否可以重用
-	 */
-	constructor(actions: Actions<T, AsyncCallback<T>>, positions: Positions<T>, reusable?: boolean);
-	/**
-	 * @param actions 各个模块的动作回调
-	 * @param positions 各个模块的位置信息
-	 * @param concurrency 最大同时任务数量
-	 * @param reusable 是否可以重用
-	 */
-	constructor(actions: Actions<T, AsyncCallback<T>>, positions: Positions<T>, concurrency: number, reusable?: boolean);
-	constructor(...args: 
-		| [boolean?]
-		| [number, boolean?]
-		| [Actions<T, AsyncCallback<T>>, boolean?]
-		| [Actions<T, AsyncCallback<T>>, number, boolean?]
-		| [Actions<T, AsyncCallback<T>>, Positions<T>, boolean?]
-		| [Actions<T, AsyncCallback<T>>, Positions<T>, number, boolean?]
-	) {
-		if (typeof args[0] !== 'object') args = [{}, ...args];
-		if (typeof args[1] === 'number') args = [args[0], {}, args[1], args[2]];
-		if (typeof args[1] !== 'object') args = [args[0], {}, args[1]];
-		if (typeof args[2] !== 'number') args = [args[0], args[1], 0, args[2]];
-		const [actions, positions, concurrency, reusable] = args;
-		super(actions, positions, reusable)
+	constructor({ concurrency = 0, ...loaderConfig }: LoaderAsyncConfig<T> = {}) {
+		super(loaderConfig)
 		this.concurrency = concurrency;
 	}
 	/**最大同时任务数量 */
