@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.0
+ * @version 4.0.0-dev.2.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -143,8 +143,11 @@ export class SignChecker<T> {
 		[Loader.START]: SignChecker.ENSURED,
 		[Loader.END]: SignChecker.ENSURED,
 	};
-	ensure(id: Id) {
-		this.statusMap[id] = SignChecker.ENSURED;
+	isEnsured(id: Id) {
+		return this.statusMap[id] === SignChecker.ENSURED;
+	}
+	ensure(...ids: Id[]) {
+		ids.forEach(id => this.statusMap[id] = SignChecker.ENSURED);
 	}
 	require(surePosition: SurePosition<T>) {
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.statusMap[id] === SignChecker.ENSURED || (this.statusMap[id] = SignChecker.REQUIRED)));
@@ -156,52 +159,89 @@ export class SignChecker<T> {
 	}
 }
 export class PositionMap<T> {
-	static readonly SPLITED = Symbol('splited');
+	private static readonly SPLITED = Symbol('splited');
+	private static readonly HOLDED = Symbol('hooked');
 	constructor(
 		private readonly signChecker: SignChecker<T>,
 	) {
 		this.insert(Loader.END, Loader.START);
 	}
-	readonly surePositionMap: MapObj<SurePosition<T>> = Object.create(null);
-	insertOne(id: Id, surePosition: SurePosition<T>) {
-		this.signChecker.ensure(id);
-		if (typeof id !== 'symbol' && this.splitedMap[id] === PositionMap.SPLITED) {
-			const { preId, postId } = Loader.getAffixed(id);
-			this.insertOne(preId, { after: surePosition.after });
-			this.insertOne(postId, { before: surePosition.before });
-			return;
-		}
+	private readonly surePositionMap: MapObj<SurePosition<T>> = Object.create(null);
+	private push(id: Id, surePosition: SurePosition<T>) {
 		const mapObj = this.surePositionMap[id] || (this.surePositionMap[id] = {});
-		SurePosition.keys.forEach(key => {
-			const ids = surePosition[key];
-			if (ids) (mapObj[key] || (mapObj[key] = [])).push(...ids);
-		});
+		SurePosition.keys.forEach(key => (mapObj[key] || (mapObj[key] = [])).push(...(surePosition[key] ?? [])) || delete mapObj[key]);
 	}
-	readonly splitedMap: MapObj<symbol, Hookable> = {};
+	private readonly splitedMap: MapObj<symbol, Hookable> = {};
+	private surelyInsert(id: Id, surePosition: SurePosition<T>) {
+		if (typeof id === 'symbol' || this.splitedMap[id] !== PositionMap.SPLITED) return this.push(id, surePosition);
+		const { preId, postId } = Loader.getAffixed(id);
+		this.surelyInsert(preId, { after: surePosition.after });
+		this.surelyInsert(postId, { before: surePosition.before });
+	}
 	private split(id: Hookable) {
-		this.signChecker.ensure(id);
 		const { preId, mainId, postId } = Loader.getAffixed(id);
 		this.splitedMap[id] = PositionMap.SPLITED;
-		this.insertOne(preId, { after: this.surePositionMap[id]?.after });
-		this.insertOne(mainId, {});
-		this.insertOne(postId, { before: this.surePositionMap[id]?.before });
+		this.signChecker.ensure(preId, mainId, postId);
+		this.push(preId, { after: this.surePositionMap[id]?.after });
+		this.surePositionMap[mainId] = {};
+		this.push(postId, { before: this.surePositionMap[id]?.before });
 		delete this.surePositionMap[id];
+	}
+	private getHookedOf(id: Id) {
+		if (typeof id !== 'string') return false;
+		for (const affix of Loader.getAffixs()) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
+		return false;
+	}
+	private requireSplited(id: Id | false) {
+		if (typeof id === 'symbol') return true;
+		if (id === false) return false;
+		if (this.splitedMap[id] === PositionMap.HOLDED) return false;
+		if (this.splitedMap[id] === PositionMap.SPLITED) return true;
+		if (this.requireSplited(this.getHookedOf(id))) {
+			this.split(id);
+			return true;
+		} else {
+			this.splitedMap[id] = PositionMap.HOLDED;
+			return false;
+		}
+	}
+	private clearHolded(id: Hookable) {
+		this.split(id);
+		Loader.getAffixs().forEach(affix => this.splitedMap[affix + id] === PositionMap.HOLDED && this.clearHolded(affix + id));
+	}
+	private ensureSplited(id: Id | false) {
+		if (typeof id === 'symbol') return this.signChecker.ensure(id), false;
+		if (id === false) return true;
+		if (this.splitedMap[id] === PositionMap.SPLITED) return false;
+		if (this.splitedMap[id] === PositionMap.HOLDED) {
+			if (this.ensureSplited(this.getHookedOf(id))) {
+				this.signChecker.ensure(id);
+				this.clearHolded(id);
+			}
+			return false;
+		} else {
+			if (this.ensureSplited(this.getHookedOf(id))) this.signChecker.ensure(id);
+			this.split(id);
+			return false;
+		}
 	}
 	insert(id: Id, position: Position<T>) {
 		const surePosition = new SurePosition(new PositionObj(position));
-		if (typeof id === 'symbol') {
-			this.insertOne(id, surePosition);
-			this.signChecker.require(surePosition);
-			return;
-		}
-		if (!(id in this.splitedMap)) this.split(id);
-		const { preId, postId } = Loader.getAffixed(id);
-		this.insertOne(preId, { after: surePosition.after });
-		this.insertOne(postId, { before: surePosition.before });
+		this.signChecker.require(surePosition);
+		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(this.getHookedOf(id))));
+		this.ensureSplited(id);
+		this.surelyInsert(id, surePosition);
 	}
+	getEdgeOf(id: Id, direction: 'Pre' | 'Main' | 'Post'): Id {
+		if (typeof id !== 'symbol' && this.splitedMap[id] === PositionMap.SPLITED) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
+		return id;
+	}
+	// getOrder() {
+	// 	return new Order(this.surePositionMap, this.splitedMap);
+	// }
 }
 // class Order<T> {
-// 	readonly edgeMap: MapObj<Id[]> = Object.create(null);
+// 	private readonly edgeMap: MapObj<Id[]> = Object.create(null);
 // 	private readonly indegreeMap: MapObj<number> = Object.create(null);
 // 	private getIndegreeMap(): MapObj<number> {
 // 		return Object.create(this.indegreeMap);
@@ -212,15 +252,23 @@ export class PositionMap<T> {
 // 	private plusCount(id: Id, num = 1) {
 // 		this.indegreeMap[id] = (this.indegreeMap[id] ?? 0) + num;
 // 	}
-// 	private insert(id: Id, { after, before }: SurePosition<T>) {
+// 	private insertAfter(id: Id, after: Id[]) {
 // 		after.forEach(n => this.putInList(n, id));
 // 		this.plusCount(id, after.length);
+// 	}
+// 	private insertBefore(id: Id, before: Id[]) {
 // 		this.putInList(id, before);
 // 		before.forEach(n => this.plusCount(n));
 // 	}
-// 	constructor(positionMap: PositionMap<T>) {
+// 	private insert(id: Id, { after = [], before = [] }: SurePosition<T>) {
+// 
+// 	}
+// 	constructor(
+// 		surePositionMap: MapObj<SurePosition<T>>,
+// 		private splitedMap: MapObj<symbol>,
+// 	) {
 // 		/**@todo 探索拆分后模块 */
-// 		mapMap(positionMap.surePositionMap, (surePosition, id) => this.insert(id, surePosition));
+// 		mapMap(surePositionMap, (surePosition, id) => this.insert(id, surePosition));
 // 		/**@todo 补全钩子间关系 */
 // 		/**@todo 拉上起点和终点 */
 // 	}
@@ -276,6 +324,13 @@ abstract class Loader<T, F extends AsyncCallback<T>> {
 	static affixPost = 'post:';
 	static affixMain = 'main:';
 	private static readonly affixedCache: MapObj<{ [I in 'preId' | 'mainId' | 'postId']: string; }> = Object.create(null);
+	static getAffixs() {
+		return [
+			this.affixPre,
+			this.affixMain,
+			this.affixPost,
+		] as const;
+	}
 	static getAffixed(id: Hookable) {
 		return this.affixedCache[id] || (this.affixedCache[id] = {
 			preId: Loader.affixPre + id,
