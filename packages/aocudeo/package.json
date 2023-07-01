@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "4.0.0-dev.2.1",
+	"version": "4.0.0-dev.2.2",
 	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -39,10 +39,22 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"devDependencies": {
+		"@ava/typescript": "^4.1.0",
+		"ava": "^5.3.1",
+		"expect": "^29.5.0",
 		"devok": "workspace:^"
 	},
 	"dependencies": {
 		"queue": "^6.0.2"
+	},
+	"ava": {
+		"extensions": [
+			"ts"
+		],
+		"require": [
+			"ts-node/register"
+		],
+		"timeout": "2m"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/aocudeo#readme"
 }

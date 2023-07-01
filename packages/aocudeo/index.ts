@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.1
+ * @version 4.0.0-dev.2.2
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -137,9 +137,9 @@ function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => vo
 // 	}
 // }
 export class SignChecker<T> {
-	private static readonly ENSURED = Symbol('ensured');
-	private static readonly REQUIRED = Symbol('required');
-	private readonly statusMap: MapObj<symbol> = {
+	protected static readonly ENSURED = Symbol('ensured');
+	protected static readonly REQUIRED = Symbol('required');
+	protected readonly statusMap: MapObj<symbol> = {
 		[Loader.START]: SignChecker.ENSURED,
 		[Loader.END]: SignChecker.ENSURED,
 	};
@@ -159,19 +159,19 @@ export class SignChecker<T> {
 	}
 }
 export class PositionMap<T> {
-	private static readonly SPLITED = Symbol('splited');
-	private static readonly HOLDED = Symbol('hooked');
+	protected static readonly SPLITED = Symbol('splited');
+	protected static readonly HOLDED = Symbol('hooked');
 	constructor(
-		private readonly signChecker: SignChecker<T>,
+		readonly signChecker: SignChecker<T>,
 	) {
 		this.insert(Loader.END, Loader.START);
 	}
-	private readonly surePositionMap: MapObj<SurePosition<T>> = Object.create(null);
+	protected readonly surePositionMap: MapObj<SurePosition<T>> = Object.create(null);
 	private push(id: Id, surePosition: SurePosition<T>) {
 		const mapObj = this.surePositionMap[id] || (this.surePositionMap[id] = {});
 		SurePosition.keys.forEach(key => (mapObj[key] || (mapObj[key] = [])).push(...(surePosition[key] ?? [])) || delete mapObj[key]);
 	}
-	private readonly splitedMap: MapObj<symbol, Hookable> = {};
+	protected readonly splitedMap: MapObj<symbol, Hookable> = {};
 	private surelyInsert(id: Id, surePosition: SurePosition<T>) {
 		if (typeof id === 'symbol' || this.splitedMap[id] !== PositionMap.SPLITED) return this.push(id, surePosition);
 		const { preId, postId } = Loader.getAffixed(id);
@@ -315,7 +315,7 @@ export interface LoaderConfig<T = unknown, F extends AsyncCallback<T> = Callback
 	/**各个模块的位置信息 */
 	positions?: Positions<T>;
 }
-abstract class Loader<T, F extends AsyncCallback<T>> {
+export abstract class Loader<T, F extends AsyncCallback<T>> {
 	/**“流程起点”符号 */
 	static readonly START = Symbol('load start');
 	/**“流程终点”符号 */
