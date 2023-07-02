@@ -1,6 +1,6 @@
 import test, { Macro } from 'ava';
 import { PositionMap, Loader, Id } from '..';
-import { Tpm, Tsc, gsm, pmS, scE } from './helpers';
+import { Tpm, gsm, car } from './helpers';
 import expect from 'expect';
 
 const cer: Macro<[
@@ -9,16 +9,31 @@ const cer: Macro<[
 	withPosInfo?: Id[]
 ], unknown> = {
 	exec(t, init, ss, di = []) {
-		const sc = new Tsc();
-		const pm = new Tpm(sc);
+		// 初始化
+		const pm = new Tpm();
 		init(pm);
-		expect(pm.get().sm).toEqual(gsm(ss, pmS));
-		expect(sc.get()).toEqual({ sm: gsm([Loader.START, Loader.END, ss, ...ss.map(n => Loader.getAffixs().map(a => a + n))].flat(), scE) });
+
+		// 都能正常拆分 
+		expect(car(pm.get().sc.get().en)).toEqual(car(ss));
+
+		// 拆分后都被保证
+		const enl = [
+			Loader.START, Loader.END,
+			ss,
+			...ss.map(n => Loader.getAffixs().map(a => a + n)),
+		].flat();
+		expect(car(pm.get().ic.get().en)).toEqual(car(enl));
+		
+		// 只留子节点的位置
 		const h = new Set<string>();
 		ss.forEach(n => h.add('pre:' + n).add('main:' + n).add('post:' + n).delete(n));
 		const spmo = gsm([...h], {} as any);
+
+		// 处理不为空的标识
 		[...di, Loader.END].forEach(i => spmo[i] = pm.get().spm[i]);
 		expect(pm.get().spm).toEqual(spmo);
+
+		// 结束
 		t.pass();
 	}
 };

@@ -7,16 +7,15 @@ import {
 	Loader,
 } from "..";
 
-export class Tsc extends SignChecker<void> {
-	static get = () => [
-		this.ENSURED,
-		this.REQUIRED,
-	] as const;
+export class Tsc extends SignChecker {
+	constructor() {
+		super(true);
+	}
 	get = () => ({
-		sm: this.statusMap,
-	} as const);
+		en: this.ensureds,
+		re: this.requireds,
+	});
 }
-export const [scE, scR] = Tsc.get();
 export class Tpm extends PositionMap<void> {
 	static get = () => [
 		this.SPLITED,
@@ -24,15 +23,19 @@ export class Tpm extends PositionMap<void> {
 	] as const;
 	get = () => ({
 		spm: this.surePositionMap,
-		sm: this.splitedMap,
-	} as const);
+		sc: this.splitedChecker,
+		ic: this.insertedChecker,
+		e: this.edition,
+	});
+	override insertedChecker = new Tsc();
+	protected override splitedChecker = new Tsc();
 }
 export const [pmS, pmH] = Tpm.get();
 export function ti(i: Id[]) {
 	return new SurePosition(new PositionObj(i));
 }
 export function gsm<T>(k: readonly Id[], s: T) {
-	const sm: { [x: Id]: T; } = {};
+	const sm: { [x: Id]: T; } = Object.create(null);
 	k.forEach(id => sm[id] = s);
 	return sm;
 }
@@ -42,4 +45,8 @@ export function pse(i: Id[]) {
 }
 export function m<A extends {}, B extends {}>(a: A, b: B) {
 	return {...a, ...b};
+}
+export function car(a: Set<Id> | readonly Id[]) {
+	if (a instanceof Set) a = [...a];
+	return gsm(a, 0);
 }

@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.2
+ * @version 4.0.0-dev.2.3
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -136,24 +136,35 @@ function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => vo
 // 		return n;
 // 	}
 // }
-export class SignChecker<T> {
-	protected static readonly ENSURED = Symbol('ensured');
-	protected static readonly REQUIRED = Symbol('required');
-	protected readonly statusMap: MapObj<symbol> = {
-		[Loader.START]: SignChecker.ENSURED,
-		[Loader.END]: SignChecker.ENSURED,
-	};
+export class SignChecker {
+	constructor(init: boolean) {
+		if (init) this.ensureds.add(Loader.START).add(Loader.END);
+	}
+	protected ensureds = new Set<Id>();
+	protected requireds = new Set<Id>();
+	getSize(type: 'required' | 'ensured') {
+		return this[`${type}s`].size;
+	}
 	isEnsured(id: Id) {
-		return this.statusMap[id] === SignChecker.ENSURED;
+		return this.ensureds.has(id);
+	}
+	isRequired(id: Id) {
+		return this.requireds.has(id);
 	}
 	ensure(...ids: Id[]) {
-		ids.forEach(id => this.statusMap[id] = SignChecker.ENSURED);
+		ids.forEach(id => {
+			this.ensureds.add(id);
+			this.requireds.delete(id);
+		});
 	}
-	require(surePosition: SurePosition<T>) {
-		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.statusMap[id] === SignChecker.ENSURED || (this.statusMap[id] = SignChecker.REQUIRED)));
+	require(...ids: Id[]) {
+		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
+	}
+	requirePosition<T>(surePosition: SurePosition<T>) {
+		SurePosition.keys.forEach(key => this.ensure(...(surePosition[key] || [])));
 	}
 	isSafe() {
-		const list = Reflect.ownKeys(this.statusMap).filter(id => this.statusMap[id] === SignChecker.REQUIRED);
+		const list = [...this.requireds];
 		return list.length ? list : false;
 		// throwError(3, Error('出现了未注册的模块'), { list });
 	}
@@ -161,31 +172,40 @@ export class SignChecker<T> {
 export class PositionMap<T> {
 	protected static readonly SPLITED = Symbol('splited');
 	protected static readonly HOLDED = Symbol('hooked');
-	constructor(
-		readonly signChecker: SignChecker<T>,
-	) {
+	constructor() {
 		this.insert(Loader.END, Loader.START);
 	}
-	protected readonly surePositionMap: MapObj<SurePosition<T>> = Object.create(null);
+	readonly insertedChecker = new SignChecker(true);
+	protected edition = 0;
+	private readonly countMap = new Map<Id, number>();
+	protected readonly surePositionMap = new Map<Id, SurePosition<T>>();
 	private push(id: Id, surePosition: SurePosition<T>) {
-		const mapObj = this.surePositionMap[id] || (this.surePositionMap[id] = {});
-		SurePosition.keys.forEach(key => (mapObj[key] || (mapObj[key] = [])).push(...(surePosition[key] ?? [])) || delete mapObj[key]);
+		let mapObj: SurePosition<T>;
+		let t = this.surePositionMap.get(id);
+		t ? mapObj = t : this.surePositionMap.set(id, mapObj = {});
+		SurePosition.keys.forEach(key => surePosition[key]?.length && (mapObj[key] || (mapObj[key] = [])).push(...surePosition[key]!));
+		const len = (mapObj.after?.length ?? 0) + (mapObj.before?.length ?? 0);
+		this.countMap.set(id, len);
+		return len;
 	}
-	protected readonly splitedMap: MapObj<symbol, Hookable> = {};
-	private surelyInsert(id: Id, surePosition: SurePosition<T>) {
-		if (typeof id === 'symbol' || this.splitedMap[id] !== PositionMap.SPLITED) return this.push(id, surePosition);
-		const { preId, postId } = Loader.getAffixed(id);
-		this.surelyInsert(preId, { after: surePosition.after });
-		this.surelyInsert(postId, { before: surePosition.before });
+	protected readonly splitedChecker = new SignChecker(false);
+	private surelyInsert(id: Id, surePosition: SurePosition<T>): number {
+		if (typeof id === 'symbol' || !this.splitedChecker.isEnsured(id)) return this.push(id, surePosition);
+		const { preId, mainId, postId } = Loader.getAffixed(id);
+		const len = this.countMap.get(mainId)!
+			+ this.surelyInsert(preId, { after: surePosition.after })
+			+ this.surelyInsert(postId, { before: surePosition.before });
+		this.countMap.set(id, len);
+		return len;
 	}
 	private split(id: Hookable) {
 		const { preId, mainId, postId } = Loader.getAffixed(id);
-		this.splitedMap[id] = PositionMap.SPLITED;
-		this.signChecker.ensure(preId, mainId, postId);
-		this.push(preId, { after: this.surePositionMap[id]?.after });
-		this.surePositionMap[mainId] = {};
-		this.push(postId, { before: this.surePositionMap[id]?.before });
-		delete this.surePositionMap[id];
+		this.splitedChecker.ensure(id);
+		this.insertedChecker.ensure(preId, mainId, postId);
+		this.push(preId, { after: this.surePositionMap.get(id)?.after });
+		this.surePositionMap.set(mainId, {});
+		this.push(postId, { before: this.surePositionMap.get(id)?.before });
+		this.surePositionMap.delete(id);
 	}
 	private getHookedOf(id: Id) {
 		if (typeof id !== 'string') return false;
@@ -194,45 +214,53 @@ export class PositionMap<T> {
 	}
 	private requireSplited(id: Hookable | false) {
 		if (id === false) return false;
-		if (this.splitedMap[id] === PositionMap.HOLDED) return false;
-		if (this.splitedMap[id] === PositionMap.SPLITED) return true;
+		if (this.splitedChecker.isRequired(id)) return false;
+		if (this.splitedChecker.isEnsured(id)) return true;
 		if (this.requireSplited(this.getHookedOf(id))) {
 			this.split(id);
 			return true;
 		} else {
-			this.splitedMap[id] = PositionMap.HOLDED;
+			this.splitedChecker.require(id);
 			return false;
 		}
 	}
 	private clearHolded(id: Hookable) {
 		this.split(id);
-		Loader.getAffixs().forEach(affix => this.splitedMap[affix + id] === PositionMap.HOLDED && this.clearHolded(affix + id));
+		Loader.getAffixs().forEach(affix => this.splitedChecker.isRequired(affix + id) && this.clearHolded(affix + id));
 	}
 	private ensureSplited(id: Id | false) {
-		if (typeof id === 'symbol') return this.signChecker.ensure(id), false;
+		if (typeof id === 'symbol') return this.insertedChecker.ensure(id), false;
 		if (id === false) return true;
-		if (this.splitedMap[id] === PositionMap.SPLITED) return false;
-		if (this.splitedMap[id] === PositionMap.HOLDED) {
+		if (this.splitedChecker.isEnsured(id)) return false;
+		if (this.splitedChecker.isRequired(id)) {
 			if (this.ensureSplited(this.getHookedOf(id))) {
-				this.signChecker.ensure(id);
+				this.insertedChecker.ensure(id);
 				this.clearHolded(id);
 			}
 			return false;
 		} else {
-			if (this.ensureSplited(this.getHookedOf(id))) this.signChecker.ensure(id);
+			if (this.ensureSplited(this.getHookedOf(id))) this.insertedChecker.ensure(id);
 			this.split(id);
 			return false;
 		}
 	}
 	insert(id: Id, position: Position<T>) {
+		const reqSize = this.insertedChecker.getSize('required');
+		const ensSize = this.insertedChecker.getSize('ensured');
+		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
-		this.signChecker.require(surePosition);
+		this.insertedChecker.requirePosition(surePosition);
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(this.getHookedOf(id))));
 		this.ensureSplited(id);
 		this.surelyInsert(id, surePosition);
+		if (
+			this.insertedChecker.getSize('required') !== reqSize ||
+			this.insertedChecker.getSize('ensured') !== ensSize ||
+			this.countMap.get(id) !== len
+		) this.edition++;
 	}
 	getEdgeOf(id: Id, direction: 'Pre' | 'Main' | 'Post'): Id {
-		if (typeof id !== 'symbol' && this.splitedMap[id] === PositionMap.SPLITED) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
+		if (typeof id !== 'symbol' && this.insertedChecker.isEnsured(id)) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
 		return id;
 	}
 	// getOrder() {
@@ -320,22 +348,21 @@ export abstract class Loader<T, F extends AsyncCallback<T>> {
 	/**“流程终点”符号 */
 	static readonly END = Symbol('load end');
 	static affixPre = 'pre:';
-	static affixPost = 'post:';
 	static affixMain = 'main:';
-	private static readonly affixedCache: MapObj<{ [I in 'preId' | 'mainId' | 'postId']: string; }> = Object.create(null);
+	static affixPost = 'post:';
 	static getAffixs() {
 		return [
 			this.affixPre,
 			this.affixMain,
 			this.affixPost,
-		] as const;
+		];
 	}
 	static getAffixed(id: Hookable) {
-		return this.affixedCache[id] || (this.affixedCache[id] = {
+		return {
 			preId: Loader.affixPre + id,
 			mainId: Loader.affixMain + id,
 			postId: Loader.affixPost + id,
-		});
+		};
 	}
 //	constructor({ actions = {}, positions = {}, reusable = false }: LoaderConfig<T, F> = {}) {
 //		this.reusable = reusable;
