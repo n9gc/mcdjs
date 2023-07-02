@@ -192,8 +192,7 @@ export class PositionMap<T> {
 		for (const affix of Loader.getAffixs()) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
 		return false;
 	}
-	private requireSplited(id: Id | false) {
-		if (typeof id === 'symbol') return true;
+	private requireSplited(id: Hookable | false) {
 		if (id === false) return false;
 		if (this.splitedMap[id] === PositionMap.HOLDED) return false;
 		if (this.splitedMap[id] === PositionMap.SPLITED) return true;

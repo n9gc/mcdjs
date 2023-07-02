@@ -1,6 +1,9 @@
 {
 	"private": true,
 	"devDependencies": {
+		"@ava/typescript": "^4.1.0",
+		"ava": "^5.3.1",
+		"expect": "^29.5.0",
 		"lage": "2.5.0",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.0.4"

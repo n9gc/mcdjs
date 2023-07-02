@@ -1,33 +1,8 @@
-import test, { Macro, ExecutionContext } from 'ava';
-import { PositionMap, SignChecker, Loader, Id } from '../';
+import test, { Macro } from 'ava';
+import { PositionMap, Loader, Id } from '..';
+import { Tpm, Tsc, gsm, pmS, scE } from './helpers';
 import expect from 'expect';
 
-class Tsc extends SignChecker<void> {
-	static get = () => [
-		this.ENSURED,
-		this.REQUIRED,
-	] as const;
-	get = () => ({
-		sm: this.statusMap,
-	} as const);
-}
-class Tpm extends PositionMap<void> {
-	static get = () => [
-		this.SPLITED,
-		this.HOLDED,
-	] as const;
-	get = () => ({
-		spm: this.surePositionMap,
-		sm: this.splitedMap,
-	} as const);
-}
-function gsm<T>(k: readonly Id[], s: T) {
-	const sm: { [x: Id]: T; } = {};
-	k.forEach(id => sm[id] = s);
-	return sm;
-}
-const [scE, scR] = Tsc.get();
-const [pmS, pmH] = Tpm.get();
 const cer: Macro<[
 	init: (pm: PositionMap<void>) => void,
 	deeperlySplited: string[],
@@ -109,10 +84,11 @@ test(
 	cer,
 	pm => {
 		pm.insert('hh1', {});
+		pm.insert('hh2', { postOf: 'hh1' });
 		pm.insert('hh3', { preOf: 'hh1' });
 	},
-	['hh1', 'hh3'],
-	['pre:hh3', 'post:hh3'],
+	['hh1', 'hh2', 'hh3'],
+	['pre:hh3', 'post:hh3', 'pre:hh2', 'post:hh2'],
 );
 
 test(
@@ -139,6 +115,7 @@ test(
 	'占取拆分',
 	cer,
 	pm => {
+		pm.insert('hh4', 'pre:hh1')
 		pm.insert('hh4', 'pre:pre:hh1')
 		pm.insert('hh1', {});
 	},
