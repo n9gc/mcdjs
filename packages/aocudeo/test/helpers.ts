@@ -8,6 +8,7 @@ import {
 	Position,
 } from "..";
 
+type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
 export class Tsc extends SignChecker {
 	constructor() {
 		super(true);
@@ -26,6 +27,7 @@ export class Tpm extends PositionMap<void> {
 		spm: this.surePositionMap,
 		sc: this.splitedChecker,
 		ic: this.insertedChecker,
+		cm: this.countMap,
 		e: this.edition,
 	});
 	override insertedChecker = new Tsc();
@@ -57,4 +59,10 @@ export function k(o: {}) {
 }
 export function car(a: Iterable<Id>) {
 	return gsm(a, 0);
+}
+export function mmo<N>(o: MapObj<N>, w: (value: N, id: Id) => void) {
+	Reflect.ownKeys(o).forEach(id => {
+		const n = o[id];
+		if (typeof n !== 'undefined') w(n, id);
+	});
 }

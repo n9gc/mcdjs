@@ -1,6 +1,6 @@
 import test from 'tape';
-import { PositionMap, Loader, Id } from '..';
-import { Tpm, gsm, car, cma } from './helpers';
+import { PositionMap, Loader, Id, SurePosition } from '..';
+import { Tpm, gsm, car, cma, mmo } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {
@@ -26,16 +26,18 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 		
 		const h = new Set<string>();
 		ss.forEach(n => h.add('pre:' + n).add('main:' + n).add('post:' + n).delete(n));
-		const spmo = gsm(h, {} as any);
+		const spmo = gsm(h, { after: {}, before: {} });
 		t.deepEqual(
 			car(pm.get().spm.keys()),
 			car(h),
 			'位置无父节点'
 		);
 
-		[...di, Loader.END].forEach(i => spmo[i] = pm.get().spm.get(i));
+		const oj: { [x: Id]: { after: { [x: Id]: number }, before: { [x: Id]: number } } } = Object.create(null);
+		pm.get().spm.forEach((v, i) => oj[i] = { after: car(v.after), before: car(v.before) });
+		[...di, Loader.END].forEach(i => spmo[i] = oj[i]);
 		t.deepLooseEqual(
-			cma(pm.get().spm),
+			oj,
 			spmo,
 			'位置数组拆分正确'
 		);
@@ -44,7 +46,7 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 	}
 };
 
-test('基础功能', t => {
+test('##基础功能', t => {
 	t.test('单独一个', cer(
 		pm => {
 			pm.insert('hh1', {});
@@ -121,7 +123,7 @@ test('基础功能', t => {
 		pm => {
 			pm.insert('hh4', 'pre:hh1')
 			pm.insert('hh4', 'pre:pre:hh1')
-			pm.insert('hh1', {});
+			pm.insert('pre:hh1', {});
 		},
 		['hh1', 'pre:hh1', 'hh4'],
 		['pre:hh4', 'post:hh4'],
@@ -153,7 +155,7 @@ function der(init: (pm: PositionMap<void>) => void, ce: boolean) {
 	}
 };
 
-test('版本控制', t => {
+test('##版本控制', t => {
 	test('插入未有', der(
 		pm => {
 			pm.insert('pre:hh1', {});

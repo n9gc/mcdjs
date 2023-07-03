@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.4
+ * @version 4.0.0-dev.2.5
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -29,24 +29,32 @@ interface JudgerObj<T> {
 	/**运行后的拦截器，若返回 `false` 则停止运行依赖此模块的模块 */
 	postJudger?: Judger<T>;
 }
-export class SurePosition<T> implements PositionObj<T> {
+export class SurePosition {
 	static keys = ['after', 'before'] as const;
-	constructor(positionObj: PositionObj<T>) {
+	private static fillSet(surePosition: Partial<SurePosition>): asserts surePosition is SurePosition {
+		if (!surePosition.after) surePosition.after = new Set<Id>();
+		if (!surePosition.before) surePosition.before = new Set<Id>();
+	}
+	static fill(surePosition: Partial<SurePosition>) {
+		this.fillSet(surePosition);
+		return surePosition;
+	}
+	constructor(positionObj: PositionObj<any>) {
 		const preOf = getArray(positionObj.preOf);
 		const postOf = getArray(positionObj.postOf);
-		(this.after = [
+		this.after = new Set([
 			...getArray(positionObj.after),
 			...preOf.map(id => Loader.affixPre + id),
 			...postOf.map(id => Loader.affixMain + id),
-		]).length || delete this.after;
-		(this.before = [
+		]);
+		this.before = new Set([
 			...getArray(positionObj.before),
 			...preOf.map(id => Loader.affixMain + id),
 			...postOf.map(id => Loader.affixPost + id),
-		]).length || delete this.before;
+		]);
 	}
-	after?: Id[];
-	before?: Id[];
+	after: Set<Id>;
+	before: Set<Id>;
 }
 /**位置信息对象 */
 export class PositionObj<T> implements JudgerObj<T> {
@@ -163,8 +171,8 @@ export class SignChecker {
 	require(...ids: Id[]) {
 		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
 	}
-	requirePosition<T>(surePosition: SurePosition<T>) {
-		SurePosition.keys.forEach(key => this.require(...(surePosition[key] || [])));
+	requirePosition(surePosition: SurePosition) {
+		SurePosition.keys.forEach(key => this.require(...surePosition[key]));
 	}
 	isSafe() {
 		const list = [...this.requireds];
@@ -180,24 +188,24 @@ export class PositionMap<T> {
 	}
 	readonly insertedChecker = new SignChecker(true);
 	protected edition = 0;
-	private readonly countMap = new Map<Id, number>();
-	protected readonly surePositionMap = new Map<Id, SurePosition<T>>();
-	private push(id: Id, surePosition: SurePosition<T>) {
-		let mapObj: SurePosition<T>;
+	protected readonly countMap = new Map<Id, number>();
+	protected readonly surePositionMap = new Map<Id, SurePosition>();
+	private push(id: Id, surePosition: SurePosition) {
+		let mapObj: SurePosition;
 		let t = this.surePositionMap.get(id);
-		t ? mapObj = t : this.surePositionMap.set(id, mapObj = {});
-		SurePosition.keys.forEach(key => surePosition[key]?.length && (mapObj[key] || (mapObj[key] = [])).push(...surePosition[key]!));
-		const len = (mapObj.after?.length ?? 0) + (mapObj.before?.length ?? 0);
+		t ? mapObj = t : this.surePositionMap.set(id, mapObj = new SurePosition({}));
+		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => mapObj[key].add(id)));
+		const len = mapObj.after.size + mapObj.before.size;
 		this.countMap.set(id, len);
 		return len;
 	}
 	protected readonly splitedChecker = new SignChecker(false);
-	private surelyInsert(id: Id, surePosition: SurePosition<T>): number {
+	private surelyInsert(id: Id, surePosition: SurePosition): number {
 		if (typeof id === 'symbol' || !this.splitedChecker.isEnsured(id)) return this.push(id, surePosition);
 		const { preId, mainId, postId } = Loader.getAffixed(id);
 		const len = this.countMap.get(mainId)!
-			+ this.surelyInsert(preId, { after: surePosition.after })
-			+ this.surelyInsert(postId, { before: surePosition.before });
+			+ this.surelyInsert(preId, SurePosition.fill({ after: surePosition.after }))
+			+ this.surelyInsert(postId, SurePosition.fill({ before: surePosition.before }));
 		this.countMap.set(id, len);
 		return len;
 	}
@@ -205,9 +213,9 @@ export class PositionMap<T> {
 		const { preId, mainId, postId } = Loader.getAffixed(id);
 		this.splitedChecker.ensure(id);
 		this.insertedChecker.ensure(preId, mainId, postId);
-		this.push(preId, { after: this.surePositionMap.get(id)?.after });
-		this.surePositionMap.set(mainId, {});
-		this.push(postId, { before: this.surePositionMap.get(id)?.before });
+		this.push(preId, SurePosition.fill({ after: this.surePositionMap.get(id)?.after }));
+		this.push(mainId, new SurePosition({}));
+		this.push(postId, SurePosition.fill({ before: this.surePositionMap.get(id)?.before }));
 		this.surePositionMap.delete(id);
 	}
 	private getHookedOf(id: Id) {
