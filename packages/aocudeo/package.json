@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "4.0.0-dev.2.3",
+	"version": "4.0.0-dev.2.4",
 	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -8,7 +8,8 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test": "pnpm ts-node .",
+		"testNoCover": "ts-node test/pos.ts | tap-difflet",
+		"test": "nyc pnpm testNoCover",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"
 	},
@@ -43,15 +44,6 @@
 	},
 	"dependencies": {
 		"queue": "^6.0.2"
-	},
-	"ava": {
-		"extensions": [
-			"ts"
-		],
-		"require": [
-			"ts-node/register"
-		],
-		"timeout": "2m"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/aocudeo#readme"
 }

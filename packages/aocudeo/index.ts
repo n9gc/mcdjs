@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.3
+ * @version 4.0.0-dev.2.4
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -102,14 +102,17 @@ function getArray<T>(mayArray?: MayArray<T>) {
 function throwError(type: ErrorType, tracker: Error, infos?: any): never {
 	throw new AocudeoError(type, tracker, infos);
 }
+function mapMapObj<N>(mapObj: MapObj<N>, walker: (value: N, id: Id) => void) {
+	Reflect.ownKeys(mapObj).forEach(id => {
+		const n = mapObj[id];
+		if (typeof n !== 'undefined') walker(n, id);
+	});
+}
 /**遍历 {@link map} */
 function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => void) {
 	map instanceof Map
 		? map.forEach(walker)
-		: Reflect.ownKeys(map).forEach(id => {
-			const n = map[id];
-			if (typeof n !== 'undefined') walker(n, id);
-		});
+		: mapMapObj(map, walker);
 }
 // abstract class ActionMap<T, F extends AsyncCallback<T>> {
 // 	protected actionMap: MapObj<F[]> = Object.create(null);
@@ -142,8 +145,8 @@ export class SignChecker {
 	}
 	protected ensureds = new Set<Id>();
 	protected requireds = new Set<Id>();
-	getSize(type: 'required' | 'ensured') {
-		return this[`${type}s`].size;
+	countEnsureds() {
+		return this.ensureds.size;
 	}
 	isEnsured(id: Id) {
 		return this.ensureds.has(id);
@@ -161,7 +164,7 @@ export class SignChecker {
 		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
 	}
 	requirePosition<T>(surePosition: SurePosition<T>) {
-		SurePosition.keys.forEach(key => this.ensure(...(surePosition[key] || [])));
+		SurePosition.keys.forEach(key => this.require(...(surePosition[key] || [])));
 	}
 	isSafe() {
 		const list = [...this.requireds];
@@ -245,19 +248,14 @@ export class PositionMap<T> {
 		}
 	}
 	insert(id: Id, position: Position<T>) {
-		const reqSize = this.insertedChecker.getSize('required');
-		const ensSize = this.insertedChecker.getSize('ensured');
+		const siz = this.insertedChecker.countEnsureds();
 		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
 		this.insertedChecker.requirePosition(surePosition);
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(this.getHookedOf(id))));
 		this.ensureSplited(id);
 		this.surelyInsert(id, surePosition);
-		if (
-			this.insertedChecker.getSize('required') !== reqSize ||
-			this.insertedChecker.getSize('ensured') !== ensSize ||
-			this.countMap.get(id) !== len
-		) this.edition++;
+		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.edition++;
 	}
 	getEdgeOf(id: Id, direction: 'Pre' | 'Main' | 'Post'): Id {
 		if (typeof id !== 'symbol' && this.insertedChecker.isEnsured(id)) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
