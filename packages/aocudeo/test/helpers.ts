@@ -6,13 +6,18 @@ import {
 	PositionObj,
 	Loader,
 	Position,
+	Hookable,
+	Graph,
 } from "..";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
-export class Tsc extends SignChecker {
-	constructor() {
-		super(true);
-	}
+export class Tsc<I extends Id> extends SignChecker<I> {
+	static idv = class extends Tsc<Id> {
+		constructor() {
+			super();
+			this.ensureds.add(Loader.START).add(Loader.END);
+		}
+	};
 	get = () => ({
 		en: this.ensureds,
 		re: this.requireds,
@@ -28,10 +33,18 @@ export class Tpm extends PositionMap<void> {
 		sc: this.splitedChecker,
 		ic: this.insertedChecker,
 		cm: this.countMap,
-		e: this.edition,
+		gc: this.graphCache,
 	});
-	override insertedChecker = new Tsc();
-	protected override splitedChecker = new Tsc();
+	override insertedChecker = new Tsc.idv();
+	protected override splitedChecker = new Tsc<Hookable>();
+}
+export function mm<K extends Id, V>(mapObj: false, kv: Iterable<readonly [K, V]>): Map<K, V>;
+export function mm<K extends Id, V>(mapObj: true, kv: Iterable<readonly [K, V]>): MapObj<V, K>;
+export function mm<K extends Id, V>(mapObj: boolean, kv: Iterable<readonly [K, V]>) {
+	if (!mapObj) return new Map(kv);
+	const o: MapObj<V, K> = Object.create(null);
+	[...kv].forEach(([k, v]) => o[k] = v);
+	return o;
 }
 export const [pmS, pmH] = Tpm.get();
 export function ti(i: Position) {
@@ -60,9 +73,12 @@ export function k(o: {}) {
 export function car(a: Iterable<Id>) {
 	return gsm(a, 0);
 }
-export function mmo<N>(o: MapObj<N>, w: (value: N, id: Id) => void) {
-	Reflect.ownKeys(o).forEach(id => {
+function nu<T>(n: T): n is T extends undefined ? never : T {
+	return typeof n !== 'undefined';
+}
+export function mmo<N, T>(o: MapObj<N>, w: (value: N, id: Id) => T) {
+	return mm(true, Reflect.ownKeys(o).map(id => {
 		const n = o[id];
-		if (typeof n !== 'undefined') w(n, id);
-	});
+		return typeof n !== 'undefined' ? [id, w(n, id)] as [Id, T] : void 0;
+	}).filter(nu));
 }

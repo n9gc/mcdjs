@@ -1,6 +1,6 @@
 import test from 'tape';
 import { PositionMap, Loader, Id, SurePosition } from '..';
-import { Tpm, gsm, car, cma, mmo } from './helpers';
+import { Tpm } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {
@@ -8,8 +8,8 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 		init(pm);
 
 		t.deepEqual(
-			car(pm.get().sc.get().en),
-			car(ss),
+			pm.get().sc.get().en,
+			new Set(ss),
 			'拆分标识无缺失'
 		);
 
@@ -19,25 +19,23 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 			...ss.map(n => Loader.getAffixs().map(a => a + n)),
 		].flat();
 		t.deepEqual(
-			car(pm.get().ic.get().en),
-			car(enl),
+			pm.get().ic.get().en,
+			new Set(enl),
 			'保证节点无缺失'
 		);
 		
-		const h = new Set<string>();
+		const h = new Set<Id>([Loader.END]);
 		ss.forEach(n => h.add('pre:' + n).add('main:' + n).add('post:' + n).delete(n));
-		const spmo = gsm(h, { after: {}, before: {} });
+		const spmo = new Map([...h].map(i => [i, new SurePosition({})]));
 		t.deepEqual(
-			car(pm.get().spm.keys()),
-			car(h),
+			pm.get().spm.keys(),
+			spmo.keys(),
 			'位置无父节点'
 		);
 
-		const oj: { [x: Id]: { after: { [x: Id]: number }, before: { [x: Id]: number } } } = Object.create(null);
-		pm.get().spm.forEach((v, i) => oj[i] = { after: car(v.after), before: car(v.before) });
-		[...di, Loader.END].forEach(i => spmo[i] = oj[i]);
+		[...di, Loader.END].forEach(i => spmo.set(i, pm.get().spm.get(i)!));
 		t.deepLooseEqual(
-			oj,
+			pm.get().spm,
 			spmo,
 			'位置数组拆分正确'
 		);
@@ -136,18 +134,18 @@ function der(init: (pm: PositionMap<void>) => void, ce: boolean) {
 	return (t: test.Test) => {
 		const pm = new Tpm();
 		pm.insert('hh1', 'hh2');
-		const eb = pm.get().e;
+		pm.getGraph();
 		init(pm);
 		if (ce) {
-			t.notEqual(
-				pm.get().e,
-				eb,
+			t.equal(
+				pm.get().gc,
+				null,
 				'版本需变更'
 			);
 		} else {
-			t.equal(
-				pm.get().e,
-				eb,
+			t.notEqual(
+				pm.get().gc,
+				null,
 				'版本需不变'
 			);
 		}
@@ -156,21 +154,21 @@ function der(init: (pm: PositionMap<void>) => void, ce: boolean) {
 };
 
 test('##版本控制', t => {
-	test('插入未有', der(
+	t.test('插入未有', der(
 		pm => {
 			pm.insert('pre:hh1', {});
 		},
 		true,
 	));
 
-	test('改变关系', der(
+	t.test('改变关系', der(
 		pm => {
 			pm.insert('hh1', 'hh3');
 		},
 		true,
 	));
 
-	test('版本不变', der(
+	t.test('版本不变', der(
 		pm => {
 			pm.insert('hh1', 'hh2');
 		},

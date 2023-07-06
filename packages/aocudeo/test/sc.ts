@@ -1,35 +1,35 @@
 import test from 'tape';
 import { Id } from '..';
-import { Tsc, gsm, pse, se, car, ti } from './helpers';
+import { Tsc, pse, se } from './helpers';
 
 function cer(i: Id[]) {
-	function req(sc: Tsc) {
-		sc.requirePosition(ti(i));
+	function req(sc: Tsc<Id>) {
+		sc.require(...i);
 	}
-	function ens(sc: Tsc) {
+	function ens(sc: Tsc<Id>) {
 		sc.ensure(...i);
 	}
 	return (t: test.Test) => {
 		t.test('集合', t => {
-			const sc = new Tsc();
+			const sc = new Tsc.idv();
 			req(sc);
 
 			t.deepEqual(
-				car(sc.get().re),
-				car(i),
+				sc.get().re,
+				new Set(i),
 				'requireds 中包含初始化的内容'
 			);
 			t.deepEqual(
-				car(sc.get().en),
-				car(se),
+				sc.get().en,
+				new Set(se),
 				'ensureds 中包含起点终点标记'
 			);
 
 			ens(sc);
 
-			t.equal(
-				sc.get().re.size,
-				0,
+			t.deepEqual(
+				sc.get().re,
+				new Set(),
 				'requireds 中再无元素'
 			);
 			t.equal(
@@ -38,8 +38,8 @@ function cer(i: Id[]) {
 				'requireds 数量正确'
 			);
 			t.deepEqual(
-				car(sc.get().en),
-				car(pse(i)),
+				sc.get().en,
+				new Set(pse(i)),
 				'ensureds 包含所有'
 			);
 
@@ -47,7 +47,7 @@ function cer(i: Id[]) {
 		});
 
 		if (i.length) t.test('应用接口', t => {
-			const sc = new Tsc();
+			const sc = new Tsc.idv();
 			req(sc);
 
 			for (const j of i) {
@@ -67,7 +67,7 @@ function cer(i: Id[]) {
 		});
 
 		t.test('安全检查', t => {
-			const sc = new Tsc();
+			const sc = new Tsc.idv();
 			req(sc);
 
 			if (i.length) { // 不为空
@@ -76,8 +76,8 @@ function cer(i: Id[]) {
 					'不空不为 false'
 				);
 				t.deepEqual(
-					gsm(sc.isSafe() || [], 0),
-					gsm(i, 0),
+					new Set(sc.isSafe() || []),
+					new Set(i),
 					'返回信息无误'
 				);
 			} else {

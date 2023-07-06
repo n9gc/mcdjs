@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "4.0.0-dev.2.5",
+	"version": "4.0.0-dev.2.6",
 	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
 	"main": "./index",
 	"module": "./index",
@@ -8,7 +8,7 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"testNoCover": "ts-node test/pos.ts | tap-difflet",
+		"testNoCover": "ts-node test | tap-difflet",
 		"test": "nyc pnpm testNoCover",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"

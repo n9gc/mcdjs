@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.5
+ * @version 4.0.0-dev.2.6
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -147,32 +147,29 @@ function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => vo
 // 		return n;
 // 	}
 // }
-export class SignChecker {
-	constructor(init: boolean) {
-		if (init) this.ensureds.add(Loader.START).add(Loader.END);
-	}
-	protected ensureds = new Set<Id>();
-	protected requireds = new Set<Id>();
+export class SignChecker<I extends Id> {
+	protected ensureds = new Set<I>();
+	protected requireds = new Set<I>();
 	countEnsureds() {
 		return this.ensureds.size;
 	}
-	isEnsured(id: Id) {
+	getEnsureds() {
+		return new Set(this.ensureds);
+	}
+	isEnsured(id: I) {
 		return this.ensureds.has(id);
 	}
-	isRequired(id: Id) {
+	isRequired(id: I) {
 		return this.requireds.has(id);
 	}
-	ensure(...ids: Id[]) {
+	ensure(...ids: I[]) {
 		ids.forEach(id => {
 			this.ensureds.add(id);
 			this.requireds.delete(id);
 		});
 	}
-	require(...ids: Id[]) {
+	require(...ids: I[]) {
 		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
-	}
-	requirePosition(surePosition: SurePosition) {
-		SurePosition.keys.forEach(key => this.require(...surePosition[key]));
 	}
 	isSafe() {
 		const list = [...this.requireds];
@@ -184,10 +181,10 @@ export class PositionMap<T> {
 	protected static readonly SPLITED = Symbol('splited');
 	protected static readonly HOLDED = Symbol('hooked');
 	constructor() {
+		this.insertedChecker.ensure(Loader.START, Loader.END);
 		this.insert(Loader.END, Loader.START);
 	}
-	readonly insertedChecker = new SignChecker(true);
-	protected edition = 0;
+	readonly insertedChecker = new SignChecker<Id>;
 	protected readonly countMap = new Map<Id, number>();
 	protected readonly surePositionMap = new Map<Id, SurePosition>();
 	private push(id: Id, surePosition: SurePosition) {
@@ -199,7 +196,7 @@ export class PositionMap<T> {
 		this.countMap.set(id, len);
 		return len;
 	}
-	protected readonly splitedChecker = new SignChecker(false);
+	protected readonly splitedChecker = new SignChecker<Hookable>;
 	private surelyInsert(id: Id, surePosition: SurePosition): number {
 		if (typeof id === 'symbol' || !this.splitedChecker.isEnsured(id)) return this.push(id, surePosition);
 		const { preId, mainId, postId } = Loader.getAffixed(id);
@@ -259,53 +256,55 @@ export class PositionMap<T> {
 		const siz = this.insertedChecker.countEnsureds();
 		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
-		this.insertedChecker.requirePosition(surePosition);
+		SurePosition.keys.forEach(key => this.insertedChecker.require(...surePosition[key]));
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(this.getHookedOf(id))));
 		this.ensureSplited(id);
 		this.surelyInsert(id, surePosition);
-		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.edition++;
+		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.graphCache = null;
 	}
-	getEdgeOf(id: Id, direction: 'Pre' | 'Main' | 'Post'): Id {
-		if (typeof id !== 'symbol' && this.insertedChecker.isEnsured(id)) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
+	protected graphCache: null | Graph = null;
+	getGraph() {
+		return this.graphCache || (this.graphCache = new Graph(this.surePositionMap, this.splitedChecker));
+	}
+}
+export class Graph {
+	readonly edgeMap: MapObj<Id[]> = Object.create(null);
+	readonly indegreeMap: MapObj<number> = Object.create(null);
+	private putInList(id: Id, ids: Id[]) {
+		(this.edgeMap[id] || (this.edgeMap[id] = [])).push(...ids);
+	}
+	private plusCount(id: Id, num = 1) {
+		this.indegreeMap[id] = (this.indegreeMap[id] || 0) + num;
+	}
+	private insertAfter(id: Id, after: Id[]) {
+		after.forEach(n => this.putInList(n, [id]));
+		this.plusCount(id, after.length);
+	}
+	private insertBefore(id: Id, before: Id[]) {
+		this.putInList(id, before);
+		before.forEach(n => this.plusCount(n));
+	}
+	private insert(id: Id, after: Id[], before: Id[]) {
+		this.insertAfter(id, after);
+		this.insertBefore(id, before);
+	}
+	private getEdgeOf(id: Id, direction: 'Pre' | 'Main' | 'Post'): Id {
+		if (typeof id !== 'symbol' && this.splitedChecker.isEnsured(id)) return this.getEdgeOf(Loader[`affix${direction}`] + id, direction);
 		return id;
 	}
-	// getOrder() {
-	// 	return new Order(this.surePositionMap, this.splitedMap);
-	// }
+	private insertEdge(id: Id, after: Id[], before: Id[]) {
+		this.insertAfter(this.getEdgeOf(id, 'Pre'), after.map(id => this.getEdgeOf(id, 'Post')));
+		this.insertBefore(this.getEdgeOf(id, 'Post'), before.map(id => this.getEdgeOf(id, 'Pre')));
+	}
+	constructor(
+		surePositionMap: Map<Id, SurePosition>,
+		private splitedChecker: SignChecker<Hookable>,
+	) {
+		surePositionMap.forEach(({ after, before }, id) => this.insertEdge(id, [...after], [...before]));
+		[...surePositionMap.keys()].filter(id => id !== Loader.END && Loader.START).forEach(id => this.insert(id, [Loader.START], [Loader.END]));
+		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Loader.affixMain + id, [Loader.affixPre + id], [Loader.affixPost + id]));
+	}
 }
-// class Order<T> {
-// 	private readonly edgeMap: MapObj<Id[]> = Object.create(null);
-// 	private readonly indegreeMap: MapObj<number> = Object.create(null);
-// 	private getIndegreeMap(): MapObj<number> {
-// 		return Object.create(this.indegreeMap);
-// 	}
-// 	private putInList(id: Id, ids: MayArray<Id>) {
-// 		(this.edgeMap[id] || (this.edgeMap[id] = [])).push(...getArray(ids));
-// 	}
-// 	private plusCount(id: Id, num = 1) {
-// 		this.indegreeMap[id] = (this.indegreeMap[id] ?? 0) + num;
-// 	}
-// 	private insertAfter(id: Id, after: Id[]) {
-// 		after.forEach(n => this.putInList(n, id));
-// 		this.plusCount(id, after.length);
-// 	}
-// 	private insertBefore(id: Id, before: Id[]) {
-// 		this.putInList(id, before);
-// 		before.forEach(n => this.plusCount(n));
-// 	}
-// 	private insert(id: Id, { after = [], before = [] }: SurePosition<T>) {
-// 
-// 	}
-// 	constructor(
-// 		surePositionMap: MapObj<SurePosition<T>>,
-// 		private splitedMap: MapObj<symbol>,
-// 	) {
-// 		/**@todo 探索拆分后模块 */
-// 		mapMap(surePositionMap, (surePosition, id) => this.insert(id, surePosition));
-// 		/**@todo 补全钩子间关系 */
-// 		/**@todo 拉上起点和终点 */
-// 	}
-// }
 // class CircleChecker<T> {
 // 	private static readonly CHECKED = Symbol('checked');
 // 	private static readonly CHECKING = Symbol('checking');
