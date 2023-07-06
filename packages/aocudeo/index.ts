@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.6
+ * @version 4.0.0-dev.2.7
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -178,8 +178,6 @@ export class SignChecker<I extends Id> {
 	}
 }
 export class PositionMap<T> {
-	protected static readonly SPLITED = Symbol('splited');
-	protected static readonly HOLDED = Symbol('hooked');
 	constructor() {
 		this.insertedChecker.ensure(Loader.START, Loader.END);
 		this.insert(Loader.END, Loader.START);
@@ -304,41 +302,44 @@ export class Graph {
 		[...surePositionMap.keys()].filter(id => id !== Loader.END && Loader.START).forEach(id => this.insert(id, [Loader.START], [Loader.END]));
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Loader.affixMain + id, [Loader.affixPre + id], [Loader.affixPost + id]));
 	}
+	private safeResult: readonly Id[] | false | null = null;
+	isSafe() {
+		return this.safeResult === null
+			? this.safeResult = new CircleChecker(this.edgeMap).result
+			: this.safeResult;
+	}
 }
-// class CircleChecker<T> {
-// 	private static readonly CHECKED = Symbol('checked');
-// 	private static readonly CHECKING = Symbol('checking');
-// 	constructor(order: Order<T>) {
-// 		this.edge = order.edgeMap;
-// 	}
-// 	private edge: MapObj<Id[]>;
-// 	private circle: Id[] = [];
-// 	private status: MapObj<symbol> = {};
-// 	private out(id: Id) {
-// 		this.circle.splice(0, this.circle.indexOf(id));
-// 		return true;
-// 	}
-// 	private mark(id: Id) {
-// 		this.status[id] = CircleChecker.CHECKING;
-// 		this.circle.push(id);
-// 	}
-// 	private unmark(id: Id) {
-// 		this.status[id] = CircleChecker.CHECKED;
-// 		this.circle.pop();
-// 	}
-// 	private from(id: Id) {
-// 		if (this.status[id] === CircleChecker.CHECKED) return false;
-// 		if (this.status[id] === CircleChecker.CHECKING) return this.out(id);
-// 		this.mark(id);
-// 		for (const p of this.edge[id] || []) if (this.from(p)) return true;
-// 		this.unmark(id);
-// 		return false;
-// 	}
-// 	isSafe(id: Id = Loader.START) {
-// 		return this.from(id) && this.circle;
-// 		// throwError(2, Error('出现环形引用'), { circle });
-// 	}
-// }
+export class CircleChecker {
+	private readonly circle: Id[] = [];
+	private readonly checkedChecker = new SignChecker<Id>();
+	private out(id: Id) {
+		this.circle.splice(0, this.circle.indexOf(id));
+		return true;
+	}
+	private mark(id: Id) {
+		this.checkedChecker.require(id);
+		this.circle.push(id);
+	}
+	private unmark(id: Id) {
+		this.checkedChecker.ensure(id);
+		this.circle.pop();
+	}
+	private from(id: Id) {
+		if (this.checkedChecker.isEnsured(id)) return false;
+		if (this.checkedChecker.isRequired(id)) return this.out(id);
+		this.mark(id);
+		for (const p of this.edgeMap[id]!) if (this.from(p)) return true;
+		this.unmark(id);
+		return false;
+	}
+	readonly result: false | readonly Id[];
+	constructor(
+		private edgeMap: MapObj<readonly Id[]>,
+	) {
+		this.result = this.from(Loader.START) && this.circle;
+		// throwError(2, Error('出现环形引用'), { circle });
+	}
+}
 export interface LoaderConfig<T = unknown, F extends AsyncCallback<T> = Callback<T>> {
 	/**是否可以重用 */
 	reusable?: boolean;

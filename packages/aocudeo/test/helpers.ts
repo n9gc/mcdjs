@@ -7,7 +7,6 @@ import {
 	Loader,
 	Position,
 	Hookable,
-	Graph,
 } from "..";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
@@ -24,10 +23,6 @@ export class Tsc<I extends Id> extends SignChecker<I> {
 	});
 }
 export class Tpm extends PositionMap<void> {
-	static get = () => [
-		this.SPLITED,
-		this.HOLDED,
-	] as const;
 	get = () => ({
 		spm: this.surePositionMap,
 		sc: this.splitedChecker,
@@ -46,7 +41,6 @@ export function mm<K extends Id, V>(mapObj: boolean, kv: Iterable<readonly [K, V
 	[...kv].forEach(([k, v]) => o[k] = v);
 	return o;
 }
-export const [pmS, pmH] = Tpm.get();
 export function ti(i: Position) {
 	return new SurePosition(new PositionObj(i));
 }
@@ -81,4 +75,9 @@ export function mmo<N, T>(o: MapObj<N>, w: (value: N, id: Id) => T) {
 		const n = o[id];
 		return typeof n !== 'undefined' ? [id, w(n, id)] as [Id, T] : void 0;
 	}).filter(nu));
+}
+export function nem(liv: [Id, Id[]?][]) {
+	const j = liv.map(([i, is = []]) => [i, new Set([...is, Loader.END])] as const);
+	j.push([Loader.END, new Set()]);
+	return j;
 }

@@ -1,6 +1,6 @@
 import test from 'tape';
-import { PositionMap, Loader, Id, SurePosition } from '..';
-import { Tpm, mm, mmo } from './helpers';
+import { PositionMap, Loader, Id } from '..';
+import { mm, mmo, nem, se } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 	return (t: test.Test) =>{
@@ -8,8 +8,7 @@ function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 		init(pm);
 		const g = pm.getGraph();
 		const k = new Map<Id, number>();
-		const j = liv.map(([i, is = []]) => [i, new Set([...is, Loader.END])] as const);
-		j.push([Loader.END, new Set()]);
+		const j = nem(liv);
 		j.forEach(([_, i]) => i.forEach(s => k.set(s, (k.get(s) ?? 0) + 1)));
 		t.deepEqual(
 			g.indegreeMap,
@@ -25,7 +24,7 @@ function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 	}
 }
 
-test('##顺序生成', t => {
+test('##基本功能', t => {
 	t.test('空转排序', cer(
 		() => {},
 		[
@@ -106,6 +105,43 @@ test('##顺序生成', t => {
 			['post:post:hh'],
 		],
 	));
+
+	t.end();
+});
+
+test('##应用接口', t => {
+	t.test('安全不变', t => {
+		const g = new PositionMap().getGraph();
+		t.equal(
+			g.isSafe(),
+			false,
+			'安全'
+		);
+		t.equal(
+			g.isSafe(),
+			false,
+			'安全不变'
+		);
+		t.end();
+	});
+
+	t.test('危险不变', t => {
+		const pm = new PositionMap();
+		pm.insert(Loader.START, Loader.END);
+		const g = pm.getGraph();
+		const da = g.isSafe();
+		t.deepEqual(
+			da && new Set(da),
+			new Set(se),
+			'危险'
+		);
+		t.equal(
+			da,
+			g.isSafe(),
+			'危险不变'
+		);
+		t.end();
+	});
 
 	t.end();
 });
