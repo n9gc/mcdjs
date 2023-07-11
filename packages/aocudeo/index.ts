@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.7
+ * @version 4.0.0-dev.2.8
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -9,8 +9,6 @@ declare module '.';
 import Queue from "queue";
 
 type MayArray<T> = readonly T[] | T;
-export type Callback<T> = (n: T) => T | void;
-export type AsyncCallback<T> = (n: T) => void | T | PromiseLike<void | T>;
 /**拦截器 */
 type Judger<T> = (n: T) => boolean;
 type MapLike<T> = Map<Id, T> | MapObj<T>;
@@ -20,8 +18,6 @@ export type Hookable = string | number;
 export type Id = symbol | Hookable;
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
 /**模块的动作回调 */
-export type Action<T, F extends AsyncCallback<T>> = { run: F; } | MayArray<F>;
-export type Actions<T, F extends AsyncCallback<T> = AsyncCallback<T>> = MapLike<Action<T, F>>;
 /**拦截器对象 */
 interface JudgerObj<T> {
 	/**运行前的拦截器，若返回 `false` 则停止运行此模块 */
@@ -104,6 +100,23 @@ export class AocudeoError {
 	readonly type;
 	declare readonly tracker;
 }
+export class ArrayMap<K, T> extends Map<K, T[]> {
+	forceGet(key: K) {
+		let value = this.get(key);
+		if (value) return value;
+		value = [];
+		this.set(key, value);
+		return value;
+	}
+	push(key: K, ...items: T[]) {
+		this.forceGet(key).push(...items);
+	}
+	unshift(key: K, ...items: T[]) {
+		this.forceGet(key).unshift(...items);
+	}
+}
+/**@todo 性能：可选和非可选分开 */
+/**@todo 性能：使用 {@link Array.isArray} */
 function getArray<T>(mayArray?: MayArray<T>) {
 	return typeof mayArray === 'undefined' ? [] : mayArray instanceof Array ? mayArray : [mayArray];
 }
@@ -122,31 +135,87 @@ function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => vo
 		? map.forEach(walker)
 		: mapMapObj(map, walker);
 }
-// abstract class ActionMap<T, F extends AsyncCallback<T>> {
-// 	protected actionMap: MapObj<F[]> = Object.create(null);
-// 	add(id: Id, action: Action<T, F>) {
-// 		if ('run' in action) action = action.run;
-// 		(this.actionMap[id] || (this.actionMap[id] = [])).push(...getArray(action));
-// 	}
-// 	abstract run(id: Id, n: T, limiter?: Queue): T | PromiseLike<T>;
-// }
-// class ActionMapSync<T> extends ActionMap<T, Callback<T>> {
-// 	override run(id: Id, n: T) {
-// 		this.actionMap[id]?.forEach(fn => n = fn(n) ?? n);
-// 		return n;
-// 	}
-// }
-// class ActionMapAsync<T> extends ActionMap<T, AsyncCallback<T>> {
-// 	override async run(id: Id, n: T, limiter: Queue) {
-// 		if (!this.actionMap[id]?.length) return n;
-// 		const release = await new Promise<Callback<void>>(grab => limiter.push(() => new Promise(res => grab(res))));
-// 		let waiter = new Promise<T>(res => res(n));
-// 		this.actionMap[id]?.forEach(fn => waiter = waiter.then(fn).then(r => r || n));
-// 		n = await waiter;
-// 		release();
-// 		return n;
-// 	}
-// }
+export class WorkerContext<T> {
+	constructor(
+		public readonly id: Id,
+		public maker: WorkerContextMaker<T>,
+	) { }
+	get data() {
+		return this.maker.data;
+	}
+	set data(n: T) {
+		this.maker.data = n;
+	}
+}
+export class WorkerContextMaker<T> {
+	constructor(
+		public data: T,
+	) { }
+	make(id: Id): WorkerContext<T> {
+		return new WorkerContext(id, this);
+	}
+}
+export interface WorkerFunction<T> {
+	(context: WorkerContext<T>): void;
+}
+export interface WorkerAsyncFunction<T> {
+	(context: WorkerContext<T>): void | PromiseLike<void>;
+}
+export type Worker<T, F extends WorkerAsyncFunction<T>> = { run: F; } | MayArray<F>;
+export type WorkerMap<T, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> = MapLike<Worker<T, F>>;
+abstract class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
+	constructor(
+		protected workerMap: ArrayMap<Id, F>,
+		data: T,
+	) {
+		this.contextMaker = new WorkerContextMaker(data);
+	}
+	protected contextMaker: WorkerContextMaker<T>;
+	abstract run(id: Id): void | PromiseLike<void>;
+}
+export class WorkerRunnerSync<T> extends WorkerRunner<T, WorkerFunction<T>> {
+	override run(id: Id) {
+		this.workerMap.get(id)?.forEach(fn => fn(this.contextMaker.make(id)));
+	}
+}
+export class WorkerRunnerAsync<T> extends WorkerRunner<T, WorkerAsyncFunction<T>> {
+	constructor(
+		workerMap: ArrayMap<Id, WorkerAsyncFunction<T>>,
+		data: T,
+		protected limiter: Queue,
+	) {
+		super(workerMap, data);
+	}
+	override async run(id: Id) {
+		if (!this.workerMap.has(id)) return;
+		const release = await new Promise<() => void>(grab => this.limiter.push(() => new Promise<void>(res => grab(res))));
+		await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.contextMaker.make(id))) || []);
+		release();
+	}
+}
+abstract class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
+	protected workerMap = new ArrayMap<Id, F>();
+	add(id: Id, worker: Worker<T, F>) {
+		if ('run' in worker) worker = worker.run;
+		if (!(worker instanceof Array)) worker = [worker];
+		if (!worker.length) return;
+		this.workerMap.push(id, ...worker);
+		this.lastRunner = null;
+	}
+	protected lastRunner: WorkerRunner<T, F> | null = null;
+	abstract getRunner(data: T, concurrency?: number): WorkerRunner<T, F>;
+}
+export class WorkerManagerSync<T> extends WorkerManager<T, WorkerFunction<T>> {
+	override getRunner(data: T): WorkerRunnerSync<T> {
+		return this.lastRunner || (this.lastRunner = new WorkerRunnerSync(this.workerMap, data));
+	}
+}
+export class WorkerManagerAsync<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
+	protected override lastRunner: WorkerRunnerAsync<T> | null = null;
+	override getRunner(data: T, concurrency: number): WorkerRunnerAsync<T> {
+		return this.lastRunner || (this.lastRunner = new WorkerRunnerAsync(this.workerMap, data, new Queue({ autostart: true, concurrency })));
+	}
+}
 export class SignChecker<I extends Id> {
 	protected ensureds = new Set<I>();
 	protected requireds = new Set<I>();
@@ -213,16 +282,11 @@ export class PositionMap<T> {
 		this.push(postId, SurePosition.fill({ before: this.surePositionMap.get(id)?.before }));
 		this.surePositionMap.delete(id);
 	}
-	private getHookedOf(id: Id) {
-		if (typeof id !== 'string') return false;
-		for (const affix of Loader.getAffixs()) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
-		return false;
-	}
 	private requireSplited(id: Hookable | false) {
 		if (id === false) return false;
 		if (this.splitedChecker.isRequired(id)) return false;
 		if (this.splitedChecker.isEnsured(id)) return true;
-		if (this.requireSplited(this.getHookedOf(id))) {
+		if (this.requireSplited(Loader.getHookedOf(id))) {
 			this.split(id);
 			return true;
 		} else {
@@ -239,13 +303,13 @@ export class PositionMap<T> {
 		if (id === false) return true;
 		if (this.splitedChecker.isEnsured(id)) return false;
 		if (this.splitedChecker.isRequired(id)) {
-			if (this.ensureSplited(this.getHookedOf(id))) {
+			if (this.ensureSplited(Loader.getHookedOf(id))) {
 				this.insertedChecker.ensure(id);
 				this.clearHolded(id);
 			}
 			return false;
 		} else {
-			if (this.ensureSplited(this.getHookedOf(id))) this.insertedChecker.ensure(id);
+			if (this.ensureSplited(Loader.getHookedOf(id))) this.insertedChecker.ensure(id);
 			this.split(id);
 			return false;
 		}
@@ -255,7 +319,7 @@ export class PositionMap<T> {
 		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
 		SurePosition.keys.forEach(key => this.insertedChecker.require(...surePosition[key]));
-		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(this.getHookedOf(id))));
+		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(Loader.getHookedOf(id))));
 		this.ensureSplited(id);
 		this.surelyInsert(id, surePosition);
 		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.graphCache = null;
@@ -340,19 +404,20 @@ export class CircleChecker {
 		// throwError(2, Error('出现环形引用'), { circle });
 	}
 }
-export interface LoaderConfig<T = unknown, F extends AsyncCallback<T> = Callback<T>> {
+export interface LoaderConfig<T = unknown, F extends WorkerAsyncFunction<T> = WorkerFunction<T>> {
 	/**是否可以重用 */
 	reusable?: boolean;
 	/**各个模块的动作回调 */
-	actions?: Actions<T, F>;
+	actions?: WorkerMap<T, F>;
 	/**各个模块的位置信息 */
 	positions?: Positions<T>;
 }
-export abstract class Loader<T, F extends AsyncCallback<T>> {
+export abstract class Loader<T, F extends WorkerAsyncFunction<T>> {
 	/**“流程起点”符号 */
 	static readonly START = Symbol('load start');
 	/**“流程终点”符号 */
 	static readonly END = Symbol('load end');
+	static readonly UNKNOWN = Symbol('unknown module');
 	static affixPre = 'pre:';
 	static affixMain = 'main:';
 	static affixPost = 'post:';
@@ -370,148 +435,153 @@ export abstract class Loader<T, F extends AsyncCallback<T>> {
 			postId: Loader.affixPost + id,
 		};
 	}
-//	constructor({ actions = {}, positions = {}, reusable = false }: LoaderConfig<T, F> = {}) {
-//		this.reusable = reusable;
-//		this.addAction(actions);
-//		this.insert(positions);
-//	}
-//	/**是否可以重用 */
-//	reusable: boolean;
-//	/**是否已经加载完一次了 */
-//	loaded = false;
-//	protected readonly signChecker = new SignChecker<T>();
-//	protected readonly positionMap = new PositionMap(this.signChecker);
-//	protected abstract readonly actionMap: ActionMap<T, F>;
-//	/**
-//	 * 增加动作回调
-//	 * @param id 要增加的模块
-//	 * @param action 动作回调
-//	 * @param noInsert 若模块不存在，是否不要主动插入
-//	 */
-//	addAction(id: Id, action: Action<T, F>, noInsert?: boolean): this;
-//	/**
-//	 * 增加多个模块的动作回调
-//	 * @param actions 各个模块的动作回调
-//	 * @param noInsert 是否不要主动插入 {@link actions} 中未被插入的模块
-//	 */
-//	addAction(actions: Actions<T, F>, noInsert?: boolean): this;
-//	addAction(id: Id | Actions<T, F>, action?: Action<T, F> | boolean, noInsert: boolean = false) {
-//		if (typeof id === 'object') {
-//			const [actions, noInsert] = [id, typeof action === 'boolean' ? action : void 0];
-//			mapMap(actions, (action, id) => this.addAction(id, action, noInsert));
-//			return this;
-//		}
-//		switch (typeof action) { case 'boolean': case 'undefined': return this; }
-//		if (!noInsert) this.positionMap.insertOne(id);
-//		this.actionMap.add(id, action);
-//		return this;
-//	}
-//	private insertMany(positions: Positions<T>) {
-//		positions instanceof Array
-//			? positions.forEach((ele, idx) =>
-//				typeof ele !== 'object'
-//					? this.insert(ele, idx ? positions[idx - 1] : {})
-//					: (
-//						this.insert(ele[0]),
-//						ele.length < 2 || ele.reduce((p, t) => (this.insert(t, p), t))
-//					)
-//			)
-//			: mapMap(positions, (position, id) => this.insert(id, position));
-//		return this;
-//	}
-//	/**
-//	 * 插入模块
-//	 * @param id 模块标识符
-//	 * @param position 位置信息
-//	 * @param action 动作回调
-//	 */
-//	insert(id: Id, position?: Position<T>, action?: Action<T, F> | null): this;
-//	/**
-//	 * 插入多个模块
-//	 * @param positions 各个模块的位置信息
-//	 */
-//	insert(positions: Positions<T>): this;
-//	insert(id: Id | Positions<T>, position: Position<T> = {}, action: Action<T, F> | null = null) {
-//		if (typeof id === 'object') return this.insertMany(id);
-//		if (action) this.addAction(id, action);
-//		this.positionMap.insert(id, position);
-//		return this;
-//	}
-//	private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
-//		if (--countMap[id]) return;
-//		path.push(id);
-//		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
-//	}
-//	/**得到运行顺序数组 */
-//	walk() {
-//		this.checkLost();
-//		this.checkCircle();
-//		const path: Id[] = [];
-//		this.walkAt(Loader.START, this.getCount(), path);
-//		return path;
-//	}
-//	protected preLoad() {
-//		if (!this.reusable && this.loaded) return null;
-//		this.checkLost();
-//		this.checkCircle();
-//		this.loaded = true;
-//		return this.getCount();
-//	}
-//	protected judge(hookPosition: 'pre' | 'post', id: Id, n: T) {
-//		return this.positionObjMap[id]?.[`${hookPosition}Judger`]?.(n) === false;
-//	}
-//	/**
-//	 * 加载！
-//	 * @param n 初始运行参数
-//	 */
-//	abstract load(n: T): Promise<T> | T;
-//	private readonly preJudgerSign: MapObj<symbol> = {};
-//	private readonly postJudgerSign: MapObj<symbol> = {};
-//	private dotLine(a: Id, b: Id, sign?: boolean) {
-//		return [
-//			'\t',
-//			!sign && new Set([a, b, Loader.END, Loader.START]).size < 4 && '// ',
-//			`"${a.toString()}" -> "${b.toString()}"`,
-//			(this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST) && ' [style = dashed]',
-//		].filter(n => n).join('');
-//	}
-//	/**
-//	 * 获取当前模块依赖关系的 DOT 图
-//	 * @param sign 是否显示起点和终点
-//	 */
-//	showDot(sign?: boolean) {
-//		return [...new Set([
-//			'digraph loader {',
-//			...Reflect.ownKeys(this.idSign)
-//				.filter(id => this.idSign[id] === Loader.EXIST && id !== Loader.END)
-//				.map(id => typeof id === 'symbol' ? id.toString() : Loader.hookName[1] + id)
-//				.map(id => this.dotLine(id, Loader.END, sign)),
-//			...Reflect.ownKeys(this.postListMap)
-//				.map(a => this.postListMap[a].map(b => this.dotLine(a, b, sign)))
-//				.flat(),
-//			// Object.keys(this.idSign)
-//			// 	.map(n => [
-//			// 		`subgraph cluster_${n} {`,
-//			// 		`\t"${n}";`,
-//			// 		Loader.HOOK_NAME.map(p => `\t"${p}${n}";`),
-//			// 		'}',
-//			// 	])
-//			// 	.flat(2)
-//			// 	.map(n => '\t' + n)
-//			// 	.join('\n'),
-//			'}',
-//		])].join('\n');
-//	}
-//	/**
-//	 * 显示当前模块依赖关系的图
-//	 *
-//	 * 如果在浏览器里，就打开新标签页，否则就把网址输出到控制台
-//	 * @param sign 是否显示起点和终点
-//	 */
-//	show(sign?: boolean) {
-//		const url = `http://dreampuf.github.io/GraphvizOnline/#${encodeURIComponent(this.showDot(sign))}`;
-//		typeof window === 'undefined' ? console.log(url) : window.open(url);
-//	}
+	static getHookedOf(id: Id) {
+		if (typeof id !== 'string') return false;
+		for (const affix of Loader.getAffixs()) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
+		return false;
+	}
+	//	constructor({ actions = {}, positions = {}, reusable = false }: LoaderConfig<T, F> = {}) {
+	//		this.reusable = reusable;
+	//		this.addAction(actions);
+	//		this.insert(positions);
+	//	}
+	//	/**是否可以重用 */
+	//	reusable: boolean;
+	//	/**是否已经加载完一次了 */
+	//	loaded = false;
+	//	protected readonly signChecker = new SignChecker<T>();
+	//	protected readonly positionMap = new PositionMap(this.signChecker);
+	//	protected abstract readonly actionMap: ActionMap<T, F>;
+	//	/**
+	//	 * 增加动作回调
+	//	 * @param id 要增加的模块
+	//	 * @param action 动作回调
+	//	 * @param noInsert 若模块不存在，是否不要主动插入
+	//	 */
+	//	addAction(id: Id, action: Action<T, F>, noInsert?: boolean): this;
+	//	/**
+	//	 * 增加多个模块的动作回调
+	//	 * @param actions 各个模块的动作回调
+	//	 * @param noInsert 是否不要主动插入 {@link actions} 中未被插入的模块
+	//	 */
+	//	addAction(actions: Actions<T, F>, noInsert?: boolean): this;
+	//	addAction(id: Id | Actions<T, F>, action?: Action<T, F> | boolean, noInsert: boolean = false) {
+	//		if (typeof id === 'object') {
+	//			const [actions, noInsert] = [id, typeof action === 'boolean' ? action : void 0];
+	//			mapMap(actions, (action, id) => this.addAction(id, action, noInsert));
+	//			return this;
+	//		}
+	//		switch (typeof action) { case 'boolean': case 'undefined': return this; }
+	//		if (!noInsert) this.positionMap.insertOne(id);
+	//		this.actionMap.add(id, action);
+	//		return this;
+	//	}
+	//	private insertMany(positions: Positions<T>) {
+	//		positions instanceof Array
+	//			? positions.forEach((ele, idx) =>
+	//				typeof ele !== 'object'
+	//					? this.insert(ele, idx ? positions[idx - 1] : {})
+	//					: (
+	//						this.insert(ele[0]),
+	//						ele.length < 2 || ele.reduce((p, t) => (this.insert(t, p), t))
+	//					)
+	//			)
+	//			: mapMap(positions, (position, id) => this.insert(id, position));
+	//		return this;
+	//	}
+	//	/**
+	//	 * 插入模块
+	//	 * @param id 模块标识符
+	//	 * @param position 位置信息
+	//	 * @param action 动作回调
+	//	 */
+	//	insert(id: Id, position?: Position<T>, action?: Action<T, F> | null): this;
+	//	/**
+	//	 * 插入多个模块
+	//	 * @param positions 各个模块的位置信息
+	//	 */
+	//	insert(positions: Positions<T>): this;
+	//	insert(id: Id | Positions<T>, position: Position<T> = {}, action: Action<T, F> | null = null) {
+	//		if (typeof id === 'object') return this.insertMany(id);
+	//		if (action) this.addAction(id, action);
+	//		this.positionMap.insert(id, position);
+	//		return this;
+	//	}
+	//	private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
+	//		if (--countMap[id]) return;
+	//		path.push(id);
+	//		this.postListMap[id]?.forEach(id => this.walkAt(id, countMap, path));
+	//	}
+	//	/**得到运行顺序数组 */
+	//	walk() {
+	//		this.checkLost();
+	//		this.checkCircle();
+	//		const path: Id[] = [];
+	//		this.walkAt(Loader.START, this.getCount(), path);
+	//		return path;
+	//	}
+	//	protected preLoad() {
+	//		if (!this.reusable && this.loaded) return null;
+	//		this.checkLost();
+	//		this.checkCircle();
+	//		this.loaded = true;
+	//		return this.getCount();
+	//	}
+	//	protected judge(hookPosition: 'pre' | 'post', id: Id, n: T) {
+	//		return this.positionObjMap[id]?.[`${hookPosition}Judger`]?.(n) === false;
+	//	}
+	//	/**
+	//	 * 加载！
+	//	 * @param n 初始运行参数
+	//	 */
+	//	abstract load(n: T): Promise<T> | T;
+	//	private readonly preJudgerSign: MapObj<symbol> = {};
+	//	private readonly postJudgerSign: MapObj<symbol> = {};
+	//	private dotLine(a: Id, b: Id, sign?: boolean) {
+	//		return [
+	//			'\t',
+	//			!sign && new Set([a, b, Loader.END, Loader.START]).size < 4 && '// ',
+	//			`"${a.toString()}" -> "${b.toString()}"`,
+	//			(this.postJudgerSign[a] === Loader.EXIST || this.preJudgerSign[b] === Loader.EXIST) && ' [style = dashed]',
+	//		].filter(n => n).join('');
+	//	}
+	//	/**
+	//	 * 获取当前模块依赖关系的 DOT 图
+	//	 * @param sign 是否显示起点和终点
+	//	 */
+	//	showDot(sign?: boolean) {
+	//		return [...new Set([
+	//			'digraph loader {',
+	//			...Reflect.ownKeys(this.idSign)
+	//				.filter(id => this.idSign[id] === Loader.EXIST && id !== Loader.END)
+	//				.map(id => typeof id === 'symbol' ? id.toString() : Loader.hookName[1] + id)
+	//				.map(id => this.dotLine(id, Loader.END, sign)),
+	//			...Reflect.ownKeys(this.postListMap)
+	//				.map(a => this.postListMap[a].map(b => this.dotLine(a, b, sign)))
+	//				.flat(),
+	//			// Object.keys(this.idSign)
+	//			// 	.map(n => [
+	//			// 		`subgraph cluster_${n} {`,
+	//			// 		`\t"${n}";`,
+	//			// 		Loader.HOOK_NAME.map(p => `\t"${p}${n}";`),
+	//			// 		'}',
+	//			// 	])
+	//			// 	.flat(2)
+	//			// 	.map(n => '\t' + n)
+	//			// 	.join('\n'),
+	//			'}',
+	//		])].join('\n');
+	//	}
+	//	/**
+	//	 * 显示当前模块依赖关系的图
+	//	 *
+	//	 * 如果在浏览器里，就打开新标签页，否则就把网址输出到控制台
+	//	 * @param sign 是否显示起点和终点
+	//	 */
+	//	show(sign?: boolean) {
+	//		const url = `http://dreampuf.github.io/GraphvizOnline/#${encodeURIComponent(this.showDot(sign))}`;
+	//		typeof window === 'undefined' ? console.log(url) : window.open(url);
+	//	}
 }
 // export interface LoaderAsyncConfig<T = unknown> extends LoaderConfig<T> {
 // 	/**最大同时任务数量 */
