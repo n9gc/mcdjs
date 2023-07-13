@@ -5,4 +5,4 @@
  */
 declare module './async';
 
-export { LoaderAsync as default } from '.';
+export { OrganizerAsync as default } from '.';

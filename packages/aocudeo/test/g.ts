@@ -1,5 +1,5 @@
 import test from 'tape';
-import { PositionMap, Loader, Id } from '..';
+import { PositionMap, Organizer, Id } from '..';
 import { mm, mmo, nem, se } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
@@ -28,7 +28,7 @@ test('##基本功能', t => {
 	t.test('空转排序', cer(
 		() => {},
 		[
-			[Loader.START],
+			[Organizer.start],
 		],
 	));
 
@@ -38,7 +38,7 @@ test('##基本功能', t => {
 			pm.insert(Symbol.for('hh1'), {})
 		},
 		[
-			[Loader.START, [
+			[Organizer.start, [
 				Symbol.for('hh0'), Symbol.for('hh1'),
 			]],
 			[Symbol.for('hh1'), [Symbol.for('hh0')]],
@@ -52,7 +52,7 @@ test('##基本功能', t => {
 			pm.insert('hh1', {})
 		},
 		[
-			[Loader.START, [
+			[Organizer.start, [
 				'pre:hh0', 'main:hh0', 'post:hh0',
 				'pre:hh1', 'main:hh1', 'post:hh1',
 			]],
@@ -70,7 +70,7 @@ test('##基本功能', t => {
 			pm.insert('pre:hh', {});
 		},
 		[
-			[Loader.START, [
+			[Organizer.start, [
 				'pre:pre:hh', 'main:pre:hh', 'post:pre:hh',
 				'main:hh', 'post:hh',
 			]],
@@ -88,7 +88,7 @@ test('##基本功能', t => {
 			pm.insert('post:hh', {});
 		},
 		[
-			[Loader.START, [
+			[Organizer.start, [
 				'pre:pre:pre:hh', 'main:pre:pre:hh', 'post:pre:pre:hh',
 				'main:pre:hh', 'post:pre:hh',
 				'main:hh',
@@ -127,7 +127,7 @@ test('##应用接口', t => {
 
 	t.test('危险不变', t => {
 		const pm = new PositionMap();
-		pm.insert(Loader.START, Loader.END);
+		pm.insert(Organizer.start, Organizer.end);
 		const g = pm.getGraph();
 		const da = g.isSafe();
 		t.deepEqual(

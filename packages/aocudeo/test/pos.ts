@@ -1,5 +1,5 @@
 import test from 'tape';
-import { PositionMap, Loader, Id, SurePosition } from '..';
+import { PositionMap, Organizer, Id, SurePosition } from '..';
 import { Tpm } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
@@ -14,17 +14,17 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 		);
 
 		const enl = [
-			Loader.START, Loader.END,
+			Organizer.start, Organizer.end,
 			ss,
-			...ss.map(n => Loader.getAffixs().map(a => a + n)),
+			...ss.map(n => Organizer.getAffixs().map(a => a + n)),
 		].flat();
 		t.deepEqual(
 			pm.get().ic.get().en,
 			new Set(enl),
 			'保证节点无缺失'
 		);
-		
-		const h = new Set<Id>([Loader.END]);
+
+		const h = new Set<Id>([Organizer.end]);
 		ss.forEach(n => h.add('pre:' + n).add('main:' + n).add('post:' + n).delete(n));
 		const spmo = new Map([...h].map(i => [i, new SurePosition({})]));
 		t.deepEqual(
@@ -33,7 +33,7 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 			'位置无父节点'
 		);
 
-		[...di, Loader.END].forEach(i => spmo.set(i, pm.get().spm.get(i)!));
+		[...di, Organizer.end].forEach(i => spmo.set(i, pm.get().spm.get(i)!));
 		t.deepLooseEqual(
 			pm.get().spm,
 			spmo,

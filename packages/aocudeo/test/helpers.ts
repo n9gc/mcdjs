@@ -1,7 +1,7 @@
 import {
 	Hookable,
 	Id,
-	Loader,
+	Organizer,
 	Position,
 	PositionMap,
 	PositionObj,
@@ -16,7 +16,7 @@ export class Tsc<I extends Id> extends SignChecker<I> {
 	static idv = class extends Tsc<Id> {
 		constructor() {
 			super();
-			this.ensureds.add(Loader.START).add(Loader.END);
+			this.ensureds.add(Organizer.start).add(Organizer.end);
 		}
 	};
 	get = () => ({
@@ -68,7 +68,7 @@ export function gsm<T>(k: Iterable<Id>, s: T) {
 	[...k].forEach(id => sm[id] = s);
 	return sm;
 }
-export const se = [Loader.START, Loader.END] as const;
+export const se = [Organizer.start, Organizer.end] as const;
 export function pse(i: Id[]) {
 	return [...se, ...i];
 }
@@ -91,8 +91,8 @@ export function mmo<N, T>(o: MapObj<N>, w: (value: N, id: Id) => T) {
 	}).filter(nu));
 }
 export function nem(liv: [Id, Id[]?][]) {
-	const j = liv.map(([i, is = []]) => [i, new Set([...is, Loader.END])] as const);
-	j.push([Loader.END, new Set()]);
+	const j = liv.map(([i, is = []]) => [i, new Set([...is, Organizer.end])] as const);
+	j.push([Organizer.end, new Set()]);
 	return j;
 }
 export function to(t: number) {

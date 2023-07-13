@@ -1,5 +1,5 @@
 import test from 'tape';
-import { CircleChecker, Id, Loader } from '..';
+import { CircleChecker, Id, Organizer } from '..';
 import { mm, nem } from './helpers';
 
 function cer(liv: [Id, Id[]?][], r: Id[] | false) {
@@ -33,17 +33,17 @@ function cer(liv: [Id, Id[]?][], r: Id[] | false) {
 test('##圆圈检查', t => {
 	t.test('空转检查', cer(
 		[
-			[Loader.START],
+			[Organizer.start],
 		],
 		false,
 	));
 
 	t.test('简单小环', cer(
 		[
-			[Loader.START, ['hh']],
-			['hh', [Loader.START]],
+			[Organizer.start, ['hh']],
+			['hh', [Organizer.start]],
 		],
-		[Loader.START, 'hh'],
+		[Organizer.start, 'hh'],
 	));
 
 	t.test('记忆检查', cer(
@@ -52,14 +52,14 @@ test('##圆圈检查', t => {
 			['xp', ['end']],
 			['hh0', ['xp']],
 			['hh1', ['xp']],
-			[Loader.START, ['hh0', 'hh1']],
+			[Organizer.start, ['hh0', 'hh1']],
 		],
 		false
 	));
 
 	t.test('深处小环', cer(
 		[
-			[Loader.START, ['entry']],
+			[Organizer.start, ['entry']],
 			['entry', ['hh0']],
 			['hh0', ['hh1']],
 			['hh1', ['hh0']],
