@@ -3,3 +3,4 @@ import "./pos";
 import "./graph";
 import "./cc";
 import "./wc";
+import "./am";

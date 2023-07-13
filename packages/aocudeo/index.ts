@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.2.8
+ * @version 4.0.0-dev.2.9
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -28,23 +28,22 @@ interface JudgerObj<T> {
 export class SurePosition {
 	static keys = ['after', 'before'] as const;
 	private static fillSet(surePosition: Partial<SurePosition>): asserts surePosition is SurePosition {
-		if (!surePosition.after) surePosition.after = new Set<Id>();
-		if (!surePosition.before) surePosition.before = new Set<Id>();
+		SurePosition.keys.forEach(key => surePosition[key] || (surePosition[key] = new Set()));
 	}
 	static fill(surePosition: Partial<SurePosition>) {
 		this.fillSet(surePosition);
 		return surePosition;
 	}
 	constructor(positionObj: PositionObj<any>) {
-		const preOf = getArray(positionObj.preOf);
-		const postOf = getArray(positionObj.postOf);
+		const preOf = getArray(positionObj.preOf || []);
+		const postOf = getArray(positionObj.postOf || []);
 		this.after = new Set([
-			...getArray(positionObj.after),
+			...getArray(positionObj.after || []),
 			...preOf.map(id => Loader.affixPre + id),
 			...postOf.map(id => Loader.affixMain + id),
 		]);
 		this.before = new Set([
-			...getArray(positionObj.before),
+			...getArray(positionObj.before || []),
 			...preOf.map(id => Loader.affixMain + id),
 			...postOf.map(id => Loader.affixPost + id),
 		]);
@@ -87,58 +86,66 @@ export enum ErrorType {
 	/**加载时仍有被引用的模块未被插入 */
 	UnregistedCodeUnits,
 }
-export class AocudeoError {
-	constructor(
-		type: ErrorType,
-		tracker: Error,
-		infos?: any,
-	) {
-		this.type = ErrorType[type] as keyof typeof ErrorType;
-		Object.assign(this, infos);
-		this.tracker = tracker;
-	}
-	readonly type;
-	declare readonly tracker;
-}
-export class ArrayMap<K, T> extends Map<K, T[]> {
+interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
+abstract class InitializableMap<K, V> extends Map<K, V> {
+	protected abstract initializeValue(): V;
 	forceGet(key: K) {
 		let value = this.get(key);
 		if (value) return value;
-		value = [];
+		value = this.initializeValue();
 		this.set(key, value);
 		return value;
+	}
+}
+class SurePositionMap<K> extends InitializableMap<K, SurePosition> {
+	protected initializeValue() {
+		return new SurePosition({});
+	}
+}
+class ArrayMap<K, T> extends InitializableMap<K, T[]> {
+	protected initializeValue(): T[] {
+		return [];
 	}
 	push(key: K, ...items: T[]) {
 		this.forceGet(key).push(...items);
 	}
-	unshift(key: K, ...items: T[]) {
-		this.forceGet(key).unshift(...items);
-	}
 }
-/**@todo 性能：可选和非可选分开 */
-/**@todo 性能：使用 {@link Array.isArray} */
-function getArray<T>(mayArray?: MayArray<T>) {
-	return typeof mayArray === 'undefined' ? [] : mayArray instanceof Array ? mayArray : [mayArray];
+const isArray: (n: any) => n is readonly any[] = Array.isArray;
+function getArray<T>(mayArray: MayArray<T>) {
+	return isArray(mayArray) ? mayArray : [mayArray];
 }
-function throwError(type: ErrorType, tracker: Error, infos?: any): never {
-	throw new AocudeoError(type, tracker, infos);
-}
-function mapMapObj<N>(mapObj: MapObj<N>, walker: (value: N, id: Id) => void) {
-	Reflect.ownKeys(mapObj).forEach(id => {
-		const n = mapObj[id];
-		if (typeof n !== 'undefined') walker(n, id);
-	});
-}
-/**遍历 {@link map} */
-function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => void) {
-	map instanceof Map
-		? map.forEach(walker)
-		: mapMapObj(map, walker);
-}
+// export class AocudeoError {
+// 	constructor(
+// 		type: ErrorType,
+// 		tracker: Error,
+// 		infos?: any,
+// 	) {
+// 		this.type = ErrorType[type] as keyof typeof ErrorType;
+// 		Object.assign(this, infos);
+// 		this.tracker = tracker;
+// 	}
+// 	readonly type;
+// 	declare readonly tracker;
+// }
+// function throwError(type: ErrorType, tracker: Error, infos?: any): never {
+// 	throw new AocudeoError(type, tracker, infos);
+// }
+// function mapMapObj<N>(mapObj: MapObj<N>, walker: (value: N, id: Id) => void) {
+// 	Reflect.ownKeys(mapObj).forEach(id => {
+// 		const n = mapObj[id];
+// 		if (typeof n !== 'undefined') walker(n, id);
+// 	});
+// }
+// /**遍历 {@link map} */
+// function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id) => void) {
+// 	map instanceof Map
+// 		? map.forEach(walker)
+// 		: mapMapObj(map, walker);
+// }
 export class WorkerContext<T> {
 	constructor(
 		public readonly id: Id,
-		public maker: WorkerContextMaker<T>,
+		public readonly maker: WorkerContextMaker<T>,
 	) { }
 	get data() {
 		return this.maker.data;
@@ -165,12 +172,12 @@ export type Worker<T, F extends WorkerAsyncFunction<T>> = { run: F; } | MayArray
 export type WorkerMap<T, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> = MapLike<Worker<T, F>>;
 abstract class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 	constructor(
-		protected workerMap: ArrayMap<Id, F>,
+		protected readonly workerMap: ReadonlyArrayMap<Id, F>,
 		data: T,
 	) {
 		this.contextMaker = new WorkerContextMaker(data);
 	}
-	protected contextMaker: WorkerContextMaker<T>;
+	protected readonly contextMaker: WorkerContextMaker<T>;
 	abstract run(id: Id): void | PromiseLike<void>;
 }
 export class WorkerRunnerSync<T> extends WorkerRunner<T, WorkerFunction<T>> {
@@ -180,40 +187,34 @@ export class WorkerRunnerSync<T> extends WorkerRunner<T, WorkerFunction<T>> {
 }
 export class WorkerRunnerAsync<T> extends WorkerRunner<T, WorkerAsyncFunction<T>> {
 	constructor(
-		workerMap: ArrayMap<Id, WorkerAsyncFunction<T>>,
-		data: T,
 		protected limiter: Queue,
-	) {
-		super(workerMap, data);
-	}
+		...superArgs: ConstructorParameters<typeof WorkerRunner<T, WorkerAsyncFunction<T>>>
+	) { super(...superArgs); }
 	override async run(id: Id) {
 		if (!this.workerMap.has(id)) return;
 		const release = await new Promise<() => void>(grab => this.limiter.push(() => new Promise<void>(res => grab(res))));
-		await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.contextMaker.make(id))) || []);
+		await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.contextMaker.make(id)))!);
 		release();
 	}
 }
 abstract class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
-	protected workerMap = new ArrayMap<Id, F>();
+	protected readonly workerMap = new ArrayMap<Id, F>();
 	add(id: Id, worker: Worker<T, F>) {
 		if ('run' in worker) worker = worker.run;
 		if (!(worker instanceof Array)) worker = [worker];
 		if (!worker.length) return;
 		this.workerMap.push(id, ...worker);
-		this.lastRunner = null;
 	}
-	protected lastRunner: WorkerRunner<T, F> | null = null;
 	abstract getRunner(data: T, concurrency?: number): WorkerRunner<T, F>;
 }
 export class WorkerManagerSync<T> extends WorkerManager<T, WorkerFunction<T>> {
 	override getRunner(data: T): WorkerRunnerSync<T> {
-		return this.lastRunner || (this.lastRunner = new WorkerRunnerSync(this.workerMap, data));
+		return new WorkerRunnerSync(this.workerMap, data);
 	}
 }
 export class WorkerManagerAsync<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
-	protected override lastRunner: WorkerRunnerAsync<T> | null = null;
 	override getRunner(data: T, concurrency: number): WorkerRunnerAsync<T> {
-		return this.lastRunner || (this.lastRunner = new WorkerRunnerAsync(this.workerMap, data, new Queue({ autostart: true, concurrency })));
+		return new WorkerRunnerAsync(new Queue({ autostart: true, concurrency }), this.workerMap, data);
 	}
 }
 export class SignChecker<I extends Id> {
@@ -253,12 +254,10 @@ export class PositionMap<T> {
 	}
 	readonly insertedChecker = new SignChecker<Id>;
 	protected readonly countMap = new Map<Id, number>();
-	protected readonly surePositionMap = new Map<Id, SurePosition>();
+	protected readonly surePositionMap = new SurePositionMap<Id>();
 	private push(id: Id, surePosition: SurePosition) {
-		let mapObj: SurePosition;
-		let t = this.surePositionMap.get(id);
-		t ? mapObj = t : this.surePositionMap.set(id, mapObj = new SurePosition({}));
-		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => mapObj[key].add(id)));
+		const mapObj = this.surePositionMap.forceGet(id);
+		SurePosition.keys.forEach(key => surePosition[key].forEach(id => mapObj[key].add(id)));
 		const len = mapObj.after.size + mapObj.before.size;
 		this.countMap.set(id, len);
 		return len;

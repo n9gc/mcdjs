@@ -1,12 +1,14 @@
 import {
-	SignChecker,
-	PositionMap,
+	Hookable,
 	Id,
-	SurePosition,
-	PositionObj,
 	Loader,
 	Position,
-	Hookable,
+	PositionMap,
+	PositionObj,
+	SignChecker,
+	SurePosition,
+	WorkerManagerAsync,
+	WorkerRunnerAsync,
 } from "..";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
@@ -32,6 +34,18 @@ export class Tpm extends PositionMap<void> {
 	});
 	override insertedChecker = new Tsc.idv();
 	protected override splitedChecker = new Tsc<Hookable>();
+}
+export class Twma<T> extends WorkerManagerAsync<T> {
+	get = () => ({
+		wm: this.workerMap,
+	});
+}
+export class Twra<T> extends WorkerRunnerAsync<T> {
+	get = () => ({
+		l: this.limiter,
+		wm: this.workerMap,
+		m: this.contextMaker,
+	});
 }
 export function mm<K extends Id, V>(mapObj: false, kv: Iterable<readonly [K, V]>): Map<K, V>;
 export function mm<K extends Id, V>(mapObj: true, kv: Iterable<readonly [K, V]>): MapObj<V, K>;
@@ -59,7 +73,7 @@ export function pse(i: Id[]) {
 	return [...se, ...i];
 }
 export function m<A extends {}, B extends {}>(a: A, b: B) {
-	return {...a, ...b};
+	return { ...a, ...b };
 }
 export function k(o: {}) {
 	return Reflect.ownKeys(o);
@@ -80,4 +94,7 @@ export function nem(liv: [Id, Id[]?][]) {
 	const j = liv.map(([i, is = []]) => [i, new Set([...is, Loader.END])] as const);
 	j.push([Loader.END, new Set()]);
 	return j;
+}
+export function to(t: number) {
+	return new Promise(res => setTimeout(res, t));
 }

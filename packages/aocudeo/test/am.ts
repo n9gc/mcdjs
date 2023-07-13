@@ -1,112 +1,182 @@
-import Queue from "queue";
 import test from "tape";
-import { ActionMapAsync, ActionMapSync, Loader } from '..';
+import { Loader, WorkerContext, WorkerManagerAsync, WorkerManagerSync } from '..';
+import { Twma, Twra, to } from './helpers';
+import Queue from "queue";
 
 test('##同步函数', t => {
 	t.test('普通回调', t => {
 		t.plan(1);
-		const am = new ActionMapSync<void>();
-		am.add(Loader.START, () => t.pass('函数运行'));
-		am.run(am.getHookedLoaderThis(), Loader.START);
+		const wm = new WorkerManagerSync<void>();
+		wm.add(Loader.START, () => t.pass('函数运行'));
+		const wr = wm.getRunner();
+		wr.run(Loader.START);
 	});
 
 	t.test('多个回调', t => {
 		t.plan(2);
-		const am = new ActionMapSync<void>();
-		am.add(Loader.START, () => t.pass('第一个函数'));
-		am.add(Loader.START, () => t.pass('第二个函数'));
-		am.run(am.getHookedLoaderThis(), Loader.START);
+		const wm = new WorkerManagerSync<void>();
+		wm.add(Loader.START, () => t.pass('第一个函数'));
+		wm.add(Loader.START, () => t.pass('第二个函数'));
+		const wr = wm.getRunner();
+		wr.run(Loader.START);
 	});
 
 	t.test('携带参数', t => {
-		const am = new ActionMapSync<5>();
-		am.add(Loader.START, function () {
+		const wm = new WorkerManagerSync<5>();
+		wm.add(Loader.START, context => {
 			t.equal(
-				this.context,
+				context.data,
 				5,
 				'包含上下文'
 			);
 			t.end();
 		});
-		am.run(am.getHookedLoaderThis(5), Loader.START);
+		const wr = wm.getRunner(5);
+		wr.run(Loader.START);
+	});
+
+	t.test('修改参数', t => {
+		const wm = new WorkerManagerSync<number>();
+		wm.add(Loader.START, context => {
+			t.equal(
+				context.data,
+				123,
+				'符合初始值'
+			);
+			context.data = 321;
+		});
+		wm.add(Loader.START, context => {
+			t.equal(
+				context.data,
+				321,
+				'成功修改值'
+			);
+		});
+		wm.add(Loader.START, () => t.end());
+		const wr = wm.getRunner(123);
+		wr.run(Loader.START);
 	});
 
 	t.end();
 });
 
-test.only('hh', t => {
-	t.plan(1);
-	const am = new ActionMapAsync<void>();
-	am.add(Loader.START, async function () {
-		t.pass('函数运行');
-	});
-	am.run(am.getHookedLoaderThis(), Loader.START, new Queue({ autostart: true }));
-});
-
 test('##异步函数', t => {
 
-	test('普通回调', t => {
+	t.test('普通回调', t => {
 		t.plan(1);
-		const am = new ActionMapAsync<void>();
-		am.add(Loader.START, async () => t.pass('函数运行'));
-		am.run(am.getHookedLoaderThis(), Loader.START, new Queue({ autostart: true }));
-		t.timeoutAfter(100);
+		const wm = new WorkerManagerAsync<void>();
+		wm.add(Loader.START, { run: async () => t.pass('函数运行') });
+		const wr = wm.getRunner(void 0, 0);
+		wr.run(Loader.START);
 	});
 
-	test('多个回调', t => {
-		t.plan(2);
-		const am = new ActionMapAsync<void>();
-		let i = 0;
-		am.add(Loader.START, async () => {
+	t.test('携带参数', t => {
+		const wm = new WorkerManagerAsync<5>();
+		wm.add(Loader.START, async context => {
 			t.equal(
-				i,
-				0,
-				'第一次被执行'
-			);
-		});
-		am.add(Loader.START, async () => {
-			i++;
-			t.pass('第二个函数');
-		});
-		am.run(am.getHookedLoaderThis(), Loader.START, new Queue({ autostart: true }));
-	});
-
-	test('携带参数', t => {
-		const am = new ActionMapAsync<5>();
-		am.add(Loader.START, async function () {
-			t.equal(
-				this.context,
+				context.data,
 				5,
 				'包含上下文'
 			);
 			t.end();
 		});
-		am.run(am.getHookedLoaderThis(5), Loader.START, new Queue({ autostart: true }));
+		const wr = wm.getRunner(5, 0);
+		wr.run(Loader.START);
 	});
 
-	test('并行执行', t => {
-		t.plan(3);
-		const am = new ActionMapAsync<void>();
-		let i = 0;
-		am.add(Loader.START, async () => {
-			await new Promise(res => setTimeout(res, 5));
+	t.test('连续回调', t => {
+		const wm = new WorkerManagerAsync<number>();
+		wm.add(Loader.START, async context => {
 			t.equal(
-				i,
+				context.data,
 				1,
-				'并行函数'
+				'第一次被执行'
+			);
+			context.data++;
+		});
+		wm.add(Loader.START, async context => {
+			t.equal(
+				context.data,
+				2,
+				'第二次被执行'
 			);
 		});
-		am.add(Loader.END, async () => {
-			i++;
-			t.pass('先启动函数');
-			await new Promise(res => setTimeout(res, 10));
-			t.pass('后结束函数');
-			i--;
+		wm.add(Loader.START, () => t.end());
+		const wr = wm.getRunner(1, 0);
+		wr.run(Loader.START);
+	});
+
+	t.test('并行回调', t => {
+		t.plan(6);
+		const wm = new WorkerManagerAsync<number>();
+		wm.add(Loader.START, async context => {
+			await to(5);
+			t.equal(
+				context.data,
+				1,
+				'并行执行中'
+			);
 		});
-		const q = new Queue({ autostart: true, concurrency: 2 });
-		const lt = am.getHookedLoaderThis();
-		am.run(lt, Loader.START, q);
-		am.run(lt, Loader.END, q);
+		wm.add(Loader.END, async context => {
+			context.data++;
+			t.pass('先启动了');
+			await to(10);
+			t.pass('后结束了');
+			context.data--;
+		});
+		const wr0 = wm.getRunner(0, 0);
+		wr0.run(Loader.END);
+		wr0.run(Loader.START);
+		const wr1 = wm.getRunner(0, 0);
+		wr1.run(Loader.START);
+		wr1.run(Loader.END);
+	});
+
+	t.test('并行限制', t => {
+		t.plan(6);
+		const wm = new WorkerManagerAsync<number>();
+		async function a(context: WorkerContext<number>) {
+			context.data++;
+			t.assert(
+				context.data < 3,
+				'并行未大于 2'
+			);
+			await to(5);
+			t.assert(
+				context.data < 3,
+				'并行未大于 2'
+			);
+			context.data--;
+		}
+		wm.add(Loader.START, a);
+		wm.add(Loader.END, a);
+		wm.add(Loader.UNKNOWN, a);
+		const wr0 = wm.getRunner(0, 2);
+		wr0.run(Loader.END);
+		wr0.run(Loader.START);
+		wr0.run(Loader.UNKNOWN);
+	});
+
+	t.test('跳过空值', t => {
+		const wm = new Twma<void>();
+		const l0 = new Queue({ autostart: true, concurrency: 0 });
+		const wr0 = new Twra(l0, wm.get().wm, void 0);
+		wr0.run(Loader.START);
+		t.equal(
+			l0.length,
+			0,
+			'没使用任何队列资源'
+		);
+		wm.add(Loader.END, []);
+		const l1 = new Queue({ autostart: true, concurrency: 0 });
+		const wr1 = new Twra(l1, wm.get().wm, void 0);
+		wr1.run(Loader.END);
+		t.equal(
+			l1.length,
+			0,
+			'没使用任何队列资源'
+		);
+		t.end();
 	});
 
 	t.end();
