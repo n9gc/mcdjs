@@ -9,6 +9,7 @@ import {
 	SurePosition,
 	WorkerManagerAsync,
 	WorkerRunnerAsync,
+	WorkerRunnerSync,
 } from "..";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
@@ -44,7 +45,13 @@ export class Twra<T> extends WorkerRunnerAsync<T> {
 	get = () => ({
 		l: this.limiter,
 		wm: this.workerMap,
-		m: this.contextMaker,
+		mc: this.makeContext.bind(this),
+	});
+}
+export class Twrs<T> extends WorkerRunnerSync<T> {
+	get = () => ({
+		wm: this.workerMap,
+		mc: this.makeContext.bind(this),
 	});
 }
 export function mm<K extends Id, V>(mapObj: false, kv: Iterable<readonly [K, V]>): Map<K, V>;
@@ -97,4 +104,16 @@ export function nem(liv: [Id, Id[]?][]) {
 }
 export function to(t: number) {
 	return new Promise(res => setTimeout(res, t));
+}
+export function msf() {
+	const s: Id[] = [];
+	return (i?: Id) => () => (i && s.push(i), s);
+}
+export function ra<T>(a: readonly T[]) {
+	const r = a.slice();
+	for (let i = 1; i < r.length; i++) {
+		const rd = Math.floor(Math.random() * (i + 1));
+		[r[i], r[rd]] = [r[rd], r[i]];
+	}
+	return r;
 }

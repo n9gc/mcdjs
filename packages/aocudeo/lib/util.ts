@@ -1,7 +1,7 @@
 /**
  * 实用工具
  * @module aocudeo/lib/util
- * @version 1.0.0
+ * @version 1.1.0
  * @license GPL-2.0-or-later
  */
 declare module './util';
@@ -76,3 +76,7 @@ export function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id
 		? map.forEach(walker)
 		: mapMapObj(map, walker);
 }
+export function isIdArray(n: MayArray<readonly Id[]>): n is readonly Id[] {
+	return typeof n[0] !== 'object';
+}
+

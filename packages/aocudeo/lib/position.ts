@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -117,7 +117,7 @@ export class PositionMap<T> {
 	}
 	private clearHolded(id: Hookable) {
 		this.split(id);
-		Organizer.getAffixs().forEach(affix => this.splitedChecker.isRequired(affix + id) && this.clearHolded(affix + id));
+		Organizer.affixs.forEach(affix => this.splitedChecker.isRequired(affix + id) && this.clearHolded(affix + id));
 	}
 	private ensureSplited(id: Id | false) {
 		if (typeof id === 'symbol') return this.insertedChecker.ensure(id), false;

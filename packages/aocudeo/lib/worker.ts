@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 1.0.0
+ * @version 2.0.0
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -9,6 +9,7 @@ declare module './worker';
 import Queue from 'queue';
 import { MapLike, MayArray, Id } from './types';
 import { ArrayMap, ReadonlyArrayMap } from './util';
+import { Organizer } from './organizer';
 
 export interface WorkerFunction<T> {
 	(context: WorkerContext<T>): void;
@@ -22,7 +23,7 @@ export type WorkerMap<T, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<
 export class WorkerContext<T> {
 	constructor(
 		public readonly id: Id,
-		public readonly maker: WorkerContextMaker<T>,
+		public readonly maker: WorkerRunner<T, any>,
 	) { }
 	get data() {
 		return this.maker.data;
@@ -31,42 +32,38 @@ export class WorkerContext<T> {
 		this.maker.data = n;
 	}
 }
-export class WorkerContextMaker<T> {
-	constructor(
-		public data: T,
-	) { }
-	make(id: Id): WorkerContext<T> {
-		return new WorkerContext(id, this);
-	}
-}
-abstract class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
+export abstract class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 	constructor(
 		protected readonly workerMap: ReadonlyArrayMap<Id, F>,
-		data: T,
-	) {
-		this.contextMaker = new WorkerContextMaker(data);
+		public data: T,
+	) { }
+	protected makeContext(id: Id): WorkerContext<T> {
+		return new WorkerContext(id, this);
 	}
-	protected readonly contextMaker: WorkerContextMaker<T>;
 	abstract run(id: Id): void | PromiseLike<void>;
 }
 export class WorkerRunnerSync<T> extends WorkerRunner<T, WorkerFunction<T>> {
-	override run(id: Id) {
-		this.workerMap.get(id)?.forEach(fn => fn(this.contextMaker.make(id)));
+	override run(id: Id): void {
+		this.workerMap.get(id)?.forEach(fn => fn(this.makeContext(id)));
+		if (Organizer.getHookType(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
 	}
 }
 export class WorkerRunnerAsync<T> extends WorkerRunner<T, WorkerAsyncFunction<T>> {
 	constructor(
+		workerMap: ReadonlyArrayMap<Id, WorkerAsyncFunction<T>>,
+		data: T,
 		protected limiter: Queue,
-		...superArgs: ConstructorParameters<typeof WorkerRunner<T, WorkerAsyncFunction<T>>>
-	) { super(...superArgs); }
-	override async run(id: Id) {
-		if (!this.workerMap.has(id)) return;
-		const release = await new Promise<() => void>(grab => this.limiter.push(() => new Promise<void>(res => grab(res))));
-		await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.contextMaker.make(id)))!);
-		release();
+	) { super(workerMap, data); }
+	override async run(id: Id): Promise<void> {
+		if (this.workerMap.has(id)) {
+			const release = await new Promise<() => void>(grab => this.limiter.push(() => new Promise<void>(res => grab(res))));
+			await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.makeContext(id)))!);
+			release();
+		}
+		if (Organizer.getHookType(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
 	}
 }
-abstract class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
+export abstract class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
 	protected readonly workerMap = new ArrayMap<Id, F>();
 	add(id: Id, worker: Worker<T, F>) {
 		if ('run' in worker) worker = worker.run;
@@ -83,6 +80,6 @@ export class WorkerManagerSync<T> extends WorkerManager<T, WorkerFunction<T>> {
 }
 export class WorkerManagerAsync<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
 	override getRunner(data: T, concurrency: number): WorkerRunnerAsync<T> {
-		return new WorkerRunnerAsync(new Queue({ autostart: true, concurrency }), this.workerMap, data);
+		return new WorkerRunnerAsync(this.workerMap, data, new Queue({ autostart: true, concurrency }));
 	}
 }

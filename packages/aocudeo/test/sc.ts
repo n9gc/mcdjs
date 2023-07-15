@@ -72,17 +72,17 @@ function cer(i: Id[]) {
 
 			if (i.length) { // 不为空
 				t.true(
-					sc.isSafe(),
+					sc.result,
 					'不空不为 false'
 				);
 				t.deepEqual(
-					new Set(sc.isSafe() || []),
+					new Set(sc.result || []),
 					new Set(i),
 					'返回信息无误'
 				);
 			} else {
 				t.false(
-					sc.isSafe(),
+					sc.result,
 					'空时为否'
 				);
 			}
@@ -90,7 +90,7 @@ function cer(i: Id[]) {
 			ens(sc);
 
 			t.false(
-				sc.isSafe(),
+				sc.result,
 				'确认后安全'
 			);
 
@@ -101,23 +101,27 @@ function cer(i: Id[]) {
 	}
 }
 
-test('##空转检查', cer(
-	[],
-));
+test('##标识符检查器', t => {
+	t.test('#空转检查', cer(
+		[],
+	));
 
-test('##只带标识', cer(
-	[Symbol('hh'), Symbol('nn')],
-));
+	t.test('#只带标识', cer(
+		[Symbol('hh'), Symbol('nn')],
+	));
 
-test('##只带字符', cer(
-	['hh', 'nn'],
-));
+	t.test('#只带字符', cer(
+		['hh', 'nn'],
+	));
 
-test('##只带数字', cer(
-	[7, 8, 1, 2],
-));
+	t.test('#只带数字', cer(
+		[7, 8, 1, 2],
+	));
 
-test('##混合检查', cer(
-	['hh', 'nn', 3, 2, Symbol('hh'), Symbol('nn')],
-));
+	t.test('#混合检查', cer(
+		['hh', 'nn', 3, 2, Symbol('hh'), Symbol('nn')],
+	));
+
+	t.end();
+});
 
