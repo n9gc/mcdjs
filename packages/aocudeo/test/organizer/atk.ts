@@ -1,5 +1,5 @@
 import test from 'tape';
-import { Organizer } from '..';
+import { Organizer } from '../..';
 
 test('##钩子标识工具类', t => {
 	t.equal(

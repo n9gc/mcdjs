@@ -1,7 +1,7 @@
 const a = Promise.resolve.bind(Promise);
 Promise.resolve = <T>(n?: T) => a(n).then((a: any) => a && console.log(a));
 
-import {LoaderAsync, Positions} from '../';
+import { LoaderAsync, Positions } from '../..';
 
 const actions = new Map([
 	["putOnShirt", {run: () => Promise.resolve("put on your shirt")}],

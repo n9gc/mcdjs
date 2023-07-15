@@ -1,7 +1,7 @@
 import test from 'tape';
-import { OrganizerSync, OrganizerAsync } from '../lib/organizer';
 import os from '..';
 import oa from '../async';
+import { OrganizerAsync, OrganizerSync } from '../lib/organizer';
 
 test('##默认导出', t => {
 	t.equal(

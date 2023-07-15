@@ -1,6 +1,6 @@
 import test from 'tape';
-import { OrganizerSync, OrganizerAsync, Organizer, Id } from '..';
-import { msf } from './helpers';
+import { Id, Organizer, OrganizerAsync, OrganizerSync } from '../..';
+import { msf } from '../helpers';
 
 test('##组织器', t => {
 	t.test('空转测试', t => {

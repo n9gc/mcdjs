@@ -8,8 +8,8 @@ import {
 	WorkerManagerAsync,
 	WorkerManagerSync,
 	WorkerRunnerAsync,
-} from '..';
-import { msf, ra } from './helpers';
+} from '../..';
+import { msf, ra } from '../helpers';
 
 function cge(a: boolean) {
 	function cer(sa: readonly Id[], init?: (pm: PositionMap<void>) => void) {

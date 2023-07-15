@@ -1,6 +1,6 @@
 import test from 'tape';
-import { Id } from '..';
-import { Tsc, pse, se } from './helpers';
+import { Id } from '../..';
+import { Tsc, pse, se } from '../helpers';
 
 function cer(i: Id[]) {
 	function req(sc: Tsc<Id>) {

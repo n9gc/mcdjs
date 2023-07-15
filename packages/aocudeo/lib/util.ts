@@ -1,13 +1,13 @@
 /**
  * 实用工具
  * @module aocudeo/lib/util
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-2.0-or-later
  */
 declare module './util';
 
 import { SurePosition } from './position';
-import { MayArray, MapObj, Id } from './types';
+import { Id, MapObj, MayArray } from './types';
 
 export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
 abstract class InitializableMap<K, V> extends Map<K, V> {

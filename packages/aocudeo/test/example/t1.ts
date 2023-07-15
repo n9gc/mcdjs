@@ -1,4 +1,4 @@
-import Loader from '../async';
+import Loader from '../../async';
 
 function log(n: any) {
 	return async () => new Promise(res => {

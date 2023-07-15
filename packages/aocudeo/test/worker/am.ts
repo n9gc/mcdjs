@@ -1,3 +1,4 @@
+import Queue from "queue";
 import test from "tape";
 import {
 	Id,
@@ -5,9 +6,8 @@ import {
 	WorkerContext,
 	WorkerManagerAsync,
 	WorkerManagerSync,
-} from '..';
-import { Twma, Twra, to, msf } from './helpers';
-import Queue from "queue";
+} from '../..';
+import { Twma, Twra, msf, to } from '../helpers';
 
 function ger(a: boolean) {
 	function cer(i: Id[], r: Id[]) {

@@ -1,6 +1,6 @@
 import Queue from 'queue';
 import test from 'tape';
-import { Twrs, Twra } from './helpers';
+import { Twra, Twrs } from '../helpers';
 
 function cer(Twr: typeof Twrs | typeof Twra) {
 	return (t: test.Test) => {

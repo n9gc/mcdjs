@@ -1,4 +1,4 @@
-import { LoaderAsync as Loader, LoaderSync } from '..';
+import { LoaderAsync as Loader, LoaderSync } from '../..';
 
 const timeout = (n: number) => new Promise(res => setTimeout(res, n));
 function log<T>(n: T) {
