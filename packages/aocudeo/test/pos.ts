@@ -16,7 +16,7 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 		const enl = [
 			Organizer.start, Organizer.end,
 			ss,
-			...ss.map(n => Organizer.getAffixs().map(a => a + n)),
+			...ss.map(n => Organizer.affixs.map(a => a + n)),
 		].flat();
 		t.deepEqual(
 			pm.get().ic.get().en,

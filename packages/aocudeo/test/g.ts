@@ -10,6 +10,7 @@ function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 		const k = new Map<Id, number>();
 		const j = nem(liv);
 		j.forEach(([_, i]) => i.forEach(s => k.set(s, (k.get(s) ?? 0) + 1)));
+		k.set(Organizer.start, 1);
 		t.deepEqual(
 			g.indegreeMap,
 			mm(true, k.entries()),

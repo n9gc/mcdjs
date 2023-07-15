@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -10,7 +10,7 @@ import { Judger, MapLike, MayArray, Id, Hookable } from './types';
 import { getArray, SurePositionMap } from './util';
 import { Organizer } from './organizer';
 import { SignChecker } from './checker';
-import { Graph } from './graph';
+import { Graph } from './executor';
 
 /**拦截器对象 */
 export interface JudgerObj<T> {

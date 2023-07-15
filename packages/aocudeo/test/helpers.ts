@@ -107,7 +107,7 @@ export function to(t: number) {
 }
 export function msf() {
 	const s: Id[] = [];
-	return (i?: Id) => () => (i && s.push(i), s);
+	return (i?: Id) => () => (typeof i !== 'undefined' && s.push(i), s);
 }
 export function ra<T>(a: readonly T[]) {
 	const r = a.slice();

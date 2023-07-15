@@ -1,15 +1,16 @@
 /**
- * 图
- * @module aocudeo/lib/graph
- * @version 1.0.0
+ * 执行器
+ * @module aocudeo/lib/executor
+ * @version 1.2.0
  * @license GPL-2.0-or-later
  */
-declare module './graph';
+declare module './executor';
 
 import { Id, Hookable, MapObj } from './types';
 import { Organizer } from './organizer';
 import { SignChecker, CircleChecker } from './checker';
 import { SurePosition } from './position';
+import { WorkerAsyncFunction, WorkerFunction, WorkerRunner, WorkerRunnerAsync, WorkerRunnerSync } from './worker';
 
 export class Graph {
 	readonly edgeMap: MapObj<Id[]> = Object.create(null);
@@ -47,11 +48,51 @@ export class Graph {
 		surePositionMap.forEach(({ after, before }, id) => this.insertEdge(id, [...after], [...before]));
 		[...surePositionMap.keys()].filter(id => id !== Organizer.end && Organizer.start).forEach(id => this.insert(id, [Organizer.start], [Organizer.end]));
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
+		this.indegreeMap[Organizer.start] = 1;
 	}
 	private safeResult: readonly Id[] | false | null = null;
 	isSafe() {
 		return this.safeResult === null
 			? this.safeResult = new CircleChecker(this.edgeMap).result
 			: this.safeResult;
+	}
+}
+export abstract class Executor<T, F extends WorkerAsyncFunction<T>> {
+	constructor(graph: Graph) {
+		this.edgeMap = graph.edgeMap;
+		this.indegreeMap = Object.create(graph.indegreeMap);
+	}
+	protected abstract readonly workRunner: WorkerRunner<T, F>;
+	protected readonly edgeMap: MapObj<readonly Id[]>;
+	protected readonly indegreeMap: MapObj<number>;
+	// protected judge(hookPosition: 'pre' | 'post', id: Id, n: T) {
+	// 	return this.positionObjMap[id]?.[`${hookPosition}Judger`]?.(n) === false;
+	// }
+	abstract execute(id?: Id): void | PromiseLike<void>;
+}
+export class ExecutorAsync<T> extends Executor<T, WorkerAsyncFunction<T>> {
+	constructor(
+		graph: Graph,
+		protected readonly workRunner: WorkerRunnerAsync<T>,
+	) { super(graph); }
+	override async execute(id: Id = Organizer.start) {
+		if (--this.indegreeMap[id]!) return;
+		// if (this.judge('pre', id, n)) return n;
+		await this.workRunner.run(id);
+		// if (this.judge('post', id, n)) return n;
+		await Promise.all(this.edgeMap[id]!.map(id => this.execute(id)));
+	}
+}
+export class ExecutorSync<T> extends Executor<T, WorkerFunction<T>> {
+	constructor(
+		graph: Graph,
+		protected readonly workRunner: WorkerRunnerSync<T>,
+	) { super(graph); }
+	override execute(id: Id = Organizer.start) {
+		if (--this.indegreeMap[id]!) return;
+		// if (this.judge('pre', id, n)) return n;
+		this.workRunner.run(id);
+		// if (this.judge('post', id, n)) return n;
+		this.edgeMap[id]!.forEach(id => this.execute(id));
 	}
 }

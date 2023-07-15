@@ -18,7 +18,7 @@ import {
 	WorkerManagerAsync,
 } from './worker';
 import { isArray, mapMap, isIdArray } from './util';
-//import { ExecutorAsync, ExecutorSync } from './executor';
+import { ExecutorAsync, ExecutorSync } from './executor';
 
 export abstract class AffixsToolKit {
 	static readonly hookTypes = [
@@ -252,7 +252,7 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 	protected override readonly workerManager = new WorkerManagerAsync<T>();
 	override async execute(data: T) {
 		const runner = this.workerManager.getRunner(data, this.concurrency);
-		//await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
+		await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;
 	}
 }
@@ -261,7 +261,7 @@ export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
 	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
 		const runner = this.workerManager.getRunner(data);
-		//new ExecutorSync(this.positionMap.getGraph(), runner).execute();
+		new ExecutorSync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;
 	}
 }

@@ -1,60 +1,56 @@
 import test from "tape";
-import { Organizer, WorkerContext, WorkerManagerAsync, WorkerManagerSync } from '..';
+import {
+	Id,
+	Organizer,
+	WorkerContext,
+	WorkerManagerAsync,
+	WorkerManagerSync,
+} from '..';
 import { Twma, Twra, to, msf } from './helpers';
 import Queue from "queue";
 
-test('回调冒泡', t => {
-	t.test('同级冒泡', t => {
-		const wm = new WorkerManagerSync<void>();
-		const mf = msf();
-		wm.add('hh', mf(1));
-		wm.add('hh', mf(2));
-		wm.add('hh', mf(3));
-		wm.getRunner().run('hh');
-		t.deepEqual(
-			mf()(),
-			[1, 2, 3],
-			'顺序正确'
-		);
-		t.end();
-	});
+function ger(a: boolean) {
+	function cer(i: Id[], r: Id[]) {
+		return async (t: test.Test) => {
+			const wm = new (a ? WorkerManagerAsync : WorkerManagerSync)<void>();
+			const mf = msf();
+			i.forEach((i, d) => wm.add(i, a ? async () => mf(d)() : mf(d)));
+			const wr = wm.getRunner(void 0, 0);
+			let rw = Promise.resolve();
+			r.forEach(i => rw = rw.then(() => wr.run(i)));
+			await rw;
+			t.deepEqual(
+				mf()(),
+				Array(i.length).fill(1).map((_, i) => i),
+				'顺序正确'
+			);
+			t.end();
+		}
+	}
 
-	t.test('往上冒泡', t => {
-		const wm = new WorkerManagerSync<void>();
-		const mf = msf();
-		wm.add('main:main:hh', mf(1));
-		wm.add('main:hh', mf(2));
-		wm.add('hh', mf(3));
-		wm.getRunner().run('main:main:hh');
-		t.deepEqual(
-			mf()(),
-			[1, 2, 3],
-			'顺序正确'
-		);
-		t.end();
-	});
+	return (t: test.Test) => {
+		t.test('同级冒泡', cer(
+			['hh', 'hh', 'hh'],
+			['hh'],
+		));
 
-	t.test('中央冒泡', t => {
-		const wm = new WorkerManagerSync<void>();
-		const mf = msf();
-		wm.add('pre:hh', mf(1));
-		wm.add('main:hh', mf(2));
-		wm.add('post:hh', mf(4));
-		wm.add('hh', mf(3));
-		const wr = wm.getRunner();
-		wr.run('pre:hh');
-		wr.run('main:hh');
-		wr.run('post:hh');
-		t.deepEqual(
-			mf()(),
-			[1, 2, 3, 4],
-			'顺序正确'
-		);
-		t.end();
-	});
+		t.test('往上冒泡', cer(
+			['main:main:hh', 'main:hh', 'hh'],
+			['main:main:hh'],
+		));
 
-	t.end();
-});
+		t.test('往上冒泡', cer(
+			['pre:hh', 'main:hh', 'hh', 'post:hh'],
+			['pre:hh', 'main:hh', 'post:hh'],
+		));
+
+		t.end();
+	}
+}
+
+test('##同步回调冒泡', ger(false));
+
+test('##异步回调冒泡', ger(true));
 
 test('##同步函数', t => {
 	t.test('普通回调', t => {
