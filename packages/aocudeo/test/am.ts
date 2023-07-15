@@ -157,26 +157,26 @@ test('##异步函数', t => {
 
 	t.test('并行回调', t => {
 		t.plan(6);
-		const wm = new WorkerManagerAsync<number>();
+		const wm = new WorkerManagerAsync<[number, string]>();
 		wm.add(Organizer.start, async context => {
 			await to(5);
 			t.equal(
-				context.data,
+				context.data[0],
 				1,
-				'并行执行中'
+				`并行执行中：${context.data[1]}`
 			);
 		});
 		wm.add(Organizer.end, async context => {
-			context.data++;
-			t.pass('先启动了');
+			context.data[0]++;
+			t.pass(`先启动了：${context.data[1]}`);
 			await to(10);
-			t.pass('后结束了');
-			context.data--;
+			t.pass(`后结束了：${context.data[1]}`);
+			context.data[0]++;
 		});
-		const wr0 = wm.getRunner(0, 0);
+		const wr0 = wm.getRunner([0, '先 end'], 0);
 		wr0.run(Organizer.end);
 		wr0.run(Organizer.start);
-		const wr1 = wm.getRunner(0, 0);
+		const wr1 = wm.getRunner([0, '先 start'], 0);
 		wr1.run(Organizer.start);
 		wr1.run(Organizer.end);
 	});
@@ -188,22 +188,22 @@ test('##异步函数', t => {
 			context.data++;
 			t.assert(
 				context.data < 3,
-				'并行未大于 2'
+				`并行未大于 2 ：${context.id.toString()} 的开始`
 			);
 			await to(5);
 			t.assert(
 				context.data < 3,
-				'并行未大于 2'
+				`并行未大于 2 ：${context.id.toString()} 的结束`
 			);
 			context.data--;
 		}
 		wm.add(Organizer.start, a);
 		wm.add(Organizer.end, a);
 		wm.add(Organizer.unknown, a);
-		const wr0 = wm.getRunner(0, 2);
-		wr0.run(Organizer.end);
-		wr0.run(Organizer.start);
-		wr0.run(Organizer.unknown);
+		const wr = wm.getRunner(0, 2);
+		wr.run(Organizer.end);
+		wr.run(Organizer.start);
+		wr.run(Organizer.unknown);
 	});
 
 	t.test('跳过空值', t => {
@@ -214,7 +214,7 @@ test('##异步函数', t => {
 		t.equal(
 			l0.length,
 			0,
-			'没使用任何队列资源'
+			'没使用任何队列资源：未定义'
 		);
 		wm.add(Organizer.end, []);
 		const l1 = new Queue({ autostart: true, concurrency: 0 });
@@ -223,7 +223,7 @@ test('##异步函数', t => {
 		t.equal(
 			l1.length,
 			0,
-			'没使用任何队列资源'
+			'没使用任何队列资源：空数组'
 		);
 		t.end();
 	});

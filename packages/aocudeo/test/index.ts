@@ -5,3 +5,6 @@ import './cc';
 import './wc';
 import './am';
 import './e';
+import './atk';
+import './exp';
+import './o';

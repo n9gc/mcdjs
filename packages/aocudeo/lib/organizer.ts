@@ -1,34 +1,31 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
 
-import { Id, Hookable } from './types';
-import { Positions, PositionMap, Position } from './position';
+import { ExecutorAsync, ExecutorSync } from './executor';
+import { Position, PositionMap, Positions } from './position';
+import { Hookable, Id } from './types';
+import { isArray, isIdArray, mapMap } from './util';
 import {
-	WorkerMap,
+	Worker,
 	WorkerAsyncFunction,
 	WorkerFunction,
 	WorkerManager,
-	Worker,
-	WorkerManagerSync,
 	WorkerManagerAsync,
+	WorkerManagerSync,
+	Workers,
 } from './worker';
-import { isArray, mapMap, isIdArray } from './util';
-import { ExecutorAsync, ExecutorSync } from './executor';
 
-export abstract class AffixsToolKit {
+export class AffixsToolKit {
 	static readonly hookTypes = [
 		'Pre',
 		'Main',
 		'Post',
 	] as const;
-	protected static setAffix(type: 'Pre' | 'Main' | 'Post', n: string) {
-		this[`_affix${type}`] = n;
-	}
 	private static _affixPre = 'pre:';
 	static get affixPre() { return this._affixPre; }
 	static set affixPre(n: string) { this.setAffix('Pre', n); }
@@ -38,6 +35,19 @@ export abstract class AffixsToolKit {
 	private static _affixPost = 'post:';
 	static get affixPost() { return this._affixPost; }
 	static set affixPost(n: string) { this.setAffix('Post', n); }
+	protected static setAffix(type: 'Pre' | 'Main' | 'Post', n: string) {
+		this[`_affix${type}`] = n;
+		this.affixs = this.getAffixs();
+		this.hookTypeMap = this.getHookTypeMap();
+	}
+	static affixs = this.getAffixs();
+	static getAffixed(id: Hookable) {
+		return {
+			preId: this._affixPre + id,
+			mainId: this._affixMain + id,
+			postId: this._affixPost + id,
+		};
+	}
 	protected static getAffixs() {
 		return [
 			this._affixPre,
@@ -52,12 +62,16 @@ export abstract class AffixsToolKit {
 			[this._affixPost]: 'Post',
 		} as const;
 	}
-	protected static getAffixMap() {
-		return {
-			Pre: this._affixPre,
-			Main: this._affixMain,
-			Post: this._affixPost,
-		} as const;
+	private static hookTypeMap = this.getHookTypeMap();
+	static getHookType(id: Id) {
+		if (typeof id !== 'string') return false;
+		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return this.hookTypeMap[affix];
+		return false;
+	}
+	static getHookedOf(id: Id) {
+		if (typeof id !== 'string') return false;
+		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
+		return false;
 	}
 }
 export interface OrganizerConfig<T = unknown, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> {
@@ -70,7 +84,7 @@ export interface OrganizerConfig<T = unknown, F extends WorkerAsyncFunction<T> =
 	 * 各个模块的动作回调
 	 * @default {}
 	 */
-	workers?: WorkerMap<T, F>;
+	workers?: Workers<T, F>;
 	/**
 	 * 各个模块的位置信息
 	 * @default {}
@@ -81,38 +95,13 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	static readonly start = Symbol('load start');
 	static readonly end = Symbol('load end');
 	static readonly unknown = Symbol('unknown module');
-	protected static override setAffix(type: 'Pre' | 'Main' | 'Post', n: string) {
-		super.setAffix(type, n);
-		this.affixs = this.getAffixs();
-		this.hookTypeMap = this.getHookTypeMap();
-	}
-	static affixs = this.getAffixs();
-	private static hookTypeMap = this.getHookTypeMap();
-	static getAffixed(id: Hookable) {
-		return {
-			preId: this.affixPre + id,
-			mainId: this.affixMain + id,
-			postId: this.affixPost + id,
-		};
-	}
-	static getHookType(id: Id) {
-		if (typeof id !== 'string') return false;
-		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return this.hookTypeMap[affix];
-		return false;
-	}
-	static getHookedOf(id: Id) {
-		if (typeof id !== 'string') return false;
-		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
-		return false;
-	}
-	constructor({ workers = {}, positions = {}, reusable = true }: OrganizerConfig<T, F> = {}) {
-		super();
+	protected construct({ workers = {}, positions = {}, reusable = true }: OrganizerConfig<T, F>) {
 		this.reusable = reusable;
 		this.addWorkers(workers);
 		this.addPositions(positions);
 	}
 	/**是否可以重用 */
-	reusable: boolean;
+	public reusable = true;
 	/**是否已经加载完一次了 */
 	loaded = false;
 	protected readonly positionMap = new PositionMap<T>();
@@ -157,7 +146,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	 * @param workers 各个模块的动作回调
 	 * @param noInsert 是否不要主动插入 {@link workers} 中未被插入的模块
 	 */
-	addWorkers(workers: WorkerMap<T, F>, noInsert?: boolean) {
+	addWorkers(workers: Workers<T, F>, noInsert?: boolean) {
 		mapMap(workers, (worker, id) => this.addWorker(id, worker, noInsert));
 		return this;
 	}
@@ -243,9 +232,10 @@ export interface OrganizerAsyncConfig<T = unknown> extends OrganizerConfig<T> {
 }
 /**异步模块加载器 */
 export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T>> {
-	constructor({ concurrency = 0, ...loaderConfig }: OrganizerAsyncConfig<T> = {}) {
-		super(loaderConfig);
+	constructor({ concurrency = 0, ...organizerConfig }: OrganizerAsyncConfig<T> = {}) {
+		super();
 		this.concurrency = concurrency;
+		this.construct(organizerConfig);
 	}
 	/**最大同时任务数量 */
 	concurrency: number;
@@ -258,6 +248,10 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 }
 /**模块加载器 */
 export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
+	constructor(organizerConfig: OrganizerConfig<T, WorkerFunction<T>> = {}) {
+		super();
+		this.construct(organizerConfig);
+	}
 	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
 		const runner = this.workerManager.getRunner(data);

@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 2.0.0
+ * @version 2.0.1
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -15,10 +15,10 @@ export interface WorkerFunction<T> {
 	(context: WorkerContext<T>): void;
 }
 export interface WorkerAsyncFunction<T> {
-	(context: WorkerContext<T>): void | PromiseLike<void>;
+	(context: WorkerContext<T>): void | PromiseLike<unknown>;
 }
 export type Worker<T, F extends WorkerAsyncFunction<T>> = { run: F; } | MayArray<F>;
-export type WorkerMap<T, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> = MapLike<Worker<T, F>>;
+export type Workers<T, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> = MapLike<Worker<T, F>>;
 /**模块的动作回调 */
 export class WorkerContext<T> {
 	constructor(
