@@ -1,13 +1,14 @@
 /**
  * 各种检查器
  * @module aocudeo/lib/checker
- * @version 1.1.1
+ * @version 2.0.0
  * @license GPL-2.0-or-later
  */
 declare module './checker';
 
 import { Organizer } from './organizer';
 import { Id, MapObj } from './types';
+import { throwError } from './util';
 
 export class SignChecker<I extends Id> {
 	protected ensureds = new Set<I>();
@@ -33,9 +34,8 @@ export class SignChecker<I extends Id> {
 	require(...ids: I[]) {
 		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
 	}
-	get result(): readonly Id[] | false {
-		return this.requireds.size ? [...this.requireds] : false;
-		// throwError(3, Error('出现了未注册的模块'), { list });
+	throw() {
+		if (this.requireds.size) throwError(3, Error('出现了未注册的模块'), { list: this.requireds });
 	}
 }
 export class CircleChecker {
@@ -61,11 +61,12 @@ export class CircleChecker {
 		this.unmark(id);
 		return false;
 	}
-	readonly result: false | readonly Id[];
+	throw() {
+		throwError(2, Error('出现环形引用'), { circle: this.circle });
+	}
 	constructor(
 		private edgeMap: MapObj<readonly Id[]>,
 	) {
-		this.result = this.from(Organizer.start) && this.circle;
-		// throwError(2, Error('出现环形引用'), { circle });
+		if (!this.from(Organizer.start)) this.throw = () => { };
 	}
 }

@@ -1,11 +1,12 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.1.1
+ * @version 1.2.0
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
 
+import type Queue from 'queue';
 import { ExecutorAsync, ExecutorSync } from './executor';
 import { Position, PositionMap, Positions } from './position';
 import { Hookable, Id } from './types';
@@ -150,6 +151,9 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 		mapMap(workers, (worker, id) => this.addWorker(id, worker, noInsert));
 		return this;
 	}
+	throw() {
+		this.positionMap.throw();
+	}
 	// private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
 	// 	if (--countMap[id]) return;
 	// 	path.push(id);
@@ -226,6 +230,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 export interface OrganizerAsyncConfig<T = unknown> extends OrganizerConfig<T> {
 	/**
 	 * 最大同时任务数量
+	 * @see {@link Queue.concurrency|`Queue#concurrency`}
 	 * @default 0
 	 */
 	concurrency?: number;
@@ -241,6 +246,7 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 	concurrency: number;
 	protected override readonly workerManager = new WorkerManagerAsync<T>();
 	override async execute(data: T) {
+		this.throw();
 		const runner = this.workerManager.getRunner(data, this.concurrency);
 		await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;
@@ -254,6 +260,7 @@ export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
 	}
 	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
+		this.throw();
 		const runner = this.workerManager.getRunner(data);
 		new ExecutorSync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;

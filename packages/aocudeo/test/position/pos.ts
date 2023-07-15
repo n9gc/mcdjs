@@ -1,6 +1,6 @@
 import test from 'tape';
 import { Id, Organizer, PositionMap, SurePosition } from '../..';
-import { Tpm } from '../helpers';
+import { Tpm, aeh } from '../helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {
@@ -41,7 +41,7 @@ function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = [])
 		);
 
 		t.end();
-	}
+	};
 };
 
 test('##基础功能', t => {
@@ -111,7 +111,7 @@ test('##基础功能', t => {
 	t.test('索取拆分', cer(
 		pm => {
 			pm.insert('hh1', {});
-			pm.insert('hh4', 'pre:pre:hh1')
+			pm.insert('hh4', 'pre:pre:hh1');
 		},
 		['hh1', 'pre:hh1', 'hh4'],
 		['pre:hh4', 'post:hh4'],
@@ -119,8 +119,8 @@ test('##基础功能', t => {
 
 	t.test('占取拆分', cer(
 		pm => {
-			pm.insert('hh4', 'pre:hh1')
-			pm.insert('hh4', 'pre:pre:hh1')
+			pm.insert('hh4', 'pre:hh1');
+			pm.insert('hh4', 'pre:pre:hh1');
 			pm.insert('pre:hh1', {});
 		},
 		['hh1', 'pre:hh1', 'hh4'],
@@ -150,7 +150,7 @@ function der(init: (pm: PositionMap<void>) => void, ce: boolean) {
 			);
 		}
 		t.end();
-	}
+	};
 };
 
 test('##版本控制', t => {
@@ -178,3 +178,51 @@ test('##版本控制', t => {
 	t.end();
 });
 
+test('##错误检查', t => {
+	t.test('比前还前', t => {
+		const pm = new Tpm();
+		pm.insert('a', { before: Organizer.start });
+		t.throws(
+			aeh(() => pm.throw()),
+			{ type: 0, id: 'a' },
+			'成功报错'
+		);
+		t.end();
+	});
+
+	t.test('比后还后', t => {
+		const pm = new Tpm();
+		pm.insert('b', Organizer.end);
+		t.throws(
+			aeh(() => pm.throw()),
+			{ type: 1, id: 'b' },
+			'成功报错'
+		);
+		t.end();
+	});
+
+	t.test('图里有环', t => {
+		const pm = new Tpm();
+		pm.insert(Symbol.for('a'), Symbol.for('b'));
+		pm.insert(Symbol.for('b'), Symbol.for('a'));
+		t.throws(
+			aeh(() => pm.throw()),
+			{ type: 2, circle: new Set([Symbol.for('b'), Symbol.for('a')]) },
+			'成功报错'
+		);
+		t.end();
+	});
+
+	t.test('缺少模块', t => {
+		const pm = new Tpm();
+		pm.insert(Symbol.for('a'), Symbol.for('b'));
+		t.throws(
+			aeh(() => pm.throw()),
+			{ type: 3, list: new Set([Symbol.for('b')]) },
+			'成功报错'
+		);
+		t.end();
+	});
+
+	t.end();
+});

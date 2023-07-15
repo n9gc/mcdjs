@@ -1,6 +1,6 @@
 import test from 'tape';
 import { Id } from '../..';
-import { Tsc, pse, se } from '../helpers';
+import { Tsc, aeh, pse, se } from '../helpers';
 
 function cer(i: Id[]) {
 	function req(sc: Tsc<Id>) {
@@ -71,26 +71,22 @@ function cer(i: Id[]) {
 			req(sc);
 
 			if (i.length) { // 不为空
-				t.true(
-					sc.result,
-					'不空不为 false'
-				);
-				t.deepEqual(
-					new Set(sc.result || []),
-					new Set(i),
+				t.throws(
+					aeh(() => sc.throw()),
+					{ type: 3, list: new Set(i) },
 					'返回信息无误'
 				);
 			} else {
-				t.false(
-					sc.result,
+				t.doesNotThrow(
+					() => sc.throw(),
 					'空时为否'
 				);
 			}
 
 			ens(sc);
 
-			t.false(
-				sc.result,
+			t.doesNotThrow(
+				() => sc.throw(),
 				'确认后安全'
 			);
 
@@ -98,7 +94,7 @@ function cer(i: Id[]) {
 		});
 
 		t.end();
-	}
+	};
 }
 
 test('##标识符检查器', t => {

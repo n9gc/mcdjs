@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.2.1
+ * @version 1.3.0
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -52,15 +52,14 @@ export class Graph {
 		private splitedChecker: SignChecker<Hookable>,
 	) {
 		surePositionMap.forEach(({ after, before }, id) => this.insertEdge(id, [...after], [...before]));
-		[...surePositionMap.keys()].filter(id => id !== Organizer.end && Organizer.start).forEach(id => this.insert(id, [Organizer.start], [Organizer.end]));
+		[...surePositionMap.keys()].filter(id => id !== Organizer.end && id !== Organizer.start).forEach(id => this.insert(id, [Organizer.start], [Organizer.end]));
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
 		this.indegreeMap[Organizer.start] = 1;
 	}
-	private safeResult: readonly Id[] | false | null = null;
-	isSafe() {
-		return this.safeResult === null
-			? this.safeResult = new CircleChecker(this.edgeMap).result
-			: this.safeResult;
+	throw() {
+		const circleChecker = new CircleChecker(this.edgeMap);
+		this.throw = () => circleChecker.throw();
+		this.throw();
 	}
 }
 export abstract class Executor<T, F extends WorkerAsyncFunction<T>> {

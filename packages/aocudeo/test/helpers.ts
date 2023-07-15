@@ -1,4 +1,5 @@
 import {
+	ErrorType,
 	Hookable,
 	Id,
 	Organizer,
@@ -116,4 +117,17 @@ export function ra<T>(a: readonly T[]) {
 		[r[i], r[rd]] = [r[rd], r[i]];
 	}
 	return r;
+}
+export function aeh(fn: () => void) {
+	return () => {
+		try { fn(); }
+		catch (err: any) {
+			err = {...err};
+			err.type = ErrorType[err.type];
+			delete err.tracker;
+			if ('list' in err) err.list = new Set(err.list);
+			if ('circle' in err) err.circle = new Set(err.circle);
+			throw err;
+		}
+	};
 }

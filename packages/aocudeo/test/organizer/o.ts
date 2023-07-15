@@ -1,6 +1,6 @@
 import test from 'tape';
 import { Id, Organizer, OrganizerAsync, OrganizerSync } from '../..';
-import { msf } from '../helpers';
+import { aeh, msf } from '../helpers';
 
 test('##组织器', t => {
 	t.test('空转测试', t => {
@@ -11,6 +11,16 @@ test('##组织器', t => {
 			[Organizer.end]: () => t.pass('结束'),
 		});
 		o.execute();
+	});
+
+	t.test('错误检查', t => {
+		const o = new OrganizerSync<void>();
+		o.addPosition(Symbol.for('a'), Symbol.for('b'));
+		t.throws(
+			aeh(() => o.execute()),
+			{ type: 3, list: new Set([Symbol.for('b')]) },
+		);
+		t.end();
 	});
 
 	t.test('自动注册', t => {
@@ -50,7 +60,7 @@ test('##组织器', t => {
 	});
 
 	t.test('初始创建', t => {
-		t.plan(3)
+		t.plan(3);
 		const o = new OrganizerAsync<string | void>({
 			workers: {
 				hh0: void 0,

@@ -1,9 +1,9 @@
 import test from 'tape';
 import { Id, Organizer, PositionMap } from '../..';
-import { mm, mmo, nem, se } from '../helpers';
+import { aeh, mm, mmo, nem, se } from '../helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
-	return (t: test.Test) =>{
+	return (t: test.Test) => {
 		const pm = new PositionMap<void>();
 		init(pm);
 		const g = pm.getGraph();
@@ -22,12 +22,12 @@ function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 			'边正确'
 		);
 		t.end();
-	}
+	};
 }
 
 test('##基本功能', t => {
 	t.test('空转排序', cer(
-		() => {},
+		() => { },
 		[
 			[Organizer.start],
 		],
@@ -36,7 +36,7 @@ test('##基本功能', t => {
 	t.test('简单符号', cer(
 		pm => {
 			pm.insert(Symbol.for('hh0'), Symbol.for('hh1'));
-			pm.insert(Symbol.for('hh1'), {})
+			pm.insert(Symbol.for('hh1'), {});
 		},
 		[
 			[Organizer.start, [
@@ -50,7 +50,7 @@ test('##基本功能', t => {
 	t.test('简单钩子', cer(
 		pm => {
 			pm.insert('hh0', 'hh1');
-			pm.insert('hh1', {})
+			pm.insert('hh1', {});
 		},
 		[
 			[Organizer.start, [
@@ -113,14 +113,12 @@ test('##基本功能', t => {
 test('##应用接口', t => {
 	t.test('安全不变', t => {
 		const g = new PositionMap().getGraph();
-		t.equal(
-			g.isSafe(),
-			false,
+		t.doesNotThrow(
+			() => g.throw(),
 			'安全'
 		);
-		t.equal(
-			g.isSafe(),
-			false,
+		t.doesNotThrow(
+			() => g.throw(),
 			'安全不变'
 		);
 		t.end();
@@ -130,15 +128,15 @@ test('##应用接口', t => {
 		const pm = new PositionMap();
 		pm.insert(Organizer.start, Organizer.end);
 		const g = pm.getGraph();
-		const da = g.isSafe();
-		t.deepEqual(
-			da && new Set(da),
-			new Set(se),
+		const da = { type: 2, circle: new Set(se) };
+		t.throws(
+			aeh(() => g.throw()),
+			da,
 			'危险'
 		);
-		t.equal(
+		t.throws(
+			aeh(() => g.throw()),
 			da,
-			g.isSafe(),
 			'危险不变'
 		);
 		t.end();

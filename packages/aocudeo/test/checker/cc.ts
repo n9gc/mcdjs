@@ -1,28 +1,21 @@
 import test from 'tape';
-import { CircleChecker, Id, Organizer } from '../..';
-import { mm, nem } from '../helpers';
+import { CircleChecker, Id, Organizer, throwError } from '../..';
+import { aeh, mm, nem } from '../helpers';
 
 function cer(liv: [Id, Id[]?][], r: Id[] | false) {
 	return (t: test.Test) => {
 		const em = mm(true, nem(liv).map(([i, s]) => [i, [...s]] as const));
-		const { result } = new CircleChecker(em);
-		if (!result) {
-			t.equal(
-				result,
-				r,
+		const cc = new CircleChecker(em);
+		if (!r) {
+			t.doesNotThrow(
+				() => cc.throw(),
 				'应安全'
 			);
 		} else {
-			const n = new Set(result);
-
-			t.equal(
-				result.length,
-				n.size,
-				'不包含重复节点'
-			)
-			t.deepEqual(
+			const n = { type: 2, circle: new Set(r) };
+			t.throws(
+				aeh(() => cc.throw()),
 				n,
-				r && new Set(r),
 				'检查结果正确'
 			);
 		}

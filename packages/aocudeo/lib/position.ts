@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.0.3
+ * @version 1.1.0
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -10,7 +10,7 @@ import { SignChecker } from './checker';
 import { Graph } from './executor';
 import { Organizer } from './organizer';
 import { Hookable, Id, Judger, MapLike, MayArray } from './types';
-import { SurePositionMap, getArray } from './util';
+import { SurePositionMap, getArray, throwError } from './util';
 
 /**拦截器对象 */
 export interface JudgerObj<T> {
@@ -74,7 +74,7 @@ export class PositionMap<T> {
 		this.insertedChecker.ensure(Organizer.start, Organizer.end);
 		this.insert(Organizer.end, Organizer.start);
 	}
-	readonly insertedChecker = new SignChecker<Id>;
+	protected readonly insertedChecker = new SignChecker<Id>;
 	protected readonly countMap = new Map<Id, number>();
 	protected readonly surePositionMap = new SurePositionMap<Id>();
 	private push(id: Id, surePosition: SurePosition) {
@@ -139,6 +139,8 @@ export class PositionMap<T> {
 		const siz = this.insertedChecker.countEnsureds();
 		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
+		if (surePosition.before.has(Organizer.start)) this.insertError = [0, id];
+		if (surePosition.after.has(Organizer.end)) this.insertError = [1, id];
 		SurePosition.keys.forEach(key => this.insertedChecker.require(...surePosition[key]));
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(Organizer.getHookedOf(id))));
 		this.ensureSplited(id);
@@ -148,5 +150,16 @@ export class PositionMap<T> {
 	protected graphCache: null | Graph = null;
 	getGraph() {
 		return this.graphCache || (this.graphCache = new Graph(this.surePositionMap, this.splitedChecker));
+	}
+	protected insertError: [0 | 1, Id] | null = null;
+	private throwInsertError() {
+		if (!this.insertError) return;
+		const [type, id] = this.insertError;
+		throwError(this.insertError[0], Error(`在 ${type ? 'Organizer.end 后' : 'Organizer.start 前'}插入位置`), { id });
+	}
+	throw() {
+		this.throwInsertError();
+		this.insertedChecker.throw();
+		this.getGraph().throw();
 	}
 }
