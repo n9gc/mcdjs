@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.3.0
+ * @version 1.3.1
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -56,10 +56,10 @@ export class Graph {
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
 		this.indegreeMap[Organizer.start] = 1;
 	}
-	throw() {
+	tryThrow() {
 		const circleChecker = new CircleChecker(this.edgeMap);
-		this.throw = () => circleChecker.throw();
-		this.throw();
+		this.tryThrow = () => circleChecker.throw();
+		this.tryThrow();
 	}
 }
 export abstract class Executor<T, F extends WorkerAsyncFunction<T>> {

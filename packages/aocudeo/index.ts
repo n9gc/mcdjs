@@ -1,7 +1,7 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.0-dev.5.5
+ * @version 4.0.0
  * @license GPL-2.0-or-later
  */
 declare module '.';

@@ -1,7 +1,7 @@
 /**
  * 各种检查器
  * @module aocudeo/lib/checker
- * @version 2.0.0
+ * @version 2.0.1
  * @license GPL-2.0-or-later
  */
 declare module './checker';
@@ -34,7 +34,7 @@ export class SignChecker<I extends Id> {
 	require(...ids: I[]) {
 		ids.forEach(id => this.ensureds.has(id) || this.requireds.add(id));
 	}
-	throw() {
+	tryThrow() {
 		if (this.requireds.size) throwError(3, Error('出现了未注册的模块'), { list: this.requireds });
 	}
 }

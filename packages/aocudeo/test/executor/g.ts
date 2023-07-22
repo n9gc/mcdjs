@@ -114,11 +114,11 @@ test('##应用接口', t => {
 	t.test('安全不变', t => {
 		const g = new PositionMap().getGraph();
 		t.doesNotThrow(
-			() => g.throw(),
+			() => g.tryThrow(),
 			'安全'
 		);
 		t.doesNotThrow(
-			() => g.throw(),
+			() => g.tryThrow(),
 			'安全不变'
 		);
 		t.end();
@@ -130,12 +130,12 @@ test('##应用接口', t => {
 		const g = pm.getGraph();
 		const da = { type: 2, circle: new Set(se) };
 		t.throws(
-			aeh(() => g.throw()),
+			aeh(() => g.tryThrow()),
 			da,
 			'危险'
 		);
 		t.throws(
-			aeh(() => g.throw()),
+			aeh(() => g.tryThrow()),
 			da,
 			'危险不变'
 		);

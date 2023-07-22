@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.2.2
+ * @version 1.2.3
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -151,8 +151,8 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 		mapMap(workers, (worker, id) => this.addWorker(id, worker, noInsert));
 		return this;
 	}
-	throw() {
-		this.positionMap.throw();
+	tryThrow() {
+		this.positionMap.tryThrow();
 	}
 	// private walkAt(id: Id, countMap: MapObj<number>, path: Id[]) {
 	// 	if (--countMap[id]) return;
@@ -172,7 +172,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	 * @param data 初始运行参数
 	 */
 	execute(data?: T): T | Promise<T> | void {
-		this.throw();
+		this.tryThrow();
 		this.loaded = true;
 	}
 	// private readonly preJudgerSign: MapObj<symbol> = {};

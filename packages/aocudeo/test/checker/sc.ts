@@ -72,13 +72,13 @@ function cer(i: Id[]) {
 
 			if (i.length) { // 不为空
 				t.throws(
-					aeh(() => sc.throw()),
+					aeh(() => sc.tryThrow()),
 					{ type: 3, list: new Set(i) },
 					'返回信息无误'
 				);
 			} else {
 				t.doesNotThrow(
-					() => sc.throw(),
+					() => sc.tryThrow(),
 					'空时为否'
 				);
 			}
@@ -86,7 +86,7 @@ function cer(i: Id[]) {
 			ens(sc);
 
 			t.doesNotThrow(
-				() => sc.throw(),
+				() => sc.tryThrow(),
 				'确认后安全'
 			);
 

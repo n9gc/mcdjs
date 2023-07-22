@@ -183,7 +183,7 @@ test('##错误检查', t => {
 		const pm = new Tpm();
 		pm.insert('a', { before: Organizer.start });
 		t.throws(
-			aeh(() => pm.throw()),
+			aeh(() => pm.tryThrow()),
 			{ type: 0, id: 'a' },
 			'成功报错'
 		);
@@ -194,7 +194,7 @@ test('##错误检查', t => {
 		const pm = new Tpm();
 		pm.insert('b', Organizer.end);
 		t.throws(
-			aeh(() => pm.throw()),
+			aeh(() => pm.tryThrow()),
 			{ type: 1, id: 'b' },
 			'成功报错'
 		);
@@ -206,7 +206,7 @@ test('##错误检查', t => {
 		pm.insert(Symbol.for('a'), Symbol.for('b'));
 		pm.insert(Symbol.for('b'), Symbol.for('a'));
 		t.throws(
-			aeh(() => pm.throw()),
+			aeh(() => pm.tryThrow()),
 			{ type: 2, circle: new Set([Symbol.for('b'), Symbol.for('a')]) },
 			'成功报错'
 		);
@@ -217,7 +217,7 @@ test('##错误检查', t => {
 		const pm = new Tpm();
 		pm.insert(Symbol.for('a'), Symbol.for('b'));
 		t.throws(
-			aeh(() => pm.throw()),
+			aeh(() => pm.tryThrow()),
 			{ type: 3, list: new Set([Symbol.for('b')]) },
 			'成功报错'
 		);

@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -14,10 +14,10 @@ import { SurePositionMap, getArray, throwError } from './util';
 
 /**拦截器对象 */
 export interface JudgerObj<T> {
-	/**运行前的拦截器，若返回 `false` 则停止运行此模块 */
-	preJudger?: Judger<T>;
-	/**运行后的拦截器，若返回 `false` 则停止运行依赖此模块的模块 */
-	postJudger?: Judger<T>;
+	// /**运行前的拦截器，若返回 `false` 则停止运行此模块 */
+	// preJudger?: Judger<T>;
+	// /**运行后的拦截器，若返回 `false` 则停止运行依赖此模块的模块 */
+	// postJudger?: Judger<T>;
 }
 /**{@link PositionObj.after|`PositionObj#after`} 的简写 */
 export type PositionArray = readonly Id[];
@@ -157,9 +157,9 @@ export class PositionMap<T> {
 		const [type, id] = this.insertError;
 		throwError(this.insertError[0], Error(`在 ${type ? 'Organizer.end 后' : 'Organizer.start 前'}插入位置`), { id });
 	}
-	throw() {
+	tryThrow() {
 		this.throwInsertError();
-		this.insertedChecker.throw();
-		this.getGraph().throw();
+		this.insertedChecker.tryThrow();
+		this.getGraph().tryThrow();
 	}
 }
