@@ -1,0 +1,11 @@
+coverage:
+  status:
+    project:
+      default: off
+      aocudeo:
+        flags:
+          - aocudeo
+flags:
+  aocudeo:
+    paths:
+      - packages/aocudeo

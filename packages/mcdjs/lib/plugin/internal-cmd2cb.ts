@@ -1,20 +1,21 @@
 /**
  * 命令转命令方块插件
  * @module mcdjs/lib/plugin/internal-cmd2cb
- * @version 0.1.11
+ * @version 0.1.12
  * @license GPL-2.0-or-later
  */
 declare module './internal-cmd2cb';
 
-import { origanizer } from ".";
+import { organizer } from ".";
 
-origanizer.insert('internal-cmd2cb', {
-}, async (operm) => {
-	operm.walk({
-		CodeBlock(path) {
-			if (path.sureDad(1)) path.dadKey;
-			console.log(path.node);
-		},
-	});
-	return operm;
-});
+organizer.addWorker(
+	'internal-cmd2cb',
+	async ({ data: operm }) => {
+		operm.walk({
+			CodeBlock(path) {
+				if (path.sureDad(1)) path.dadKey;
+				console.log(path.node);
+			},
+		});
+	}
+);

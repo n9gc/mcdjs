@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.2.0
+ * @version 1.2.2
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -167,18 +167,14 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	// 	this.walkAt(Organizer.start, this.getCount(), path);
 	// 	return path;
 	// }
-	// protected preLoad() {
-	// 	if (!this.reusable && this.loaded) return null;
-	// 	this.checkLost();
-	// 	this.checkCircle();
-	// 	this.loaded = true;
-	// 	return this.getCount();
-	// }
 	/**
 	 * 加载！
 	 * @param data 初始运行参数
 	 */
-	abstract execute(data: T): PromiseLike<T> | T;
+	execute(data?: T): T | Promise<T> | void {
+		this.throw();
+		this.loaded = true;
+	}
 	// private readonly preJudgerSign: MapObj<symbol> = {};
 	// private readonly postJudgerSign: MapObj<symbol> = {};
 	// private dotLine(a: Id, b: Id, sign?: boolean) {
@@ -246,7 +242,8 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 	concurrency: number;
 	protected override readonly workerManager = new WorkerManagerAsync<T>();
 	override async execute(data: T) {
-		this.throw();
+		if (!this.reusable && this.loaded) return data;
+		super.execute();
 		const runner = this.workerManager.getRunner(data, this.concurrency);
 		await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;
@@ -260,7 +257,8 @@ export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
 	}
 	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
-		this.throw();
+		if (!this.reusable && this.loaded) return data;
+		super.execute();
 		const runner = this.workerManager.getRunner(data);
 		new ExecutorSync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;

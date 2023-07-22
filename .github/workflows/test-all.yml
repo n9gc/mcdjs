@@ -6,8 +6,13 @@ on:
   pull_request:
     branches: ["master", "dev-prototype"]
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  test-all:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,12 +29,57 @@ jobs:
           rm -rf package-lock.json
           pnpm i
           pnpm i
-
       - name: Test
         run: |
           pnpm test
-
       - name: Test cli
         run: |
           pnpm test:cli
           pnpm clear
+
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - aocudeo
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - uses: actions/checkout@master
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Push Branch
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: x-cov-${{ matrix.package }}
+          amend: true
+          force: true
+
+      - name: Init enviroument
+        run: |
+          npm i pnpm -g
+          rm -rf package-lock.json
+          pnpm i
+          pnpm i
+
+      - name: Output coverage
+        run: |
+          cd packages/${{ matrix.package }}
+          pnpm test
+          pnpm nyc report -r=cobertura
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ github.token }}
+          file: ./packages/${{ matrix.package }}/coverage/cobertura-coverage.xml
+          format: cobertura
+          git-branch: x-cov-${{ matrix.package }}
+

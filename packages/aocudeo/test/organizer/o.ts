@@ -13,6 +13,24 @@ test('##组织器', t => {
 		o.execute();
 	});
 
+	t.test('同步复用', t => {
+		t.plan(1);
+		const o = new OrganizerSync<void>({ reusable: false });
+		o.addWorker(Organizer.start, () => t.pass('运行一次'));
+		o.execute();
+		o.execute();
+		o.execute();
+	});
+
+	t.test('异步复用', t => {
+		t.plan(1);
+		const o = new OrganizerAsync<void>({ reusable: false });
+		o.addWorker(Organizer.start, async () => t.pass('运行一次'));
+		o.execute();
+		o.execute();
+		o.execute();
+	});
+
 	t.test('错误检查', t => {
 		const o = new OrganizerSync<void>();
 		o.addPosition(Symbol.for('a'), Symbol.for('b'));

@@ -1,7 +1,7 @@
 /**
  * 异步胡乱加载器
  * @module aocudeo/async
- * @version 4.0.0-dev.5.4
+ * @version 4.0.0-dev.5.5
  * @license GPL-2.0-or-later
  */
 declare module './async';

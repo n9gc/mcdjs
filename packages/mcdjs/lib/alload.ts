@@ -1,7 +1,7 @@
 /**
  * 全局定义加载模块
  * @module mcdjs/lib/alload
- * @version 4.3.0
+ * @version 4.3.1
  * @license GPL-2.0-or-later
  */
 declare module './alload';
@@ -21,12 +21,12 @@ declare global {
 	function McdJSTempMerge(temp: typeof McdJSTemp): void;
 }
 
-import Loader from 'aocudeo';
+import Organizer from 'aocudeo';
 import * as Index from '.';
 import * as Types from './types';
 import glo = globalThis;
 
-export const loader = new Loader;
+export const organizer = new Organizer;
 
 glo.McdJSTemp = {
 	Imp: Index,
@@ -54,7 +54,7 @@ glo.McdJSTempMerge = (temp) => {
 export * from './cmdobj/init';
 export * from './struct/init';
 
-loader.load();
+organizer.execute();
 temps.forEach(n => merge(n, glo.McdJSTemp));
 
 export import Temp = glo.McdJSTemp;

@@ -1,7 +1,7 @@
 /**
  * 程序结构工具初始化
  * @module mcdjs/lib/struct/init
- * @version 1.1.1
+ * @version 1.1.2
  * @license GPL-2.0-or-later
  */
 /// <reference path="./grammer.ts" />
@@ -15,9 +15,9 @@ declare global {
 	}
 }
 
-import { loader } from '../alload';
+import { organizer } from '../alload';
 
-loader.addAct('struct', () => {
+organizer.addWorker('struct', () => {
 	require('./grammer');
 	require('./util');
 });
