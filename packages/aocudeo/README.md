@@ -1,60 +1,57 @@
 # Aocudeo
 
-通过各个模块提供的位置信息，本包可用于自动以正确的流程加载加载相互依赖的模块。
-作为延伸，本包也能用来组织代码流程。
+[![github action](https://github.com/n9gc/mcdjs/actions/workflows/test-all.yml/badge.svg)](https://github.com/n9gc/mcdjs/actions)
+[![github action](https://github.com/n9gc/mcdjs/actions/workflows/dobuild.yml/badge.svg)](https://github.com/n9gc/mcdjs/actions)
+[![Coverage Status](https://coveralls.io/repos/github/n9gc/mcdjs/badge.svg?branch=x-cov-aocudeo)](https://coveralls.io/github/n9gc/mcdjs?branch=x-cov-aocudeo)
 
-*An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can load your interdependent modules with the correct order through the dependency list registered by each of modules.
+通过注册位置信息并在其上绑定工作器回调，本包可用于以正确的顺序组织异步或同步代码流程。
+
+*An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can organize your pipelining work with the correct order through the 'Position' registered by 'Workers'.
 It can also be used to organize your pipelining work.
 
 ## 用例 Usage
 
-### 通常用法 Basic Usage
+### 加载插件 Loading Plugins
 
-1. 弄个加载器用来加载模块。
+1. 在索引模块中弄个加载器用来加载模块。
 
-   Get a public loader for your modules.
+   Get a public loader for your plugins in the index.
 
    ```ts
-   import Loader from 'aocudeo';
+   import Loader from 'aocudeo/async';
 
-   export const loader = new Loader();
+   export const loader = new Loader({ reuseable: false });
    ```
 
-2. 根据模块标识符和位置信息插入模块。
+2. 根据插件名称和位置信息插入插件。
 
-   Use loader's APIs to register the module ID and dependencies' ID in each of your modules.
-
-   Such as:
+   Insert the plugin with its name and dependencies' name.
 
    ```ts
    loader
-     .insert('myMod', {
-       after: ['toolMod', 'baseMod'],
-       before: 'endMod',
+     .addPosition('foo', {
+       after: ['bar', 'baz'],
+       preOf: 'foobar',
      })
-     .addAction('myMod', () => {
-       console.log('Loading myMod');
+     .addWorker('foo', async () => {
+       await import('./plugins/foo.ts');
      });
    ```
 
-3. 把模块都运行一遍，确保所有模块都已被插入。
-
-   Run modules all to make sure all of your modules have been registered.
-
-4. ```ts
-   loader.load();
+3. ```ts
+   loader.execute();
    ```
 
-### 流程工作 Pipeline
+### 简单流程工作 Simple Pipeline Work
 
 借以 *p-graph* 的示例代码为例。
 
 Do what *p-graph*'s sample code do.
 
 ```ts
-import { LoaderAsync, Positions } from 'aocudeo';
+import Organizer, { Positions } from 'aocudeo/async';
 
-const actions = new Map([
+const workers = new Map([
   ["putOnShirt", { run: () => Promise.resolve("put on your shirt") }],
   ["putOnShorts", { run: () => Promise.resolve("put on your shorts") }],
   ["putOnJacket", { run: () => Promise.resolve("put on your jacket") }],
@@ -70,13 +67,50 @@ const positions: Positions = [
   ["putOnShorts", "putOnShoes"],
 ];
 
-await new LoaderAsync<void>({ actions, positions }).load();
+await new Organizer({ workers, positions }).execute();
+```
+
+### 流水线处理 Pipeline Process
+
+以下这个用例导出一个用于得到一个穿好衣服的人的函数 `getPerson` 。
+
+The following usage exports `getPerson` to obtain a person dressed properly.
+
+```ts
+import Organizer from "../../async";
+
+export interface Person {
+  shorts?: 'shorts';
+  shoes?: 'shoes';
+  tied: boolean;
+}
+
+const organizer = new Organizer<Person>()
+  .addPositions({
+    putOnShoes: 'putOnShorts',
+    tieShoes: { postOf: 'putOnShoes' },
+  })
+  .addWorkers({
+    async putOnShorts({ data: person }) {
+      person.shorts = await Promise.resolve('shorts');
+    },
+    async putOnShoes({ data: person }) {
+      person.shoes = await Promise.resolve('shoes');
+    },
+    async tieShoes({ data: person }) {
+      person.tied = await Promise.resolve(true);
+    },
+  });
+
+export async function getPerson() {
+  return await organizer.execute({ tied: false });
+}
 ```
 
 ## 链接 Links
 
 - [p-graph](https://github.com/microsoft/p-graph)
-  
+
   功能上与本包类似。
 
   Functionally similar to this package.
