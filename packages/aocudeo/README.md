@@ -7,7 +7,6 @@
 通过注册位置信息并在其上绑定工作器回调，本包可用于以正确的顺序组织异步或同步代码流程。
 
 *An Organizer of Code Units that Depend on Each Other* - *Aocudeo*, can organize your pipelining work with the correct order through the 'Position' registered by 'Workers'.
-It can also be used to organize your pipelining work.
 
 ## 用例 Usage
 
@@ -77,7 +76,7 @@ await new Organizer({ workers, positions }).execute();
 The following usage exports `getPerson` to obtain a person dressed properly.
 
 ```ts
-import Organizer from "../../async";
+import Organizer from "aocudeo/async";
 
 export interface Person {
   shorts?: 'shorts';

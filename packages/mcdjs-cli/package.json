@@ -8,7 +8,7 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test:cli": "./bin/mcdjsc ../mcdjs/test/tests/say ./test/out.json",
+		"test:cli": "node ./bin/mcdjsc ../mcdjs/test/tests/say ./test/out.json",
 		"test": "ts-node .",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"
@@ -19,6 +19,8 @@
 	"files": [
 		"bin",
 		"lib",
+		"!*.swp",
+		"!.nyc_output",
 		"LICENSE",
 		"!**/*.ts",
 		"**/*.d.ts",

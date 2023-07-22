@@ -28,6 +28,8 @@
 		"!test",
 		"!.turbo",
 		"!**/*.ts",
+		"!*.swp",
+		"!.nyc_output",
 		"**/*.d.ts",
 		"!tsconfig.json"
 	],

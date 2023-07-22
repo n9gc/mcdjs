@@ -16,6 +16,8 @@
 		"lib",
 		"LICENSE",
 		"!**/*.ts",
+		"!*.swp",
+		"!.nyc_output",
 		"**/*.d.ts",
 		"README.md"
 	],
