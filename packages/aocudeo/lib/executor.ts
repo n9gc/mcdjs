@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.3.2
+ * @version 1.4.0
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -47,12 +47,27 @@ export class Graph {
 		this.insertAfter(this.getEdgeOf(id, 'Pre'), after.map(id => this.getEdgeOf(id, 'Post')));
 		this.insertBefore(this.getEdgeOf(id, 'Post'), before.map(id => this.getEdgeOf(id, 'Pre')));
 	}
+	private checkHookType(hooked: string | false, type: 'Post' | 'Pre'): 'Pre' | 'Post' | false {
+		const hookType = Organizer.getHookTypeOf(hooked);
+		if (!hookType) return type;
+		if (hookType !== type) return false;
+		return this.checkHookType(Organizer.getHookedOf(hooked), type);
+	}
+	private linkSymbol(id: Id) {
+		if (typeof id === 'symbol') return this.insert(id, [Organizer.start], [Organizer.end]);
+		const hookType = Organizer.getHookTypeOf(id);
+		if (!hookType || hookType === 'Main') return;
+		switch (this.checkHookType(Organizer.getHookedOf(id), hookType)) {
+			case 'Post': return this.insert(id, [], [Organizer.end]);
+			case 'Pre': return this.insert(id, [Organizer.start], []);
+		}
+	}
 	constructor(
 		surePositionMap: Map<Id, SurePosition>,
 		private splitedChecker: SignChecker<Hookable>,
 	) {
 		surePositionMap.forEach(({ after, before }, id) => this.insertEdge(id, [...after], [...before]));
-		[...surePositionMap.keys()].filter(id => id !== Organizer.end && id !== Organizer.start).forEach(id => this.insert(id, [Organizer.start], [Organizer.end]));
+		[...surePositionMap.keys()].filter(id => id !== Organizer.end && id !== Organizer.start).forEach(id => this.linkSymbol(id));
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
 		this.indegreeMap[Organizer.start] = 1;
 	}

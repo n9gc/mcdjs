@@ -57,10 +57,6 @@ test('## 带起终点图示', t => {
 		[
 			[Organizer.start, Organizer.end],
 			[Organizer.start, 'pre:hh'],
-			[Organizer.start, 'main:hh'],
-			[Organizer.start, 'post:hh'],
-			['pre:hh', Organizer.end],
-			['main:hh', Organizer.end],
 			['post:hh', Organizer.end],
 			['pre:hh', 'main:hh'],
 			['main:hh', 'post:hh'],

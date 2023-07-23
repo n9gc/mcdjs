@@ -11,6 +11,7 @@ function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
 		const j = nem(liv);
 		j.forEach(([_, i]) => i.forEach(s => k.set(s, (k.get(s) ?? 0) + 1)));
 		k.set(Organizer.start, 1);
+		console.log(0, { asd: 123 });
 		t.deepEqual(
 			g.indegreeMap,
 			mm(true, k.entries()),
@@ -29,7 +30,7 @@ test('##基本功能', t => {
 	t.test('空转排序', cer(
 		() => { },
 		[
-			[Organizer.start],
+			[Organizer.start, [Organizer.end]],
 		],
 	));
 
@@ -41,9 +42,10 @@ test('##基本功能', t => {
 		[
 			[Organizer.start, [
 				Symbol.for('hh0'), Symbol.for('hh1'),
+				Organizer.end,
 			]],
-			[Symbol.for('hh1'), [Symbol.for('hh0')]],
-			[Symbol.for('hh0')],
+			[Symbol.for('hh1'), [Symbol.for('hh0'), Organizer.end]],
+			[Symbol.for('hh0'), [Organizer.end]],
 		],
 	));
 
@@ -53,16 +55,13 @@ test('##基本功能', t => {
 			pm.insert('hh1', {});
 		},
 		[
-			[Organizer.start, [
-				'pre:hh0', 'main:hh0', 'post:hh0',
-				'pre:hh1', 'main:hh1', 'post:hh1',
-			]],
+			[Organizer.start, ['pre:hh0', 'pre:hh1', Organizer.end]],
 			['pre:hh1', ['main:hh1']],
 			['main:hh1', ['post:hh1']],
-			['post:hh1', ['pre:hh0']],
+			['post:hh1', ['pre:hh0', Organizer.end]],
 			['pre:hh0', ['main:hh0']],
 			['main:hh0', ['post:hh0']],
-			['post:hh0'],
+			['post:hh0', [Organizer.end]],
 		],
 	));
 
@@ -71,15 +70,12 @@ test('##基本功能', t => {
 			pm.insert('pre:hh', {});
 		},
 		[
-			[Organizer.start, [
-				'pre:pre:hh', 'main:pre:hh', 'post:pre:hh',
-				'main:hh', 'post:hh',
-			]],
+			[Organizer.start, ['pre:pre:hh', Organizer.end]],
 			['pre:pre:hh', ['main:pre:hh']],
 			['main:pre:hh', ['post:pre:hh']],
 			['post:pre:hh', ['main:hh']],
 			['main:hh', ['post:hh']],
-			['post:hh'],
+			['post:hh', [Organizer.end]],
 		],
 	));
 
@@ -89,12 +85,7 @@ test('##基本功能', t => {
 			pm.insert('post:hh', {});
 		},
 		[
-			[Organizer.start, [
-				'pre:pre:pre:hh', 'main:pre:pre:hh', 'post:pre:pre:hh',
-				'main:pre:hh', 'post:pre:hh',
-				'main:hh',
-				'pre:post:hh', 'main:post:hh', 'post:post:hh',
-			]],
+			[Organizer.start, ['pre:pre:pre:hh', Organizer.end]],
 			['pre:pre:pre:hh', ['main:pre:pre:hh']],
 			['main:pre:pre:hh', ['post:pre:pre:hh']],
 			['post:pre:pre:hh', ['main:pre:hh']],
@@ -103,7 +94,7 @@ test('##基本功能', t => {
 			['main:hh', ['pre:post:hh']],
 			['pre:post:hh', ['main:post:hh']],
 			['main:post:hh', ['post:post:hh']],
-			['post:post:hh'],
+			['post:post:hh', [Organizer.end]],
 		],
 	));
 
@@ -144,4 +135,3 @@ test('##应用接口', t => {
 
 	t.end();
 });
-

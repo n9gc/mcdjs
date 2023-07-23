@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.3.0
+ * @version 1.3.1
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -64,12 +64,16 @@ export class AffixsToolKit {
 		} as const;
 	}
 	private static hookTypeMap = this.getHookTypeMap();
-	static getHookType(id: Id) {
+	static getHookTypeOf(id: Id | false) {
 		if (typeof id !== 'string') return false;
 		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return this.hookTypeMap[affix];
 		return false;
 	}
-	static getHookedOf(id: Id) {
+	/**@deprecated 请使用 {@link AffixsToolKit.getHookTypeOf|`AffixsToolKit.getHookTypeOf`} 代替此方法 */
+	static getHookType(id: Id) {
+		return this.getHookTypeOf(id);
+	}
+	static getHookedOf(id: Id | false) {
 		if (typeof id !== 'string') return false;
 		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
 		return false;

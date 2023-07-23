@@ -12,7 +12,6 @@ import {
 	WorkerRunnerAsync,
 	WorkerRunnerSync,
 } from "..";
-import { Diagram } from "../lib/diagram";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
 export class Tsc<I extends Id> extends SignChecker<I> {
@@ -100,7 +99,7 @@ export function mmo<N, T>(o: MapObj<N>, w: (value: N, id: Id) => T) {
 	}).filter(nu));
 }
 export function nem(liv: [Id, Id[]?][]) {
-	const j = liv.map(([i, is = []]) => [i, new Set([...is, Organizer.end])] as const);
+	const j = liv.map(([i, is = []]) => [i, new Set(is)] as const);
 	j.push([Organizer.end, new Set()]);
 	return j;
 }

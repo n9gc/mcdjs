@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 2.0.3
+ * @version 2.0.4
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -45,7 +45,7 @@ export abstract class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 export class WorkerRunnerSync<T> extends WorkerRunner<T, WorkerFunction<T>> {
 	override run(id: Id): void {
 		this.workerMap.get(id)?.forEach(fn => fn(this.makeContext(id)));
-		if (Organizer.getHookType(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
+		if (Organizer.getHookTypeOf(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
 	}
 }
 export class WorkerRunnerAsync<T> extends WorkerRunner<T, WorkerAsyncFunction<T>> {
@@ -60,7 +60,7 @@ export class WorkerRunnerAsync<T> extends WorkerRunner<T, WorkerAsyncFunction<T>
 			await Promise.all(this.workerMap.get(id)?.map(fn => fn(this.makeContext(id)))!);
 			release();
 		}
-		if (Organizer.getHookType(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
+		if (Organizer.getHookTypeOf(id) === 'Main') return this.run(Organizer.getHookedOf(id) as string);
 	}
 }
 export abstract class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
