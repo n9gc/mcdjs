@@ -8,3 +8,4 @@ import './executor/e';
 import './organizer/atk';
 import './exp';
 import './organizer/o';
+import './diagram/d';

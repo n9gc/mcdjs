@@ -12,6 +12,7 @@ import {
 	WorkerRunnerAsync,
 	WorkerRunnerSync,
 } from "..";
+import { Diagram } from "../lib/diagram";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
 export class Tsc<I extends Id> extends SignChecker<I> {
@@ -122,7 +123,7 @@ export function aeh(fn: () => void) {
 	return () => {
 		try { fn(); }
 		catch (err: any) {
-			err = {...err};
+			err = { ...err };
 			err.type = ErrorType[err.type];
 			delete err.tracker;
 			if ('list' in err) err.list = new Set(err.list);
@@ -130,4 +131,18 @@ export function aeh(fn: () => void) {
 			throw err;
 		}
 	};
+}
+export function csz(m: string[], c: string[]) {
+	const rc: string[] = [];
+	for (const i of c) {
+		const l: string[] = [];
+		let f = false;
+		for (const j of m)
+			f || !j.includes(i)
+				? l.push(j)
+				: f = true;
+		if (!f) rc.push(i);
+		m = l;
+	}
+	return { rc, rm: m };
 }

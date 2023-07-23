@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.2.3
+ * @version 1.3.0
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -9,7 +9,7 @@ declare module './organizer';
 import type Queue from 'queue';
 import { ExecutorAsync, ExecutorSync } from './executor';
 import { Position, PositionMap, Positions } from './position';
-import { Hookable, Id } from './types';
+import type { Hookable, Id } from './types';
 import { isArray, isIdArray, mapMap } from './util';
 import {
 	Worker,
@@ -102,7 +102,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 		this.addPositions(positions);
 	}
 	/**是否可以重用 */
-	public reusable = true;
+	reusable = true;
 	/**是否已经加载完一次了 */
 	loaded = false;
 	protected readonly positionMap = new PositionMap<T>();
@@ -171,57 +171,15 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	 * 加载！
 	 * @param data 初始运行参数
 	 */
-	execute(data?: T): T | Promise<T> | void {
+	execute(data?: T): T | Promise<T> | boolean {
+		if (!this.reusable && this.loaded) return true;
 		this.tryThrow();
 		this.loaded = true;
+		return false;
 	}
-	// private readonly preJudgerSign: MapObj<symbol> = {};
-	// private readonly postJudgerSign: MapObj<symbol> = {};
-	// private dotLine(a: Id, b: Id, sign?: boolean) {
-	// 	return [
-	// 		'\t',
-	// 		!sign && new Set([a, b, Organizer.end, Organizer.start]).size < 4 && '// ',
-	// 		`"${a.toString()}" -> "${b.toString()}"`,
-	// 		(this.postJudgerSign[a] === Organizer.EXIST || this.preJudgerSign[b] === Organizer.EXIST) && ' [style = dashed]',
-	// 	].filter(n => n).join('');
-	// }
-	// /**
-	//  * 获取当前模块依赖关系的 DOT 图
-	//  * @param sign 是否显示起点和终点
-	//  */
-	// showDot(sign?: boolean) {
-	// 	return [...new Set([
-	// 		'digraph loader {',
-	// 		...Reflect.ownKeys(this.idSign)
-	// 			.filter(id => this.idSign[id] === Organizer.EXIST && id !== Organizer.end)
-	// 			.map(id => typeof id === 'symbol' ? id.toString() : Organizer.hookName[1] + id)
-	// 			.map(id => this.dotLine(id, Organizer.end, sign)),
-	// 		...Reflect.ownKeys(this.postListMap)
-	// 			.map(a => this.postListMap[a].map(b => this.dotLine(a, b, sign)))
-	// 			.flat(),
-	// 		// Object.keys(this.idSign)
-	// 		// 	.map(n => [
-	// 		// 		`subgraph cluster_${n} {`,
-	// 		// 		`\t"${n}";`,
-	// 		// 		Loader.HOOK_NAME.map(p => `\t"${p}${n}";`),
-	// 		// 		'}',
-	// 		// 	])
-	// 		// 	.flat(2)
-	// 		// 	.map(n => '\t' + n)
-	// 		// 	.join('\n'),
-	// 		'}',
-	// 	])].join('\n');
-	// }
-	// /**
-	//  * 显示当前模块依赖关系的图
-	//  *
-	//  * 如果在浏览器里，就打开新标签页，否则就把网址输出到控制台
-	//  * @param sign 是否显示起点和终点
-	//  */
-	// show(sign?: boolean) {
-	// 	const url = `http://dreampuf.github.io/GraphvizOnline/#${encodeURIComponent(this.showDot(sign))}`;
-	// 	typeof window === 'undefined' ? console.log(url) : window.open(url);
-	// }
+	getDiagram() {
+		return this.positionMap.getDiagram();
+	}
 }
 export interface OrganizerAsyncConfig<T = unknown> extends OrganizerConfig<T> {
 	/**
@@ -242,8 +200,7 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 	concurrency: number;
 	protected override readonly workerManager = new WorkerManagerAsync<T>();
 	override async execute(data: T) {
-		if (!this.reusable && this.loaded) return data;
-		super.execute();
+		if (super.execute()) return data;
 		const runner = this.workerManager.getRunner(data, this.concurrency);
 		await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;
@@ -257,8 +214,7 @@ export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
 	}
 	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
-		if (!this.reusable && this.loaded) return data;
-		super.execute();
+		if (super.execute()) return data;
 		const runner = this.workerManager.getRunner(data);
 		new ExecutorSync(this.positionMap.getGraph(), runner).execute();
 		return runner.data;

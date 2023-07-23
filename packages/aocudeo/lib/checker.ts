@@ -1,13 +1,13 @@
 /**
  * 各种检查器
  * @module aocudeo/lib/checker
- * @version 2.0.1
+ * @version 2.0.2
  * @license GPL-2.0-or-later
  */
 declare module './checker';
 
 import { Organizer } from './organizer';
-import { Id, MapObj } from './types';
+import type { Id, MapObj } from './types';
 import { throwError } from './util';
 
 export class SignChecker<I extends Id> {

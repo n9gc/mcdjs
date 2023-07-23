@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.3.1
+ * @version 1.3.2
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -9,7 +9,7 @@ declare module './executor';
 import { CircleChecker, SignChecker } from './checker';
 import { Organizer } from './organizer';
 import { SurePosition } from './position';
-import { Hookable, Id, MapObj } from './types';
+import type { Hookable, Id, MapObj } from './types';
 import {
 	WorkerAsyncFunction,
 	WorkerFunction,

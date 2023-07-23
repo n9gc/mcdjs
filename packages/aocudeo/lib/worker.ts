@@ -1,14 +1,14 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 2.0.2
+ * @version 2.0.3
  * @license GPL-2.0-or-later
  */
 declare module './worker';
 
 import Queue from 'queue';
 import { Organizer } from './organizer';
-import { Id, MapLike, MayArray } from './types';
+import type { Id, MapLike, MayArray } from './types';
 import { ArrayMap, ReadonlyArrayMap } from './util';
 
 export interface WorkerFunction<T> {

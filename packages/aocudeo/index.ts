@@ -1,12 +1,13 @@
 /**
  * 胡乱加载器
  * @module aocudeo
- * @version 4.0.1
+ * @version 4.1.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
 
 export * from './lib/checker';
+export * from './lib/diagram';
 export * from './lib/executor';
 export * from './lib/organizer';
 export { OrganizerSync as default } from './lib/organizer';

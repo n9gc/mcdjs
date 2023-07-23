@@ -1,15 +1,14 @@
 /**
  * 实用工具
  * @module aocudeo/lib/util
- * @version 1.1.1
+ * @version 1.1.2
  * @license GPL-2.0-or-later
  */
 declare module './util';
 
 import { SurePosition } from './position';
-import { Id, MapObj, MayArray } from './types';
+import type { Id, MapObj, MayArray } from './types';
 
-export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
 abstract class InitializableMap<K, V> extends Map<K, V> {
 	protected abstract initializeValue(): V;
 	forceGet(key: K) {
@@ -33,6 +32,7 @@ export class ArrayMap<K, T> extends InitializableMap<K, T[]> {
 		this.forceGet(key).push(...items);
 	}
 }
+export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
 export const isArray: (n: any) => n is readonly any[] = Array.isArray;
 export function getArray<T>(mayArray: MayArray<T>) {
 	return isArray(mayArray) ? mayArray : [mayArray];
@@ -79,4 +79,3 @@ export function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id
 export function isIdArray(n: MayArray<readonly Id[]>): n is readonly Id[] {
 	return typeof n[0] !== 'object';
 }
-

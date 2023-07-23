@@ -1,15 +1,16 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.1.1
+ * @version 1.2.0
  * @license GPL-2.0-or-later
  */
 declare module './position';
 
 import { SignChecker } from './checker';
+import { Diagram } from './diagram';
 import { Graph } from './executor';
 import { Organizer } from './organizer';
-import { Hookable, Id, Judger, MapLike, MayArray } from './types';
+import type { Hookable, Id, Judger, MapLike, MayArray } from './types';
 import { SurePositionMap, getArray, throwError } from './util';
 
 /**拦截器对象 */
@@ -145,11 +146,19 @@ export class PositionMap<T> {
 		SurePosition.keys.forEach(key => surePosition[key]?.forEach(id => this.requireSplited(Organizer.getHookedOf(id))));
 		this.ensureSplited(id);
 		this.surelyInsert(id, surePosition);
-		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.graphCache = null;
+		if (this.insertedChecker.countEnsureds() !== siz || this.countMap.get(id) !== len) this.clearCache();
+	}
+	private clearCache() {
+		this.graphCache = null;
+		this.diagramCache = null;
 	}
 	protected graphCache: null | Graph = null;
 	getGraph() {
 		return this.graphCache || (this.graphCache = new Graph(this.surePositionMap, this.splitedChecker));
+	}
+	protected diagramCache: null | Diagram = null;
+	getDiagram() {
+		return this.diagramCache || (this.diagramCache = new Diagram([...this.surePositionMap.keys()], this.getGraph().edgeMap));
 	}
 	protected insertError: [0 | 1, Id] | null = null;
 	private throwInsertError() {
