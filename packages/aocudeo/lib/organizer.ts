@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.3.1
+ * @version 1.4.0
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -77,6 +77,18 @@ export class AffixsToolKit {
 		if (typeof id !== 'string') return false;
 		for (const affix of Organizer.affixs) if (id.slice(0, affix.length) === affix) return id.slice(affix.length);
 		return false;
+	}
+	private static ensureHookedPart(hooked: string | false, type: 'Post' | 'Pre'): 'Pre' | 'Post' | 'Body' {
+		const hookType = Organizer.getHookTypeOf(hooked);
+		if (!hookType) return type;
+		if (hookType !== type) return 'Body';
+		return this.ensureHookedPart(Organizer.getHookedOf(hooked), type);
+	}
+	static getHookedPartOf(id: Id) {
+		if (typeof id === 'symbol') return 'All';
+		const hookType = Organizer.getHookTypeOf(id);
+		if (!hookType || hookType === 'Main') return 'Body';
+		return this.ensureHookedPart(Organizer.getHookedOf(id), hookType);
 	}
 }
 export interface OrganizerConfig<T = unknown, F extends WorkerAsyncFunction<T> = WorkerAsyncFunction<T>> {

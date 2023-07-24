@@ -1,7 +1,7 @@
 {
 	"name": "aocudeo",
-	"version": "4.1.1",
-	"description": "Run a action graph, which may have some concurrency control, with the correct order.",
+	"version": "4.1.2",
+	"description": "Process organizer of asynchronous or/and synchronous interdependent code units",
 	"main": "./index",
 	"module": "./index",
 	"types": "./index",
@@ -30,6 +30,11 @@
 		"pipeline",
 		"loader",
 		"modules",
+		"promise",
+		"asynchronous",
+		"job",
+		"task",
+		"concurrency",
 		"flow-control"
 	],
 	"author": "e0selmy4v",

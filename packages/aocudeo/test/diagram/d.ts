@@ -20,7 +20,7 @@ function cge(sign: boolean) {
 				[],
 				'未多余'
 			);
-			t.comment(o.getDiagram().getUrl(sign));
+			console.log(o.getDiagram().getUrl(sign));
 			t.end();
 		};
 	};
@@ -66,6 +66,30 @@ test('## 带起终点图示', t => {
 		}
 	));
 
+	t.test('复杂钩子', cer(
+		[
+			[Organizer.start, Organizer.end],
+			[Organizer.start, 'pre:pre:pre:hh'],
+			['pre:pre:pre:hh', 'main:pre:pre:hh'],
+			['main:pre:pre:hh', 'post:pre:pre:hh'],
+			['post:pre:pre:hh', 'main:pre:hh'],
+			['main:pre:hh', 'post:pre:hh'],
+			['post:pre:hh', 'main:hh'],
+			['main:hh', 'pre:post:hh'],
+			['pre:post:hh', 'pre:main:post:hh'],
+			['pre:main:post:hh', 'main:main:post:hh'],
+			['main:main:post:hh', 'pre:post:main:post:hh'],
+			['pre:post:main:post:hh', 'main:post:main:post:hh'],
+			['main:post:main:post:hh', 'post:post:main:post:hh'],
+			['post:post:main:post:hh', 'post:post:hh'],
+			['post:post:hh', Organizer.end],
+		],
+		o => {
+			o.addPosition('pre:pre:hh', {});
+			o.addPosition('post:main:post:hh', {});
+		}
+	));
+
 	t.end();
 });
 
@@ -95,6 +119,27 @@ test('## 不带起终点图示', t => {
 		],
 		o => {
 			o.addPosition('hh', {});
+		}
+	));
+
+	t.test('复杂钩子', cer(
+		[
+			['pre:pre:pre:hh', 'main:pre:pre:hh'],
+			['main:pre:pre:hh', 'post:pre:pre:hh'],
+			['post:pre:pre:hh', 'main:pre:hh'],
+			['main:pre:hh', 'post:pre:hh'],
+			['post:pre:hh', 'main:hh'],
+			['main:hh', 'pre:post:hh'],
+			['pre:post:hh', 'pre:main:post:hh'],
+			['pre:main:post:hh', 'main:main:post:hh'],
+			['main:main:post:hh', 'pre:post:main:post:hh'],
+			['pre:post:main:post:hh', 'main:post:main:post:hh'],
+			['main:post:main:post:hh', 'post:post:main:post:hh'],
+			['post:post:main:post:hh', 'post:post:hh'],
+		],
+		o => {
+			o.addPosition('pre:pre:hh', {});
+			o.addPosition('post:main:post:hh', {});
 		}
 	));
 

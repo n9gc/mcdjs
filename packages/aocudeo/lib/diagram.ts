@@ -1,7 +1,7 @@
 /**
  * 图解
  * @module aocudeo/lib/diagram
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-2.0-or-later
  */
 declare module './diagram';
@@ -27,11 +27,11 @@ export class Diagram {
 			this.idList
 				.filter(id => id !== Organizer.end && id !== Organizer.start)
 				.map((id) => {
-					if (typeof id === 'symbol') return [this.dotLine(id, Organizer.end), this.dotLine(Organizer.start, id)];
-					switch (Organizer.getHookTypeOf(id)) {
+					switch (Organizer.getHookedPartOf(id)) {
+						case 'All': return [this.dotLine(id, Organizer.end), this.dotLine(Organizer.start, id)];
 						case 'Post': return this.dotLine(id, Organizer.end);
 						case 'Pre': return this.dotLine(Organizer.start, id);
-						default: return [];
+						case 'Body': return [];
 					}
 				}),
 		].flat(3)));

@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.4.0
+ * @version 1.4.1
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -47,17 +47,9 @@ export class Graph {
 		this.insertAfter(this.getEdgeOf(id, 'Pre'), after.map(id => this.getEdgeOf(id, 'Post')));
 		this.insertBefore(this.getEdgeOf(id, 'Post'), before.map(id => this.getEdgeOf(id, 'Pre')));
 	}
-	private checkHookType(hooked: string | false, type: 'Post' | 'Pre'): 'Pre' | 'Post' | false {
-		const hookType = Organizer.getHookTypeOf(hooked);
-		if (!hookType) return type;
-		if (hookType !== type) return false;
-		return this.checkHookType(Organizer.getHookedOf(hooked), type);
-	}
 	private linkSymbol(id: Id) {
-		if (typeof id === 'symbol') return this.insert(id, [Organizer.start], [Organizer.end]);
-		const hookType = Organizer.getHookTypeOf(id);
-		if (!hookType || hookType === 'Main') return;
-		switch (this.checkHookType(Organizer.getHookedOf(id), hookType)) {
+		switch (Organizer.getHookedPartOf(id)) {
+			case 'All': return this.insert(id, [Organizer.start], [Organizer.end]);
 			case 'Post': return this.insert(id, [], [Organizer.end]);
 			case 'Pre': return this.insert(id, [Organizer.start], []);
 		}

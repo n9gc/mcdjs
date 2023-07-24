@@ -1,7 +1,7 @@
 /**
  * 各种检查器
  * @module aocudeo/lib/checker
- * @version 2.0.2
+ * @version 2.0.3
  * @license GPL-2.0-or-later
  */
 declare module './checker';
@@ -61,12 +61,16 @@ export class CircleChecker {
 		this.unmark(id);
 		return false;
 	}
+	/**@deprecated 请使用 {@link CircleChecker.prototype.tryThrow|`CircleChecker#tryThrow`} 代替此方法 */
 	throw() {
+		this.tryThrow();
+	}
+	tryThrow() {
 		throwError(2, Error('出现环形引用'), { circle: this.circle });
 	}
 	constructor(
 		private edgeMap: MapObj<readonly Id[]>,
 	) {
-		if (!this.from(Organizer.start)) this.throw = () => { };
+		if (!this.from(Organizer.start)) this.tryThrow = () => { };
 	}
 }
