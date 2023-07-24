@@ -1,7 +1,7 @@
 /**
  * 命令集初始化信息
  * @module mcdjs/lib/cmdobj/init
- * @version 1.0.2
+ * @version 1.0.3
  * @license GPL-2.0-or-later
  */
 /// <reference path="./base.ts" />
@@ -24,9 +24,13 @@ declare global {
 
 import { organizer } from '../alload';
 
-organizer.addPosition('cmdobj', {
-	after: 'struct',
-}, () => {
-	require('./base');
-	require('./lib');
-});
+organizer.addPosition(
+	'cmdobj',
+	{
+		after: 'struct',
+	},
+	() => {
+		require('./base');
+		require('./lib');
+	}
+);

@@ -42,6 +42,7 @@
 	},
 	"dependencies": {
 		"aocudeo": "workspace:^",
+		"reflect-metadata": "^0.1.13",
 		"@types/node": ""
 	},
 	"devDependencies": {

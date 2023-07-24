@@ -1,7 +1,7 @@
 /**
  * 转译流程模块
  * @module mcdjs/lib/plugin
- * @version 1.0.2
+ * @version 1.0.3
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -14,4 +14,5 @@ export default function (operm: Operator) {
 	return organizer.execute(operm);
 }
 
-export * from './internal-cmd2cb';
+export * from './internal-pack';
+export * from './internal-cond';

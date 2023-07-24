@@ -1,13 +1,13 @@
 {
 	"private": true,
 	"devDependencies": {
+		"@types/tape": "^5.6.0",
+		"colortape": "^0.0.2",
 		"lage": "2.5.0",
 		"nyc": "^15.1.0",
-		"@types/tape": "^5.6.0",
-		"tape": "^5.6.4",
-		"colortape": "^0.0.2",
+		"tape": "^5.6.6",
 		"ts-node": "^10.9.1",
-		"typescript": "^5.0.4"
+		"typescript": "^5.1.6"
 	},
 	"scripts": {
 		"build": "pnpm lage build",

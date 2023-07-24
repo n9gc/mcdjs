@@ -1,26 +1,28 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.2.0
+ * @version 2.3.0
  * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
 
+import 'reflect-metadata';
 import { InArr } from '../types/tool';
 import Metcls from './metcls';
-import { NType, NTypeKey, NTypeObj, Node } from './nodes';
+import { NType, NTypeObj, Node } from './nodes';
 import Operator from './operator';
 import { Plugin, PluginEmiter } from './transf';
 
 export interface Asserts {
 	dad: NType;
+	inList: boolean;
 }
 export default class PathInfo<T extends NType = NType, A extends Asserts = Asserts> extends Metcls {
 	constructor(
 		operm: Operator,
 		public node: Node<T>,
 		public dad: Node<A['dad']>,
-		public inList: boolean,
+		public inList: A['inList'],
 		public listIndex: number,
 		public dadKey: InArr<typeof Node[NTypeObj[A['dad']]]['nodeAttr']>,
 	) {
@@ -33,26 +35,21 @@ export default class PathInfo<T extends NType = NType, A extends Asserts = Asser
 	sureDad<K extends NType>(ntype: K): this is PathInfo<T, A & { dad: K; }> {
 		return ntype === this.dad?.ntype;
 	}
-	private useNodeAttr(attr: InArr<typeof Node[NTypeKey]['nodeAttr']>): Node | Node[] | null {
-		return (this.node as any)[attr];
-	}
 	private walkEmiter(emiter: PluginEmiter) {
 		emiter.entry(this);
-		for (const attrName of Node[NType[this.node.ntype as NType]].nodeAttr) {
-			let attr = this.useNodeAttr(attrName);
+		for (const attrName of Reflect.getMetadata('nodeAttr', this.node) || []) {
+			let attr: Node | Node[] | null = (<any>this.node)[attrName];
 			if (attr === null) continue;
 			let idx, inList = true;
+			if (!attr) console.log(attrName, this.node);
 			if (!('length' in attr)) attr = [attr], inList = false;
-			for (idx = 0; idx; ++idx) {
-				const path: PathInfo = new PathInfo(
+			else attr = attr.slice(0);
+			for (idx = 0; idx < attr.length; ++idx)
+				new PathInfo(
 					this.operm, attr[idx], this.node,
 					inList, idx,
 					attrName,
-				);
-				emiter.entry(path);
-				path.walkEmiter(emiter);
-				emiter.exit(path);
-			}
+				).walkEmiter(emiter);
 		}
 		emiter.exit(this);
 	}
