@@ -1,18 +1,10 @@
-/// <reference types="../../global" />
-{
-	const say2 = Command.say('8&fh0');
+import '../../global';
 
-	tip`test if say2 ran successfully`;
-	const ifRslt = If(say2).Then(() => {
-		tip`log success`;
-		Command.say('Success!');
-	}).Else(() => {
-		Command.tag('@a', 'add', 'hh');
-	});
+const say2 = Command.say('8&fh0');
 
-	If(ifRslt, () => {
-		Command.say('Success!');
-	}, () => {
-		Command.say('Failed!');
-	});
-}
+tip`test if say2 ran successfully`;
+If(say2, () => {
+	Command.say('Success!');
+}, () => {
+	Command.say('Failed!');
+});

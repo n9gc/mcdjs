@@ -1,7 +1,6 @@
-/// <reference types="../../global" />
-{
-	Command.say('890');
+import '../../global';
 
-	tip`say some funny things`;
-	Command.say('8&fh0');
-}
+Command.say('890');
+
+tip`say some funny things`;
+Command.say('8&fh0');

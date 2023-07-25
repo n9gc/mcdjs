@@ -1,7 +1,7 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.1.4
+ * @version 1.1.5
  * @license GPL-2.0-or-later
  */
 declare module './appinf';
@@ -25,7 +25,6 @@ export function globalify() {
 
 export async function parse(tips: string, fn: () => void | PromiseLike<void>) {
 	const operm = new Operator(tips);
-	globalify();
 	operm.come();
 	await fn();
 	operm.exit();

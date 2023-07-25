@@ -1,12 +1,3 @@
-/// <reference types="../../global" />
-{
-	const rslt = Command.say('hh');
+import '../../global';
 
-	const sucRslt = When(rslt, () => {
-		Command.say('success!');
-	});
-
-	When(sucRslt).Then(() => {
-		Command.say('success, again!');
-	});
-}
+const rslt = Command.say('hh');

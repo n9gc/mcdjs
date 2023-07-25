@@ -26,7 +26,7 @@ declare global {
 		export import XNOR = Temp.XNOR;
 		export import Tag = Temp.Tag;
 		export import If = Temp.If;
-		export import When = Temp.When;
+		// export import When = Temp.When;
 		export import select = Temp.select;
 
 		// lib/struct/util
@@ -35,4 +35,7 @@ declare global {
 	}
 }
 
+import * as mcdjs from '.';
 import Temp from './lib/alload';
+
+mcdjs.appinf.globalify();
