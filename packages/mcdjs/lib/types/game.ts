@@ -1,7 +1,7 @@
 /**
  * 游戏相关类型定义模块
  * @module mcdjs/lib/types/game
- * @version 1.3.8
+ * @version 1.4.0
  * @license GPL-2.0-or-later
  */
 declare module './game';
@@ -59,7 +59,7 @@ export namespace Sim {
 		;
 }
 
-export import Expression = Expression.Any;
+export import Expression = Expression.Calcable;
 export namespace Expression {
 	/**单目运算符 */
 	export type OperatorSig =
@@ -89,6 +89,9 @@ export namespace Expression {
 	export type Calcable =
 		| Sub
 		| Sim
+		| SelectString
+		| Selected
+		| CommandRslt
 		;
 
 	/**单目表达式 */
@@ -102,9 +105,6 @@ export namespace Expression {
 		| SubSig
 		| SubBin
 		;
-
-	/**表达式 */
-	export type Any = null | Calcable;
 }
 
 export import Selected = Select.Obj;
@@ -114,7 +114,6 @@ export namespace Select {
 	/**选择器结果 */
 	export interface Obj {
 		expr: Expression;
-		range: At;
 		tid: TypeId.Selected;
 	}
 
@@ -127,6 +126,3 @@ export namespace Select {
 		| '@e'
 		;
 }
-
-/**条件 */
-export type Condition = CommandRslt | Selected;

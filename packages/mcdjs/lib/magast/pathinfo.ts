@@ -1,7 +1,7 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.4.0
+ * @version 2.4.1
  * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
@@ -31,9 +31,9 @@ export default class PathInfo<T extends NType = NType, A extends Asserts = Asser
 		this.dadKey = <any>dadKey;
 		this.listIn = inList ? (dad as any)[dadKey] : null;
 	}
-	public dadKey: keyof Node<A['dad']>;
-	override operm;
-	listIn: Node[] | null;
+	override readonly operm;
+	readonly dadKey: keyof Node<A['dad']>;
+	readonly listIn: Node[] | null;
 	isInList(): this is PathInfo<T, A & { inList: true; }> {
 		return this.inList;
 	}
@@ -62,8 +62,7 @@ export default class PathInfo<T extends NType = NType, A extends Asserts = Asser
 	private walkEmiter(emiter: PluginEmiter) {
 		emiter.entry(this);
 		for (const attrName of Reflect.getMetadata('nodeAttr', this.node) || []) {
-			let attr: Node | Node[] | null = (<any>this.node)[attrName];
-			if (attr === null) continue;
+			let attr: Node | Node[] = (<any>this.node)[attrName];
 			let idx, inList = true;
 			if (!attr) console.log(attrName, this.node);
 			if (!('length' in attr)) attr = [attr], inList = false;

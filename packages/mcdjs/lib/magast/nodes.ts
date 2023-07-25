@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.4.0
+ * @version 1.5.0
  * @license GPL-2.0-or-later
  */
 declare module './nodes';
@@ -12,9 +12,8 @@ import { regEnum } from '../config/text';
 import { EType, throwErr } from '../errlib';
 import { Enum, listKeyOf } from '../types/base';
 import {
-	Condition as GameCond,
 	Expression as GameExpr,
-	Select,
+	SelectString,
 	Sim,
 	TypeId,
 } from '../types/game';
@@ -29,7 +28,7 @@ export interface NodeBase {
 abstract class Base implements NodeBase {
 	static readonly nodeAttr: string[] = [];
 	constructor(operm: Operator, getTip = true) {
-		this.index = operm.nodeNum++;
+		this.index = operm.plusNodeNum();
 		if (getTip) {
 			const tips = Temp.tip.getTip();
 			if (tips) this.tips = tips;
@@ -92,13 +91,13 @@ export namespace Node {
 	export class Branch extends Base {
 		ntype = NType.Branch;
 		static readonly 'zh-CN' = '条件分支';
-		constructor(operm: Operator, cond: GameCond, tdoOri: Vcb, fdoOri: Vcb) {
+		constructor(operm: Operator, cond: GameExpr, tdoOri: Vcb, fdoOri: Vcb) {
 			super(operm);
-			this.cond = getCondition(operm, cond);
+			this.cond = getExpression(operm, cond);
 			this.tdo = new Node.CodeBlock(operm, tdoOri);
 			this.fdo = new Node.CodeBlock(operm, fdoOri);
 		}
-		@NodeAttr readonly cond: Condition;
+		@NodeAttr readonly cond: Expression;
 		@NodeAttr readonly tdo: CodeBlock;
 		@NodeAttr readonly fdo: CodeBlock;
 	}
@@ -115,50 +114,21 @@ export namespace Node {
 }
 
 export namespace Node {
-	export class ConditionCommand extends Base {
-		ntype = NType.ConditionCommand;
+	export class CommandRslt extends Base {
+		ntype = NType.CommandRslt;
 		static readonly 'zh-CN' = '命令条件';
 		constructor(
 			operm: Operator,
-			public pos: number,
+			public readonly check: number,
 		) { super(operm); }
 	}
-	export class ConditionSelector extends Base {
-		ntype = NType.ConditionSelector;
-		static readonly 'zh-CN' = '选择器条件';
-		constructor(operm: Operator, range: Select.At, expr: Expression | null) {
-			super(operm);
-			this.range = range;
-			this.expr = expr;
-		}
-		range: Select.At;
-		@NodeAttr expr: Expression | null;
-	}
-	export type Condition =
-		| ConditionCommand
-		| ConditionSelector
-		;
-}
-export function getCondition(operm: Operator, cond: GameCond) {
-	switch (cond.tid) {
-		case TypeId.CommandRslt:
-			return new Node.ConditionCommand(operm, cond.index);
-		case TypeId.Selected:
-			return new Node.ConditionSelector(
-				operm,
-				cond.range,
-				cond.expr && getExpression(operm, cond.expr),
-			);
-	}
-}
-
-export namespace Node {
-	export class SimData extends Base {
-		ntype = NType.SimData;
-		static readonly 'zh-CN' = '模拟数据';
+	export class Selector extends Base {
+		ntype = NType.Selector;
+		static readonly 'zh-CN' = '选中的人';
 		constructor(
 			operm: Operator,
-			public readonly data: Sim,
+			public readonly range: SelectString = '@e',
+			public readonly simData?: Sim,
 		) { super(operm); }
 	}
 	abstract class BaseExpressionSig extends Base {
@@ -206,7 +176,8 @@ export namespace Node {
 		static readonly 'zh-CN' = '同或表达式';
 	}
 	export type Expression =
-		| SimData
+		| Selector
+		| CommandRslt
 		| ExpressionAnd
 		| ExpressionOr
 		| ExpressionNot
@@ -228,8 +199,13 @@ const signCls = {
 	xor: Node.ExpressionXor,
 	xnor: Node.ExpressionXnor,
 } as const;
-export function getExpression(operm: Operator, expr: GameExpr.Calcable): Node.Expression {
-	if ('tid' in expr) return new Node.SimData(operm, expr);
+export function getExpression(operm: Operator, expr: GameExpr): Node.Expression {
+	if (typeof expr === 'string') return new Node.Selector(operm, expr);
+	if ('tid' in expr) switch (expr.tid) {
+		case TypeId.CommandRslt: return new Node.CommandRslt(operm, expr.index);
+		case TypeId.Selected: return getExpression(operm, expr.expr);
+		case TypeId.SimTag: return new Node.Selector(operm, void 0, expr);
+	}
 	if (expr.length === 2) return new signCls[expr[0]](
 		operm,
 		getExpression(operm, expr[1]),

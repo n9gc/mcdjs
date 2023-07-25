@@ -1,7 +1,7 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 2.2.2
+ * @version 2.2.3
  * @license GPL-2.0-or-later
  */
 declare module './operator';
@@ -23,12 +23,14 @@ export default class Operator extends Metcls {
 			this.scope = this.ast = new Node.System(this, tips)
 		);
 	}
-	override operm = this;
+	override readonly operm = this;
 	scope: Node.CodeBlock | Node.System;
-	ast: AST;
-	private top: Node.Top;
-	nodeNum = 0;
-	Types = Types;
+	readonly ast: AST;
+	protected readonly top: Node.Top;
+	protected nodeNum = 0;
+	plusNodeNum() {
+		return this.nodeNum++;
+	}
 	come() {
 		chCommand.come(this);
 		return this;

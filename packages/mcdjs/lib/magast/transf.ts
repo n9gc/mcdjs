@@ -1,7 +1,7 @@
 /**
  * 转译相关定义模块
  * @module mcdjs/lib/magast/transf
- * @version 2.2.1
+ * @version 2.2.2
  * @license GPL-2.0-or-later
  */
 declare module './transf';
@@ -16,10 +16,6 @@ namespace Alias {
 	function con<T extends AnyArr>(...n: [...T]): Readonly<T> {
 		return n;
 	}
-	export const condition = con(
-		NType.ConditionCommand,
-		NType.ConditionSelector,
-	);
 	export const expressionCalcSig = con(
 		NType.ExpressionNot,
 	);
@@ -37,7 +33,8 @@ namespace Alias {
 	);
 	export const expression = con(
 		...expressionCalc,
-		NType.SimData,
+		NType.Selector,
+		NType.CommandRslt,
 	);
 }
 export type Alias = keyof typeof Alias;

@@ -1,6 +1,6 @@
 /**
  * 命令集初始化
- * @version 0.1.10
+ * @version 0.1.11
  * @license GPL-2.0-or-later
  */
 "use strict";
@@ -32,7 +32,7 @@ namespace McdJSTemp {
 		}
 		export function insert(cmd: string) {
 			const opering = getOperm();
-			const cmdObj = opering.getCls('Command', cmd);
+			const cmdObj = opering.getNode('Command', cmd);
 			return new CRClass(opering.push(cmdObj));
 		}
 	}
