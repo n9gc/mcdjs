@@ -37,6 +37,7 @@ test('##组织器', t => {
 		t.throws(
 			aeh(() => o.execute()),
 			{ type: 3, list: new Set([Symbol.for('b')]) },
+			'随便一错'
 		);
 		t.end();
 	});
@@ -130,6 +131,36 @@ test('##组织器', t => {
 			'tieShoes',
 		].map(n => [n, { async run() { mf(n)(); } }])));
 		o.addPositions(order);
+		o.execute();
+	});
+
+	t.test('简单钩子', t => {
+		const mf = msf();
+		const o = new OrganizerSync<void>();
+		o.addPositions({
+			hh0: {},
+			hh1: { preOf: 'hh0' },
+			hh2: { before: 'hh0' },
+			hh3: { postOf: 'hh0' },
+			hh4: { after: 'hh0' },
+		});
+		o.addWorkers({
+			hh2: mf(0),
+			'pre:hh0': mf(1),
+			hh1: mf(2),
+			hh0: mf(3),
+			hh3: mf(4),
+			'post:hh0': mf(5),
+			hh4: mf(6),
+			[Organizer.end]() {
+				t.deepEqual(
+					mf()(),
+					[0, 1, 2, 3, 4, 5, 6],
+					'顺序正确'
+				);
+				t.end();
+			}
+		});
 		o.execute();
 	});
 

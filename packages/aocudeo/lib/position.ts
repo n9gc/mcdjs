@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.2.0
+ * @version 1.2.1
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -88,7 +88,7 @@ export class PositionMap<T> {
 	protected readonly splitedChecker = new SignChecker<Hookable>;
 	private surelyInsert(id: Id, surePosition: SurePosition): number {
 		if (typeof id === 'symbol' || !this.splitedChecker.isEnsured(id)) return this.push(id, surePosition);
-		const { preId, mainId, postId } = Organizer.getAffixed(id);
+		const { preId, mainId, postId } = Organizer.getAffixedOf(id);
 		const len = this.countMap.get(mainId)!
 			+ this.surelyInsert(preId, SurePosition.fill({ after: surePosition.after }))
 			+ this.surelyInsert(postId, SurePosition.fill({ before: surePosition.before }));
@@ -96,7 +96,7 @@ export class PositionMap<T> {
 		return len;
 	}
 	private split(id: Hookable) {
-		const { preId, mainId, postId } = Organizer.getAffixed(id);
+		const { preId, mainId, postId } = Organizer.getAffixedOf(id);
 		this.splitedChecker.ensure(id);
 		this.insertedChecker.ensure(preId, mainId, postId);
 		this.push(preId, SurePosition.fill({ after: this.surePositionMap.get(id)?.after }));
