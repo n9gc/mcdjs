@@ -1,15 +1,15 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.3.0
+ * @version 2.4.0
  * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
 
 import 'reflect-metadata';
-import { InArr } from '../types/tool';
+import { EType, throwErr } from '../errlib';
 import Metcls from './metcls';
-import { NType, NTypeObj, Node } from './nodes';
+import { NType, Node } from './nodes';
 import Operator from './operator';
 import { Plugin, PluginEmiter } from './transf';
 
@@ -22,18 +22,42 @@ export default class PathInfo<T extends NType = NType, A extends Asserts = Asser
 		operm: Operator,
 		public node: Node<T>,
 		public dad: Node<A['dad']>,
-		public inList: A['inList'],
+		protected inList: boolean,
 		public listIndex: number,
-		public dadKey: InArr<typeof Node[NTypeObj[A['dad']]]['nodeAttr']>,
+		dadKey: string,
 	) {
 		super();
 		this.operm = operm;
+		this.dadKey = <any>dadKey;
 		this.listIn = inList ? (dad as any)[dadKey] : null;
 	}
+	public dadKey: keyof Node<A['dad']>;
 	override operm;
 	listIn: Node[] | null;
+	isInList(): this is PathInfo<T, A & { inList: true; }> {
+		return this.inList;
+	}
+	isNotInList(): this is PathInfo<T, A & { inList: false; }> {
+		return this.inList;
+	}
+	sure<K extends NType>(ntype: K): this is PathInfo<K, A> {
+		return ntype === this.node.ntype;
+	}
+	notSure<K extends NType>(ntype: K): this is PathInfo<Exclude<T, K>, A> {
+		return ntype !== this.node.ntype;
+	}
 	sureDad<K extends NType>(ntype: K): this is PathInfo<T, A & { dad: K; }> {
 		return ntype === this.dad?.ntype;
+	}
+	notSureDad<K extends NType>(ntype: K): this is PathInfo<T, A & { dad: Exclude<A['dad'], K>; }> {
+		return ntype === this.dad?.ntype;
+	}
+	private removed = false;
+	remove() {
+		if (!this.inList) throwErr(EType.ErrNotInList, Error(), this);
+		if (this.removed) return;
+		const list = <Node[]>this.dad[this.dadKey];
+		list.splice(list.indexOf(this.node), 1);
 	}
 	private walkEmiter(emiter: PluginEmiter) {
 		emiter.entry(this);

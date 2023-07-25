@@ -1,7 +1,7 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.1.3
+ * @version 1.1.4
  * @license GPL-2.0-or-later
  */
 declare module './appinf';
@@ -29,6 +29,6 @@ export async function parse(tips: string, fn: () => void | PromiseLike<void>) {
 	operm.come();
 	await fn();
 	operm.exit();
-	transform(operm);
+	await transform(operm);
 	return operm.ast;
 }

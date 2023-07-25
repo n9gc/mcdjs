@@ -1,12 +1,13 @@
 /**
  * 错误类型定义模块
  * @module mcdjs/lib/errlib/errors
- * @version 1.5.1
+ * @version 1.5.2
  * @license GPL-2.0-or-later
  */
 declare module './errors';
 
 import { throwErr } from '../errlib';
+import { PathInfo } from '../magast';
 import type { Node } from '../magast/nodes';
 import { Enum, listKeyOf } from '../types/base';
 
@@ -50,6 +51,9 @@ export const errs = {
 	ErrInitWithoutGetter: (domain: string, instance: Node) => ({
 		domain,
 		instance,
+	}),
+	ErrNotInList: (path: PathInfo<any, any>) => ({
+		path,
 	}),
 } as const;
 

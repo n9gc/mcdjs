@@ -1,7 +1,7 @@
 /**
  * 错误相关文本
  * @module mcdjs/lib/errlib/text
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './text';
@@ -52,4 +52,5 @@ export const tranumEType = regEnum('EType', EType, {
 	ErrNoEnumText: '找不到枚举对应的文本',
 	ErrUnregisteredEnum: '使用了未被注册的枚举',
 	ErrInitWithoutGetter: '未使用要求的工厂函数获取实例',
+	ErrNotInList: '节点不在列表里',
 });
