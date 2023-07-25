@@ -1,4 +1,4 @@
-import '../../global';
+/// <reference path="../../global.ts" />
 
 const say2 = Command.say('8&fh0');
 

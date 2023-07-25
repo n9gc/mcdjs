@@ -1,4 +1,4 @@
-import '../../global';
+/// <reference path="../../global.ts" />
 
 const tagA = new Tag();
 const tagB = new Tag();

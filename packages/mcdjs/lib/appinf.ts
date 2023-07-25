@@ -25,6 +25,7 @@ export function globalify() {
 
 export async function parse(tips: string, fn: () => void | PromiseLike<void>) {
 	const operm = new Operator(tips);
+	globalify();
 	operm.come();
 	await fn();
 	operm.exit();

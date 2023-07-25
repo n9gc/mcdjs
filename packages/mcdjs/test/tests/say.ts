@@ -1,4 +1,4 @@
-import '../../global';
+/// <reference path="../../global.ts" />
 
 Command.say('890');
 
