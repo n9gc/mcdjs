@@ -3,7 +3,4 @@
 	"include": [
 		"lib",
 	],
-	"compilerOptions": {
-		"emitDeclarationOnly": true,
-	}
 }

@@ -1,13 +1,13 @@
 import { Configuration } from 'webpack';
 const config: Configuration = {
 	entry: __dirname + '/lib/exp.ts',
-	mode: 'development',
+	mode: 'production',
 	output: {
 		path: __dirname + '/lib',
 		filename: 'packed.js',
 	},
 	resolve: {
-		extensions: [".ts", ".tsx", ".js"],
+		extensions: [".js", ".ts", ".tsx"],
 		extensionAlias: {
 			".js": [".js", ".ts"],
 			".cjs": [".cjs", ".cts"],

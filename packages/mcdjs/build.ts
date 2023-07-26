@@ -20,7 +20,6 @@ const {
 	time,
 	timeEnd,
 	timeStart,
-	judge,
 } = LBIniter(__dirname);
 
 const mn: string[] = [];
@@ -32,16 +31,18 @@ snake(
 	timeStart(),
 	async () => Object.keys(require('./lib/index.ts')).forEach(e => e != 'default' && mn.push(e)),
 	exec('pnpm webpack'),
+	mkdir('temp'),
 	outFS([
 		[1, cmt('lib/index.ts')],
 		[1, '((exp)=>{'],
 		[0, 'lib/packed.js'],
-		[1, '})(typeof module==="undefined"?false:module);']
-	], 'lib/index.js'),
+		[1, '})(typeof module==="undefined"?false:module);'],
+	], 'temp/index.js'),
 	timeEnd(),
 	log<any>('\nwebpack compiled in', time(), 'ms\n'),
-	dels('lib/packed.js'),
-	() => mn.forEachAsync(m => fsp.writeFile(`lib/${m}.js`, `module.exports=require('.').${m};`)),
+	dels(RegExp(`${goodReg(comp('lib'))}[\\/\\\\].*js$`)),
+	() => mn.forEachAsync(m => fsp.writeFile(`temp/${m}.js`, `module.exports=require('.').${m};`)),
+	mvs(['temp', 'lib']),
 	timeEnd(),
 	log<any>('\nBuilt in', time(), 'ms\n')
 ).then(() => process.exit(0));
