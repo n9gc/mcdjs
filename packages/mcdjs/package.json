@@ -5,9 +5,10 @@
 	"main": "./lib",
 	"module": "./lib",
 	"types": "./lib",
+	"browser": "./lib",
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
-		"build": "pnpm tsc",
+		"build": "ts-node build",
 		"test": "pnpm ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi']]]\"",
 		"prepublishOnly": "pnpm run build",
 		"postpublish": "pnpm run clear"
@@ -41,13 +42,17 @@
 		"url": "https://github.com/n9gc/mcdjs/issues"
 	},
 	"dependencies": {
+		"@types/node": "",
 		"aocudeo": "workspace:^",
-		"reflect-metadata": "^0.1.13",
-		"@types/node": ""
+		"reflect-metadata": "^0.1.13"
 	},
 	"devDependencies": {
+		"devok": "workspace:^",
+		"lethal-build": "^1.3.2",
 		"promise-snake": "^1.2.2",
-		"devok": "workspace:^"
+		"ts-loader": "^9.4.4",
+		"webpack": "^5.88.2",
+		"webpack-cli": "^5.1.4"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs#readme"
 }
