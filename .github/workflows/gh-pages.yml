@@ -33,6 +33,7 @@ jobs:
           pnpm i
           pnpm build
           echo "<html><meta http-equiv=\"refresh\" content=\"0;url=./docs/\"></html>" > ./index.html
+          echo "mcd.js.org" > ./CNAME
 
       - name: Save changes
         run: |
