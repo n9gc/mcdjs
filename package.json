@@ -1,5 +1,6 @@
 {
 	"private": true,
+	"license": "GPL-2.0-or-later",
 	"devDependencies": {
 		"@types/tape": "^5.6.0",
 		"colortape": "^0.0.2",

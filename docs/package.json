@@ -1,0 +1,8 @@
+{
+	"private": true,
+	"scripts": {},
+	"license": "GPL-2.0-or-later",
+	"dependencies": {
+		"mcdjs": "workspace:^"
+	}
+}
