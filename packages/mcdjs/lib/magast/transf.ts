@@ -1,16 +1,17 @@
 /**
  * 转译相关定义模块
  * @module mcdjs/lib/magast/transf
- * @version 2.2.2
+ * @version 2.3.0
  * @license GPL-2.0-or-later
  */
 declare module './transf';
 
 import { EType, throwErr } from '../errlib';
-import { Enum, listKeyOf } from '../types/base';
+import { ArrayMap, Enum, listKeyOf } from '../types/base';
 import { AnyArr, InArr } from '../types/tool';
 import { NType, NTypeKey } from './nodes';
-import PathInfo, { Asserts } from './pathinfo';
+import PathInfo from './pathinfo';
+import { TransfError, TransfSignal } from './util';
 
 namespace Alias {
 	function con<T extends AnyArr>(...n: [...T]): Readonly<T> {
@@ -68,31 +69,45 @@ export type Plugin = {
 	[I in VisitorName]?: Visitor<VisitedNType<I>>;
 };
 
-class VisitorFns {
-	entrys: VisitorFn[] = [];
-	exits: VisitorFn[] = [];
-	add({ entry, exit }: VisitorObj) {
-		entry && this.entrys.push(entry);
-		exit && this.entrys.push(exit);
-	}
-}
 export class PluginEmiter {
-	constructor(mod: Plugin | PluginEmiter) {
-		if ('entry' in mod) return mod;
-		for (const name in mod) {
-			const now = mod[name as VisitorName]!;
-			const obj: VisitorObj<any> = typeof now === 'function' ? { entry: now } : now;
-			getNodesVisited(name).forEach(n => this.addMap(n, obj));
+	static readonly visitorType = ['exit', 'entry'] as const;
+	constructor(plugin?: Plugin | PluginEmiter) {
+		if (!plugin) return;
+		if ('addMap' in plugin) return plugin;
+		else {
+			for (const name in plugin) {
+				const now = plugin[name as VisitorName]!;
+				const obj: VisitorObj<any> = typeof now === 'function' ? { entry: now } : now;
+				getNodesVisited(name).forEach(n => this.addMap(n, obj));
+			}
 		}
 	}
-	protected map: { [I in NType]?: VisitorFns } = {};
+	protected entryMap = new ArrayMap<NType, VisitorFn>;
+	protected exitMap = new ArrayMap<NType, VisitorFn>;
 	protected addMap(n: NType, obj: VisitorObj) {
-		(this.map[n] || (this.map[n] = new VisitorFns)).add(obj);
+		PluginEmiter.visitorType.forEach(key => obj[key] && this[`${key}Map`].push(n, obj[key]!));
+	}
+	protected do(way: 'entry' | 'exit', path: PathInfo<any, any>) {
+		this[`${way}Map`].get(path.node.ntype)?.forEach(fn => {
+			try { fn(path); }
+			catch (err: unknown) {
+				TransfError.assert(err);
+				switch (err.cause.signal) {
+					case TransfSignal.Next: return;
+				}
+			}
+		});
 	}
 	entry(path: PathInfo<any, any>) {
-		this.map[path.node.ntype as NType]?.entrys.forEach(fn => fn(path));
+		this.do('entry', path);
 	}
 	exit(path: PathInfo<any, any>) {
-		this.map[path.node.ntype as NType]?.exits.forEach(fn => fn(path));
+		this.do('exit', path);
 	}
+	// merge(plugin: Plugin | PluginEmiter) {
+	// 	console.log(0, this.entryMap);
+	// 	const emiter = new PluginEmiter(plugin);
+	// 	PluginEmiter.visitorType.forEach(key => Enum.mapIn(NType, type => this[`${key}Map`].push(type, ...(emiter[`${key}Map`].get(type) || []))));
+	// 	console.log(1, this.entryMap);
+	// }
 }

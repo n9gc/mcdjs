@@ -1,6 +1,6 @@
 /**
  * 实用语法相关
- * @version 2.0.0
+ * @version 2.0.1
  * @license GPL-2.0-or-later
  */
 "use strict";
@@ -45,23 +45,14 @@ namespace McdJSTemp {
 	import CRClass = Struct.CommandRsltClass;
 	import SEClass = Struct.SelectedClass;
 	import Vcb = TTool.Vcb;
+	// export class NameSpace {
+	// 	constructor(sign: string, content: Vcb) {
+	// 		const opering = chCommand.getOperm();
+	// 		this.node = opering.getNode('NameSpace', sign, content);
+	// 	}
+	// 	protected readonly node;
+	// }
 	export import Tag = Struct.Tag;
-	function binCalcsFn(sign: Expression.OperatorBin, exprs: binCalcsFn.Args) {
-		if (!exprs.length) return errParams(Error(), exprs);
-		let sub = exprs.shift()!;
-		exprs.forEach(n => sub = [sub, sign, n]);
-		return sub;
-	}
-	namespace binCalcsFn {
-		export type Args = [Expression.Calcable, ...Expression.Calcable[]];
-	}
-	export function and(...expr: binCalcsFn.Args) { return binCalcsFn(AND, expr); }
-	export function or(...expr: binCalcsFn.Args) { return binCalcsFn(OR, expr); }
-	export function not(expr: Expression.Calcable): Expression.Calcable { return [NOT, expr]; }
-	export function nand(...expr: binCalcsFn.Args) { return binCalcsFn(NAND, expr); }
-	export function nor(...expr: binCalcsFn.Args) { return binCalcsFn(NOR, expr); }
-	export function xor(...expr: binCalcsFn.Args) { return binCalcsFn(XOR, expr); }
-	export function xnor(...expr: binCalcsFn.Args) { return binCalcsFn(XNOR, expr); }
 	export const AND = 'and';
 	export const OR = 'or';
 	export const NOT = 'not';
@@ -69,6 +60,23 @@ namespace McdJSTemp {
 	export const NOR = 'nor';
 	export const XOR = 'xor';
 	export const XNOR = 'xnor';
+	function binCalcsFn(sign: Expression.OperatorBin, exprs: binCalcsFn.UnlimitedArgs) {
+		if (!exprs.length) return errParams(Error(), exprs);
+		let sub = exprs.shift()!;
+		exprs.forEach(n => sub = [sub, sign, n]);
+		return sub;
+	}
+	namespace binCalcsFn {
+		export type Args = [Expression, Expression];
+		export type UnlimitedArgs = [Expression, Expression, ...Expression[]];
+	}
+	export function and(...expr: binCalcsFn.UnlimitedArgs) { return binCalcsFn(AND, expr); }
+	export function or(...expr: binCalcsFn.UnlimitedArgs) { return binCalcsFn(OR, expr); }
+	export function not(expr: Expression): Expression { return [NOT, expr]; }
+	export function nand(...expr: binCalcsFn.Args) { return binCalcsFn(NAND, expr); }
+	export function nor(...expr: binCalcsFn.Args) { return binCalcsFn(NOR, expr); }
+	export function xor(...expr: binCalcsFn.Args) { return binCalcsFn(XOR, expr); }
+	export function xnor(...expr: binCalcsFn.Args) { return binCalcsFn(XNOR, expr); }
 	function errParams(tracker: Error, args: IArguments | readonly any[]): never {
 		const { errlib: { throwErr, EType } } = Imp;
 		return throwErr(EType.ErrIllegalParameter, tracker, args);

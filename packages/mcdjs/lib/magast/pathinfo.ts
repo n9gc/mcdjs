@@ -1,7 +1,7 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.4.1
+ * @version 2.5.0
  * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
@@ -12,6 +12,7 @@ import Metcls from './metcls';
 import { NType, Node } from './nodes';
 import Operator from './operator';
 import { Plugin, PluginEmiter } from './transf';
+import { TransfError, TransfSignal } from './util';
 
 export interface Asserts {
 	dad: NType;
@@ -60,24 +61,34 @@ export default class PathInfo<T extends NType = NType, A extends Asserts = Asser
 		list.splice(list.indexOf(this.node), 1);
 	}
 	private walkEmiter(emiter: PluginEmiter) {
-		emiter.entry(this);
-		for (const attrName of Reflect.getMetadata('nodeAttr', this.node) || []) {
-			let attr: Node | Node[] = (<any>this.node)[attrName];
-			let idx, inList = true;
-			if (!attr) console.log(attrName, this.node);
-			if (!('length' in attr)) attr = [attr], inList = false;
-			else attr = attr.slice(0);
-			for (idx = 0; idx < attr.length; ++idx)
-				new PathInfo(
-					this.operm, attr[idx], this.node,
-					inList, idx,
-					attrName,
-				).walkEmiter(emiter);
+		try {
+			emiter.entry(this);
+			for (const attrName of Reflect.getMetadata('nodeAttr', this.node) || []) {
+				let attr: Node | Node[] = (<any>this.node)[attrName];
+				let idx, inList = true;
+				if (!('length' in attr)) attr = [attr], inList = false;
+				else attr = attr.slice(0);
+				for (idx = 0; idx < attr.length; ++idx)
+					new PathInfo(
+						this.operm, attr[idx], this.node,
+						inList, idx,
+						attrName,
+					).walkEmiter(emiter);
+			}
+			emiter.exit(this);
+		} catch (err: unknown) {
+			TransfError.assert(err);
+			switch (err?.cause?.signal) {
+				case TransfSignal.Stop: return;
+				default: throwErr(EType.ErrWrongTransfErrorSignal, err, err);
+			}
 		}
-		emiter.exit(this);
 	}
 	override walk(emiter: Plugin | PluginEmiter) {
 		this.walkEmiter(new PluginEmiter(emiter));
+	}
+	stop() {
+		throw new TransfError(TransfSignal.Stop);
 	}
 	/*
 	replace<N extends NType>(n: GotSelNode<N>, tips?: string) {

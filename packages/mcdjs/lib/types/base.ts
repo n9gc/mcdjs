@@ -1,7 +1,7 @@
 /**
  * 功能无关类型定义模块
  * @module mcdjs/lib/types/base
- * @version 1.3.0
+ * @version 1.4.0
  * @license GPL-2.0-or-later
  */
 declare module './base';
@@ -59,10 +59,30 @@ export namespace Enum {
 		return typeof which[n] === 'number';
 	}
 
-	export function mapIn<T extends Enum, R>(which: T, cb: (value: number, key: KeyOf<T>) => R): R[] {
+	export function mapIn<T extends Enum, R>(which: T, cb: (value: ValueOf<T>, key: KeyOf<T>) => R): R[] {
 		const rslt = [];
 		let i = 0;
-		while (i in which) rslt.push(cb(i, which[i++] as KeyOf<T>));
+		while (i in which) rslt.push(cb(i as ValueOf<T>, which[i++] as KeyOf<T>));
 		return rslt;
 	}
 }
+
+abstract class InitializableMap<K, V> extends Map<K, V> {
+	protected abstract initializeValue(): V;
+	forceGet(key: K) {
+		let value = this.get(key);
+		if (value) return value;
+		value = this.initializeValue();
+		this.set(key, value);
+		return value;
+	}
+}
+export class ArrayMap<K, T> extends InitializableMap<K, T[]> {
+	protected initializeValue(): T[] {
+		return [];
+	}
+	push(key: K, ...items: T[]) {
+		this.forceGet(key).push(...items);
+	}
+}
+export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }

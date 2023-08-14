@@ -1,7 +1,7 @@
 /**
  * 文本配置处理相关
  * @module mcdjs/lib/config/text
- * @version 1.0.2
+ * @version 1.0.3
  * @license GPL-2.0-or-later
  */
 declare module './text';
@@ -18,7 +18,7 @@ export function initText<K extends string, T = { [I in K]: Obj }>(n: T) {
 }
 
 const enumNameMap = new Map<Enum, string>;
-export function findName<B extends Enum>(n: B) {
+export function getEnumName<B extends Enum>(n: B) {
 	return enumNameMap.get(n) ?? throwErr('ErrUnregisteredEnum', Error(), n);
 }
 
@@ -48,6 +48,6 @@ interface EnumObj<B extends Enum> {
 function getEnumFn<B extends Enum>(enumObj: EnumObj<B>) {
 	return (value: Enum.ValueOf<B>) => sureObj(
 		enumObj.keyMap?.[value] as Obj
-		?? throwErr('ErrNoEnumText', Error(), findName(enumObj.which), value)
+		?? throwErr('ErrNoEnumText', Error(), getEnumName(enumObj.which), value)
 	);
 }

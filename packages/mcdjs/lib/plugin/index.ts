@@ -1,7 +1,7 @@
 /**
  * 转译流程模块
  * @module mcdjs/lib/plugin
- * @version 1.0.3
+ * @version 1.0.4
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -10,8 +10,9 @@ import Organizer from "aocudeo/async";
 import { Operator } from "../magast";
 
 export const organizer = new Organizer<Operator>();
-export default function (operm: Operator) {
-	return organizer.execute(operm);
+export default async function (operm: Operator) {
+	await organizer.execute(operm);
+	return operm;
 }
 
 export * from './internal-pack';

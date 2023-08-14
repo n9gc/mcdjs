@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.5.0
+ * @version 1.6.0
  * @license GPL-2.0-or-later
  */
 declare module './nodes';
@@ -110,6 +110,17 @@ export namespace Node {
 			public tick: number,
 		) { super(operm); }
 		@NodeAttr readonly cbs: Node[] = [];
+	}
+	export class NameSpace extends Base {
+		ntype = NType.NameSpace;
+		static readonly 'zh-CN' = '命名空间';
+		constructor(operm: Operator, sign: string, content: Vcb) {
+			super(operm);
+			this.sign = sign;
+			this.content = new CodeBlock(operm, content);
+		}
+		readonly sign: string;
+		@NodeAttr readonly content: CodeBlock;
 	}
 }
 
