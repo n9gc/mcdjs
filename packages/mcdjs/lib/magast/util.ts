@@ -1,7 +1,7 @@
 /**
  * 树操作工具库
  * @module mcdjs/lib/magast/util
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './util';
@@ -27,9 +27,10 @@ export class TransfError extends Error {
 		if (!(err instanceof TransfError)) throw err;
 	}
 	constructor(signal: TransfSignal) {
-		super(sureObj(some.report), { cause: { signal, info: tranumTransfSignal(signal) } });
+		super(sureObj(some.report));
+		this.cause = { signal, info: tranumTransfSignal(signal) };
 	}
-	declare cause: { signal: TransfSignal, info: string; };
+	cause: { signal: TransfSignal, info: string; };
 }
 export function guard(n: boolean): asserts n {
 	if (!n) throw new TransfError(TransfSignal.Stop);
