@@ -1,0 +1,49 @@
+@startuml Acodudeo 架构图
+title Aocudeo 架构图
+class Queue
+package checker {
+	class CircleChecker
+	class SignChecker
+	SignChecker -o CircleChecker
+}
+package diagram {
+	class Diagram
+}
+package executor {
+	class Executor
+	class Graph
+}
+package organizer {
+	class Organizer
+	() OrganizerConfig
+	Organizer .> OrganizerConfig
+}
+package position {
+	() Position
+	class PositionMap
+	class PositionObj
+	class SurePosition
+	PositionObj ..|> Position
+	SurePosition --> PositionObj
+	PositionMap --> SurePosition
+}
+package worker {
+	class WorkerContext
+	class WorkerRunner
+	class WorkerManager
+	WorkerRunner --o WorkerManager : < 每执行生成
+	WorkerContext --o WorkerRunner : < 每函数生成
+}
+Queue -o WorkerRunner
+Diagram -> Graph
+PositionMap --* Organizer
+Executor -o Graph : < 每执行生成
+Executor -> WorkerRunner
+CircleChecker --* Graph
+SignChecker --* PositionMap
+SignChecker --* PositionMap
+PositionMap o- Graph : 缓存生成 >
+SignChecker --* Graph
+WorkerManager --* Organizer
+Diagram --o PositionMap : < 缓存生成
+@enduml

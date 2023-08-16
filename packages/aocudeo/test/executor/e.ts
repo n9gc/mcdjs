@@ -1,13 +1,10 @@
 import test from 'tape';
 import {
-	ExecutorAsync,
-	ExecutorSync,
 	Id,
 	Organizer,
 	PositionMap,
 	WorkerManagerAsync,
-	WorkerManagerSync,
-	WorkerRunnerAsync,
+	WorkerManagerSync
 } from '../..';
 import { msf, ra } from '../helpers';
 
@@ -27,7 +24,7 @@ function cge(a: boolean) {
 					'顺序正确'
 				);
 			});
-			new (a ? ExecutorAsync : ExecutorSync)(pm.getGraph(), wr.getRunner(void 0, 0) as WorkerRunnerAsync<void>).execute();
+			pm.getGraph().getExecutor(wr.getRunner(void 0, 0))[a ? 'executeAsync' : 'executeSync']();
 		}
 	}
 

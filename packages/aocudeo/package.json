@@ -1,6 +1,6 @@
 {
 	"name": "aocudeo",
-	"version": "4.1.3",
+	"version": "4.1.4",
 	"description": "Process organizer of asynchronous or/and synchronous interdependent code units",
 	"main": "./index",
 	"module": "./index",

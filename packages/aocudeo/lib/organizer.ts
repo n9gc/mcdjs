@@ -1,13 +1,12 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.4.1
+ * @version 1.4.2
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
 
 import type Queue from 'queue';
-import { ExecutorAsync, ExecutorSync } from './executor';
 import { Position, PositionMap, Positions } from './position';
 import type { Hookable, Id } from './types';
 import { isArray, isIdArray, mapMap } from './util';
@@ -218,7 +217,7 @@ export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T
 	override async execute(data: T) {
 		if (super.execute()) return data;
 		const runner = this.workerManager.getRunner(data, this.concurrency);
-		await new ExecutorAsync(this.positionMap.getGraph(), runner).execute();
+		await this.positionMap.getGraph().getExecutor(runner).executeAsync();
 		return runner.data;
 	}
 }
@@ -232,7 +231,7 @@ export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
 	override execute(data: T) {
 		if (super.execute()) return data;
 		const runner = this.workerManager.getRunner(data);
-		new ExecutorSync(this.positionMap.getGraph(), runner).execute();
+		this.positionMap.getGraph().getExecutor(runner).executeSync();
 		return runner.data;
 	}
 }
