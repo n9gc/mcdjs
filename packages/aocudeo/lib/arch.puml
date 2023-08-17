@@ -1,10 +1,10 @@
-@startuml Acodudeo 架构图
+@startuml "Acodudeo 架构图"
 title Aocudeo 架构图
 class Queue
 package checker {
 	class CircleChecker
 	class SignChecker
-	SignChecker -o CircleChecker
+	SignChecker -* CircleChecker
 }
 package diagram {
 	class Diagram

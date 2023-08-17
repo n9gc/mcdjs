@@ -1,10 +1,10 @@
 /// <reference types="mcdjs/browser.d.ts" />
+/// <reference path="./lib.js" />
 // @ts-check
-function getN(/**@type {string} */name) {
-	return document.getElementsByName(name)[0];
-}
+"use strict";
+
 window.onload = () => {
-	window.McdJS.appinf.globalify();
+	McdJS.appinf.globalify();
 	const [Ebutton, Einput, Eoutput] = ['Ebutton', 'Einput', 'Eoutput'].map(getN);
 	Ebutton.onclick = async () => {
 		const result = await McdJS.appinf.parse('playground', () => {
