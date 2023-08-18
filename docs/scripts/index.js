@@ -13,7 +13,7 @@ window.onload = () => {
 	const [Eindex] = ['Eindex'].map(getN);
 	for (const id in indexList) {
 		const Ea = document.createElement('a');
-		Ea.setAttribute('data-umami-event', `Index ${id}`);
+		Ea.setAttribute('data-umami-event', `/docs/ 索引-${id}`);
 		Ea.innerText = indexList[id][0];
 		Ea.href = indexList[id][1] ?? `./${id}/`;
 		const Eli = document.createElement('li');

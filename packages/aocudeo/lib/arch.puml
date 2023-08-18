@@ -1,4 +1,4 @@
-@startuml "Acodudeo 架构图"
+@startuml
 title Aocudeo 架构图
 class Queue
 package checker {
@@ -31,19 +31,19 @@ package worker {
 	class WorkerContext
 	class WorkerRunner
 	class WorkerManager
-	WorkerRunner --o WorkerManager : < 每执行生成
-	WorkerContext --o WorkerRunner : < 每函数生成
+	WorkerRunner --o WorkerManager : < 每  执  行  生  成
+	WorkerContext --o WorkerRunner : < 每  函  数  生  成
 }
 Queue -o WorkerRunner
 Diagram -> Graph
 PositionMap --* Organizer
-Executor -o Graph : < 每执行生成
+Executor -o Graph : < 每  执  行  生  成
 Executor -> WorkerRunner
 CircleChecker --* Graph
 SignChecker --* PositionMap
 SignChecker --* PositionMap
-PositionMap o- Graph : 缓存生成 >
+PositionMap o- Graph : 缓  存  生  成 >
 SignChecker --* Graph
 WorkerManager --* Organizer
-Diagram --o PositionMap : < 缓存生成
+Diagram --o PositionMap : < 缓  存  生  成
 @enduml

@@ -4,7 +4,7 @@
 
 async function getUmlUrl(/**@type {string} */uml) {
 	const res = await fetch(uml);
-	const text = (await res.text()).split('\n').join(';\n');
+	const text = replace(await res.text(), [['\n', ';'], ['"', '\\"']]);
 	return `https://www.gravizo.com/svg?${text}`;
 }
 window.onload = async () => {
