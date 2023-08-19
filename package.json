@@ -4,6 +4,7 @@
 	"devDependencies": {
 		"@types/tape": "^5.6.0",
 		"colortape": "^0.0.2",
+		"http-server": "^14.1.1",
 		"lage": "^2.7.5",
 		"nyc": "^15.1.0",
 		"tape": "^5.6.6",
@@ -11,9 +12,10 @@
 		"typescript": "^5.1.6"
 	},
 	"scripts": {
-		"build": "pnpm lage build",
-		"clear": "pnpm lage clear",
-		"test:cli": "pnpm lage test:cli",
-		"test": "pnpm lage test"
+		"serve": "http-server .",
+		"build": "lage build",
+		"clear": "lage clear",
+		"test:cli": "lage test:cli",
+		"test": "lage test"
 	}
 }
