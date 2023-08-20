@@ -1,13 +1,12 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.6.0
+ * @version 1.6.1
  * @license GPL-2.0-or-later
  */
 declare module './nodes';
 
 import 'reflect-metadata';
-import Temp from '../alload';
 import { regEnum } from '../config/text';
 import { EType, throwErr } from '../errlib';
 import { Enum, listKeyOf } from '../types/base';
@@ -30,7 +29,7 @@ abstract class Base implements NodeBase {
 	constructor(operm: Operator, getTip = true) {
 		this.index = operm.plusNodeNum();
 		if (getTip) {
-			const tips = Temp.tip.getTip();
+			const tips = operm.api.getTip();
 			if (tips) this.tips = tips;
 		}
 	}

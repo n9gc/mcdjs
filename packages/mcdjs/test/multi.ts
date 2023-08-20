@@ -10,7 +10,7 @@ export default async function () {
 		await Promise.all(
 			tests
 				.map(n => `${__dirname}/tests/${n}`)
-				.map(n => parse(n, () => import(n)))
+				.map(n => parse(n, () => import(n), { globalify: true }))
 		)
 	);
 }

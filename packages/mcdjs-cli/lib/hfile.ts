@@ -1,7 +1,7 @@
 /**
  * 文件解析处理模块
  * @module mcdjs-cli/lib/hfile
- * @version 1.1.0
+ * @version 1.1.1
  * @license GPL-2.0-or-later
  */
 declare module './hfile';
@@ -55,7 +55,7 @@ export async function resolve({ inputs }: RunInfos) {
 export async function compile(files: string[]) {
 	const commands: RoundParsed = [];
 	await Promise.thens(files.map(file => async () =>
-		commands.push(await parse(file, () => import(file)))
+		commands.push(await parse(file, () => import(file), { globalify: true }))
 	));
 	return commands;
 }

@@ -17,27 +17,28 @@ code_C --> operm_C
 code_B --> operm_B
 code_A --> operm_A
 frame GlobalThis {
-	component "McdJSTemp" {
-		component Struct
-		component Command
-		portin "chCommand 注  册  操  作  器" as chCommand
-		portout API
-	}
+	entity API_D
+	entity API_C
+	entity API_B
+	entity API_A
+	API_C .> API_D
+	API_B .> API_C
+	API_A .> API_B : 顺  序  执  行 >
 }
-operm_D ---> chCommand
-operm_C ---> chCommand
-operm_B ---> chCommand
-operm_A ---> chCommand
-frame IR {
+operm_D *--> API_D
+operm_C *--> API_C
+operm_B *--> API_B
+operm_A *--> API_A
+package IR {
 	entity magAST_D
 	entity magAST_C
 	entity magAST_B
 	entity magAST_A
 }
-API --> magAST_D
-API --> magAST_C
-API --> magAST_B
-API --> magAST_A
+API_D --> magAST_D
+API_C --> magAST_C
+API_B --> magAST_B
+API_A --> magAST_A
 component "Transf 转  译  模  块" {
 	portin " " as TrasfIn_D
 	portin " " as TrasfIn_C

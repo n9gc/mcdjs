@@ -1,12 +1,11 @@
 /**
  * 抽象语法树操作器定义模块
  * @module mcdjs/lib/magast/operator
- * @version 2.2.4
+ * @version 2.3.0
  * @license GPL-2.0-or-later
  */
 declare module './operator';
 
-import { chCommand } from '../cmdobj';
 import Metcls from './metcls';
 import {
 	AST,
@@ -14,6 +13,7 @@ import {
 } from './nodes';
 import PathInfo from './pathinfo';
 import { Plugin, PluginEmiter } from './transf';
+import getApi from '../api';
 
 export default class Operator extends Metcls {
 	constructor(tips: string) {
@@ -27,20 +27,13 @@ export default class Operator extends Metcls {
 	readonly ast: AST;
 	protected readonly top: Node.Top;
 	protected nodeNum = 0;
+	readonly api = getApi(this);
 	plusNodeNum() {
 		return this.nodeNum++;
 	}
-	come() {
-		chCommand.come(this);
-		return this;
-	}
-	exit() {
-		chCommand.exit();
-		return this;
-	}
 	push(node: Node) {
 		this.scope.nodes.push(node);
-		return node.index;
+		return new this.api.CommandRsltClass(node.index);
 	}
 	override walk(emiter: Plugin | PluginEmiter) {
 		new PathInfo(

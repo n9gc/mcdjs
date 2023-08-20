@@ -1,7 +1,7 @@
 /**
  * 功能无关类型定义模块
  * @module mcdjs/lib/types/base
- * @version 1.4.0
+ * @version 1.5.0
  * @license GPL-2.0-or-later
  */
 declare module './base';
@@ -86,3 +86,14 @@ export class ArrayMap<K, T> extends InitializableMap<K, T[]> {
 	}
 }
 export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
+
+export namespace Template {
+	export type ArgsJoin = [literals: { raw: readonly string[]; }, ...values: any[]];
+	export function join(...args: ArgsJoin) {
+		const [{ raw }, ...values] = args;
+		const outArr: any[] = [];
+		values.forEach((n, i) => outArr.push(raw[i], n));
+		outArr.push(raw.at(-1));
+		return outArr.join('');
+	}
+}

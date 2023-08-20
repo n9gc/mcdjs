@@ -8,7 +8,7 @@
 declare module '.';
 
 export * as default from '.';
-export * as alload from './alload';
+export * as api from './api';
 export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
