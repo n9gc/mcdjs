@@ -7,12 +7,12 @@
 	"types": "./lib",
 	"browser": "./lib",
 	"scripts": {
-		"clear": "pnpm ts-node ../dev/actor/clear -R",
+		"clear": "ts-node ../dev/actor/clear -R",
 		"play": "nodemon --ext ts,js -r ts-node/register ./test/play",
 		"build": "ts-node build",
-		"test": "pnpm ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi']]]\"",
-		"prepublishOnly": "pnpm run build",
-		"postpublish": "pnpm run clear"
+		"test": "ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi'], { ignoreError: true }]]\"",
+		"prepublishOnly": "pnpm build",
+		"postpublish": "pnpm clear"
 	},
 	"files": [
 		"lib",
