@@ -1,4 +1,4 @@
-/// <reference path="../../global.ts" />
+/// <reference types="../../global" />
 
 Command.say('890');
 

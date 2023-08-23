@@ -1,4 +1,6 @@
-/// <reference path="../../global.ts" />
+/// <reference types="../../global" />
+
+console.log(Tag.toString())
 
 const tagA = new Tag();
 const tagB = new Tag();

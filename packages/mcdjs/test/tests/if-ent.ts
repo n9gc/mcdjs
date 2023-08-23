@@ -1,4 +1,4 @@
-/// <reference path="../../global.ts" />
+/// <reference types="../../global" />
 
 If('@e', () => {
 	Command.say('some entity');

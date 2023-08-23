@@ -1,7 +1,7 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.2.0
+ * @version 1.2.1
  * @license GPL-2.0-or-later
  */
 declare module './appinf';
@@ -9,9 +9,11 @@ declare module './appinf';
 import { Operator } from './magast';
 import transform from './plugin';
 
-export function globalify(operm: Operator) {
-	globalify.methodKeys.forEach(key => (globalThis as any)[key] = (...args: any[]) => (operm.api as any)[key](...args));
-	globalify.attributeKeys.forEach(key => (globalThis as any)[key] = (operm.api as any)[key]);
+export function globalify({ api }: Operator) {
+	globalify.methodKeys.forEach(key => (globalThis as any)[key] = function fn(...args: any[]) {
+		return this instanceof fn ? new (api as any)[key](...args) : (api as any)[key](...args);
+	});
+	globalify.attributeKeys.forEach(key => (globalThis as any)[key] = (api as any)[key]);
 }
 export namespace globalify {
 	export const methodKeys = new Set<string>();

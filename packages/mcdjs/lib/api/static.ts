@@ -1,7 +1,7 @@
 /**
  * 操作器无关API库
  * @module mcdjs/lib/api/static
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './static';
@@ -18,11 +18,15 @@ import {
 } from "../types/game";
 import * as me from './static';
 
+const noExportList: string[] = [];
+function noExport(name: keyof typeof me) {
+	noExportList.push(name);
+}
+
+noExport('default');
 function clsStatic() { }
 clsStatic.prototype = me;
 export default clsStatic as any as new () => typeof me;
-
-Object.keys(me).filter(key => key !== 'default').forEach(key => globalify.Export(me, key));
 
 export class CommandRsltClass implements CommandRslt {
 	constructor(
@@ -36,6 +40,8 @@ export class SelectedClass implements Selected {
 	) { }
 	readonly tid = TypeId.Selected as const;
 }
+
+noExport('tagExist');
 export let tagExist: { [name: string]: true; } = {};
 /**标签实体 */
 export class Tag implements SimTag {
@@ -82,3 +88,8 @@ export function select(expr: Expression, range?: SelectString): Selected {
 	if (range) expr = and(expr, range);
 	return new SelectedClass(expr);
 }
+
+Object.keys(me)
+	.filter(key => !noExportList.includes(key))
+	.forEach(key => globalify.Export(me, key));
+

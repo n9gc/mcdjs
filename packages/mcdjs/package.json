@@ -10,7 +10,7 @@
 		"clear": "ts-node ../dev/actor/clear -R",
 		"play": "nodemon --ext ts,js -r ts-node/register ./test/play",
 		"build": "ts-node build",
-		"test": "ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi'], { ignoreError: true }]]\"",
+		"test": "ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi']]]\"",
 		"prepublishOnly": "pnpm build",
 		"postpublish": "pnpm clear"
 	},
