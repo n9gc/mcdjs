@@ -10,7 +10,6 @@ import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import { parse } from "mcdjs/lib/appinf";
 import { EType, errCatcher, getTracker, trapErr } from 'mcdjs/lib/errlib';
-import { Ast } from 'mcdjs/lib/magast/nodes';
 import * as path from 'path';
 import 'promise-snake';
 

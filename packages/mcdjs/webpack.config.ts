@@ -1,9 +1,9 @@
 import { Configuration } from 'webpack';
 const config: Configuration = {
-	entry: __dirname + '/lib/exp.ts',
+	entry: __dirname + '/lib/exp.js',
 	mode: 'production',
 	output: {
-		path: __dirname + '/lib',
+		path: __dirname,
 		filename: 'packed.js',
 	},
 	resolve: {
