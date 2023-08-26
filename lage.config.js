@@ -48,9 +48,6 @@ module.exports = {
 			]
 		},
 		"build": {
-			"dependsOn": [
-				"^build"
-			],
 			"inputs": [
 				"./**/*.ts"
 			],

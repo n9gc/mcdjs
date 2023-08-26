@@ -1,15 +1,15 @@
 /**
  * 指令生成模块
  * @module mcdjs/lib/generator
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
 
 import { ParseOption } from "../appinf";
 import { Ast, NType } from "../magast/nodes";
-import { CbInfo, CbType } from "../types/game";
-import getFormatter, { InternalFormatter, Formatter } from './formatters';
+import { CbType } from "../types/game";
+import getFormatter, { Formatter, InternalFormatter } from './formatters';
 import getGrouper, { Grouper, InternalGrouper } from "./groupers";
 import getNoter, { InternalNoter, Noter } from "./noters";
 
@@ -48,7 +48,7 @@ export default async function generate(ast: Ast, option: ParseOption) {
 		texts.push(grouper());
 		if (node.tips) texts.push(noter(node.tips));
 		let cbTypeFirst = node.repeat ? CbType.Repeat : CbType.Impulse;
-		texts.push(...node.cbs.slice(1).map((cb, idx) => {
+		texts.push(...node.cbs.map((cb, idx) => {
 			if (cb.ntype !== NType.Command) return '';
 			return formatter({
 				cbType: idx ? CbType.Chain : cbTypeFirst,

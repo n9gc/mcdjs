@@ -17,7 +17,7 @@ export function listKeyOf<T extends {}>(n: T): Readonly<KeyArrayOf<T>> {
 	return Object.keys(n) as any;
 }
 
-export import Enum = Enum.Enum;
+export type Enum = Enum.Enum;
 export namespace Enum {
 	/**枚举 */
 	export interface Enum {
