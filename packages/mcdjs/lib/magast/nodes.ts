@@ -1,7 +1,7 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 1.6.1
+ * @version 1.6.2
  * @license GPL-2.0-or-later
  */
 declare module './nodes';
@@ -236,5 +236,5 @@ export type NTypeKey<V extends NType = NType> = Enum.KeyOf<NTypeObj, V>;
 export const tranumNType = regEnum('NType', NType, Node);
 
 export type Node<T extends NType = NType> = InstanceType<(typeof Node)[NTypeKey<T>]>;
-export type AST = Node.System;
+export type Ast = Node.System;
 // export type GotSelNode<T extends NType = NType> = Exclude<Node<T>, 'index'>;

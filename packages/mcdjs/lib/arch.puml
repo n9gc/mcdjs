@@ -1,80 +1,88 @@
 @startuml
 title "McdJS 架构图"
 folder "源  代  码  文  件" {
-	file code_D
-	file code_C
-	file code_B
 	file code_A
+	file code_B
+	file code_C
+	file code_D
 }
 package "Operator 操  作  器  模  块" {
-	entity operm_D
-	entity operm_C
-	entity operm_B
 	entity operm_A
+	entity operm_B
+	entity operm_C
+	entity operm_D
 }
-code_D --> operm_D
-code_C --> operm_C
-code_B --> operm_B
 code_A --> operm_A
+code_B --> operm_B
+code_C --> operm_C
+code_D --> operm_D
 frame GlobalThis {
-	entity API_D
-	entity API_C
-	entity API_B
 	entity API_A
+	entity API_B
+	entity API_C
+	entity API_D
 	API_C .> API_D
 	API_B .> API_C
 	API_A .> API_B : 顺  序  执  行 >
 }
-operm_D *--> API_D
-operm_C *--> API_C
-operm_B *--> API_B
 operm_A *--> API_A
+operm_B *--> API_B
+operm_C *--> API_C
+operm_D *--> API_D
 package IR {
-	entity magAST_D
-	entity magAST_C
-	entity magAST_B
 	entity magAST_A
+	entity magAST_B
+	entity magAST_C
+	entity magAST_D
 }
-API_D --> magAST_D
-API_C --> magAST_C
-API_B --> magAST_B
 API_A --> magAST_A
+API_B --> magAST_B
+API_C --> magAST_C
+API_D --> magAST_D
 component "Transf 转  译  模  块" {
-	portin " " as TrasfIn_D
-	portin " " as TrasfIn_C
-	portin " " as TrasfIn_B
 	portin " " as TrasfIn_A
-	portout " " as TrasfOut_D
-	portout " " as TrasfOut_C
-	portout " " as TrasfOut_B
+	portin " " as TrasfIn_B
+	portin " " as TrasfIn_C
+	portin " " as TrasfIn_D
 	portout " " as TrasfOut_A
+	portout " " as TrasfOut_B
+	portout " " as TrasfOut_C
+	portout " " as TrasfOut_D
 }
-magAST_D --> TrasfIn_D
-magAST_C --> TrasfIn_C
-magAST_B --> TrasfIn_B
 magAST_A --> TrasfIn_A
+magAST_B --> TrasfIn_B
+magAST_C --> TrasfIn_C
+magAST_D --> TrasfIn_D
 component "Generate 生  成  模  块" {
-	portin " " as GenerateIn_D
-	portin " " as GenerateIn_C
-	portin " " as GenerateIn_B
 	portin " " as GenerateIn_A
-	portout " " as GenerateOut_D
-	portout " " as GenerateOut_C
-	portout " " as GenerateOut_B
+	portin " " as GenerateIn_B
+	portin " " as GenerateIn_C
+	portin " " as GenerateIn_D
 	portout " " as GenerateOut_A
+	portout " " as GenerateOut_B
+	portout " " as GenerateOut_C
+	portout " " as GenerateOut_D
 }
-TrasfOut_D --> GenerateIn_D
-TrasfOut_C --> GenerateIn_C
-TrasfOut_B --> GenerateIn_B
 TrasfOut_A --> GenerateIn_A
-folder "生  成  的  指  令" {
-	file command_D
-	file command_C
-	file command_B
-	file command_A
+TrasfOut_B --> GenerateIn_B
+TrasfOut_C --> GenerateIn_C
+TrasfOut_D --> GenerateIn_D
+folder "生  成  的  结  果" {
+	package Generated_A {
+		file command_A
+	}
+	package Generated_B {
+		file command_B
+	}
+	package Generated_C {
+		file command_C
+	}
+	package Generated_D {
+		file command_D
+	}
 }
-GenerateOut_D --> command_D
-GenerateOut_C --> command_C
-GenerateOut_B --> command_B
-GenerateOut_A --> command_A
+GenerateOut_A --> Generated_A
+GenerateOut_B --> Generated_B
+GenerateOut_C --> Generated_C
+GenerateOut_D --> Generated_D
 @enduml

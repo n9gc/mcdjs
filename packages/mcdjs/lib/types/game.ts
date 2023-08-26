@@ -1,7 +1,7 @@
 /**
  * 游戏相关类型定义模块
  * @module mcdjs/lib/types/game
- * @version 1.4.0
+ * @version 1.5.0
  * @license GPL-2.0-or-later
  */
 declare module './game';
@@ -31,6 +31,22 @@ export const tranumCbType = regEnum('CbType', CbType, {
 	Chain: '链式',
 	Repeat: '重复',
 });
+
+/**命令方块信息 */
+export interface CbInfo {
+	/**提示信息 */
+	note: string;
+	/**命令方块种类 */
+	cbType: CbType | null;
+	/**指令内容 */
+	command: string;
+	/**延迟时间 */
+	delay: number | null;
+	/**是否是有条件的 */
+	conditional: boolean | null;
+	/**是否需要红石信号 */
+	redstone: boolean | null;
+}
 
 /**命令运行结果 */
 export interface CommandRslt {

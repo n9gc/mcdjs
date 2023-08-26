@@ -1,7 +1,7 @@
 /**
  * 文件解析处理模块
  * @module mcdjs-cli/lib/hfile
- * @version 1.1.1
+ * @version 1.1.3
  * @license GPL-2.0-or-later
  */
 declare module './hfile';
@@ -10,11 +10,11 @@ import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import { parse } from "mcdjs/lib/appinf";
 import { EType, errCatcher, getTracker, trapErr } from 'mcdjs/lib/errlib';
-import { AST } from 'mcdjs/lib/magast/nodes';
+import { Ast } from 'mcdjs/lib/magast/nodes';
 import * as path from 'path';
 import 'promise-snake';
 
-export interface RoundParsed extends Array<AST> {
+export interface RoundParsed extends Array<string> {
 }
 
 export interface ParRunInfos extends Partial<RunInfos> { }
@@ -55,7 +55,7 @@ export async function resolve({ inputs }: RunInfos) {
 export async function compile(files: string[]) {
 	const commands: RoundParsed = [];
 	await Promise.thens(files.map(file => async () =>
-		commands.push(await parse(file, () => import(file), { globalify: true }))
+		commands.push((await parse(file, () => import(file), { globalify: true })).text)
 	));
 	return commands;
 }

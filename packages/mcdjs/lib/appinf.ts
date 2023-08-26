@@ -1,11 +1,13 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.2.1
+ * @version 1.3.0
  * @license GPL-2.0-or-later
  */
 declare module './appinf';
 
+import { Api } from './api';
+import generate, { GenerateOption } from './generator';
 import { Operator } from './magast';
 import transform from './plugin';
 
@@ -27,14 +29,21 @@ export namespace globalify {
 	}
 }
 
-export interface ParseOption {
-	globalify: boolean;
+export interface ParseOption extends GenerateOption {
+	/**
+	 * 是否将 API 放到全局定义域中
+	 * @default false
+	 */
+	globalify?: boolean;
 }
-export async function parse(tips: string, fn: () => void | PromiseLike<void>, option: ParseOption = { globalify: false }) {
+export interface ParseFunction {
+	(api: Api): void | PromiseLike<any>;
+}
+export async function parse(tips: string, fn: ParseFunction, option: ParseOption = {}) {
 	const operm = new Operator(tips);
 	if (option.globalify) globalify(operm);
-	await fn();
+	await fn(operm.api);
 	if (option.globalify) globalify.clear();
 	await transform(operm);
-	return operm.ast;
+	return generate(operm.ast, option);
 }

@@ -1,7 +1,7 @@
 /**
  * 工具类型定义模块
  * @module mcdjs/lib/types/tool
- * @version 1.4.6
+ * @version 1.4.7
  * @license GPL-2.0-or-later
  */
 declare module './tool';
@@ -137,3 +137,6 @@ export type RevedArr<T extends AnyArr> = SWArray<T> extends SWTmpl<infer R> ? [.
 
 /**{@link Object.keys} 得到的结果 */
 export type KeyArrayOf<T> = EachOfUnion<keyof T>;
+
+/**通过匹配截取字符串 {@link T} */
+export type InferedString<T, P extends Tostrable = '', O extends Tostrable = ''> = T extends `${P}${infer K}${O}` ? K : never;
