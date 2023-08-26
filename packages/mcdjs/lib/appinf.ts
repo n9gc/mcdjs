@@ -1,12 +1,12 @@
 /**
  * 应用包装模块
  * @module mcdjs/lib/appinf
- * @version 1.3.0
+ * @version 1.3.1
  * @license GPL-2.0-or-later
  */
 declare module './appinf';
 
-import { Api } from './api';
+import type { Api } from './api';
 import generate, { GenerateOption } from './generator';
 import { Operator } from './magast';
 import transform from './plugin';

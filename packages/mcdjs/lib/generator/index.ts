@@ -1,12 +1,12 @@
 /**
  * 指令生成模块
  * @module mcdjs/lib/generator
- * @version 1.0.1
+ * @version 1.0.2
  * @license GPL-2.0-or-later
  */
 declare module '.';
 
-import { ParseOption } from "../appinf";
+import type { ParseOption } from "../appinf";
 import { Ast, NType } from "../magast/nodes";
 import { CbType } from "../types/game";
 import getFormatter, { Formatter, InternalFormatter } from './formatters';

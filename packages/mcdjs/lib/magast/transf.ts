@@ -1,16 +1,16 @@
 /**
  * 转译相关定义模块
  * @module mcdjs/lib/magast/transf
- * @version 2.3.0
+ * @version 2.3.1
  * @license GPL-2.0-or-later
  */
 declare module './transf';
 
 import { EType, throwErr } from '../errlib';
 import { ArrayMap, Enum, listKeyOf } from '../types/base';
-import { AnyArr, InArr } from '../types/tool';
+import type { AnyArr, InArr } from '../types/tool';
 import { NType, NTypeKey } from './nodes';
-import PathInfo from './pathinfo';
+import type PathInfo from './pathinfo';
 import { TransfError, TransfSignal } from './util';
 
 namespace Alias {

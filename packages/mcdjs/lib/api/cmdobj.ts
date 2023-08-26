@@ -1,14 +1,14 @@
 /**
  * 命令集模块
  * @module mcdjs/lib/api/cmdobj
- * @version 0.2.0
+ * @version 0.2.1
  * @license GPL-2.0-or-later
  */
 declare module './cmdobj';
 
 import { globalify } from "../appinf";
 import type { Operator } from "../magast";
-import { CommandRsltClass } from "./static";
+import type { CommandRsltClass } from "./static";
 import clsUtil from "./util";
 import Export = globalify.Export;
 

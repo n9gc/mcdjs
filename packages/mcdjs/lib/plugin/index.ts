@@ -1,13 +1,13 @@
 /**
  * 转译流程模块
  * @module mcdjs/lib/plugin
- * @version 1.0.4
+ * @version 1.0.5
  * @license GPL-2.0-or-later
  */
 declare module '.';
 
 import Organizer from "aocudeo/async";
-import { Operator } from "../magast";
+import type { Operator } from "../magast";
 
 export const organizer = new Organizer<Operator>();
 export default async function (operm: Operator) {

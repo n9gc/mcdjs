@@ -1,13 +1,13 @@
 /**
  * 错误类型定义模块
  * @module mcdjs/lib/errlib/errors
- * @version 1.6.0
+ * @version 1.6.1
  * @license GPL-2.0-or-later
  */
 declare module './errors';
 
 import { throwErr } from '../errlib';
-import { PathInfo } from '../magast';
+import type { PathInfo } from '../magast';
 import type { Node } from '../magast/nodes';
 import type { TransfError } from '../magast/util';
 import { Enum, listKeyOf } from '../types/base';

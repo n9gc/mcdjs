@@ -1,7 +1,7 @@
 /**
  * 访问器路径对象定义模块
  * @module mcdjs/lib/magast/pathinfo
- * @version 2.5.0
+ * @version 2.5.1
  * @license GPL-2.0-or-later
  */
 declare module './pathinfo';
@@ -9,8 +9,8 @@ declare module './pathinfo';
 import 'reflect-metadata';
 import { EType, throwErr } from '../errlib';
 import Metcls from './metcls';
-import { NType, Node } from './nodes';
-import Operator from './operator';
+import type { NType, Node } from './nodes';
+import type Operator from './operator';
 import { Plugin, PluginEmiter } from './transf';
 import { TransfError, TransfSignal } from './util';
 

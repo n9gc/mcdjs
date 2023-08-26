@@ -1,14 +1,14 @@
 /**
  * 注释函数
  * @module mcdjs/lib/generator/noters
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './noters';
 
-import { GenerateOption } from ".";
+import type { GenerateOption } from ".";
 import { CbType } from "../types/game";
-import { InferedString } from "../types/tool";
+import type { InferedString } from "../types/tool";
 import { formatMPText } from "./formatters";
 import * as noters from './noters';
 

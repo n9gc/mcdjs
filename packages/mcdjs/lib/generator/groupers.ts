@@ -1,13 +1,13 @@
 /**
  * 分组函数
  * @module mcdjs/lib/generator/groupers
- * @version 1.0.0
+ * @version 1.0.1
  * @license GPL-2.0-or-later
  */
 declare module './groupers';
 
-import { GenerateOption } from '.';
-import { InferedString } from '../types/tool';
+import type { GenerateOption } from '.';
+import type { InferedString } from '../types/tool';
 import * as groupers from './groupers';
 
 export type InternalGrouper = InferedString<keyof typeof groupers, 'note'>;
