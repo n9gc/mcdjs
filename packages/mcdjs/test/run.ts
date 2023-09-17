@@ -1,1 +1,1 @@
-export * as mcdjs from '../lib';
+export import mcdjs = require('../lib');

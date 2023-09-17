@@ -5,6 +5,7 @@
  * @license GPL-2.0-or-later
  * @see https://mcd.js.org/ 介绍页面
  */
+/// <reference path="../lib-splited/index.ts" />
 declare module '.';
 
 export * as default from '.';
@@ -13,6 +14,8 @@ export * as appinf from './appinf';
 export * as config from './config';
 export * as errlib from './errlib';
 export * as generator from './generator';
+export * as gload from './gload';
 export * as magast from './magast';
 export * as plugin from './plugin';
 export * as types from './types';
+require('../lib-splited');
