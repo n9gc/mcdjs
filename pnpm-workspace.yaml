@@ -5,3 +5,5 @@ packages:
   - "!**/test/**"
   # documents
   - "doc"
+  # playground
+  - "playground"

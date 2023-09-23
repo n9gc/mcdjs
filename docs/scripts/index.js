@@ -1,4 +1,4 @@
-/// <reference path="./lib.js" />
+/// <reference path="../../playground/lib.js" />
 // @ts-check
 "use strict";
 
