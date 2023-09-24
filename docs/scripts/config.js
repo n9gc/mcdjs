@@ -1,5 +1,8 @@
 "use strict";
 
+/* 离线文档 */
+navigator?.serviceWorker?.register?.('scripts/sw.js');
+
 /**@see https://docsify.js.org/#/zh-cn/configuration */
 var $docsify = {
 	repo: 'https://github.com/n9gc/mcdjs',
