@@ -37,4 +37,4 @@ class Handler {
 	}
 }
 
-new Handler();
+new Handler().snake();

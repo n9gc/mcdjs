@@ -1,4 +1,6 @@
-# ![banner](../packages/mcdjs/lib/banner.svg)
+# McdJS - 指令生成器
+
+![banner](../packages/mcdjs/lib/banner.svg)
 
 ## 简介
 
@@ -9,7 +11,7 @@ McdJS 是一个能够让你用 JavaScript / TypeScript 写出我的世界指令�
 
 ## 索引
 
-- [试验场](./playground/)
+- [试验场](/playground/ ':ignore')
 - [详细了解](./about/)
 - [项目代码仓库](https://github.com/n9gc/mcdjs)
 - [《MC 指令设计》系列教程](https://github.com/n9gc/the-minecraft-command-design)
