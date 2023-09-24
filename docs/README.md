@@ -1,8 +1,6 @@
-# McdJS - 指令生成器
+# 简介 <!-- {docsify-ignore-all} -->
 
 ![banner](../packages/mcdjs/lib/banner.svg)
-
-## 简介
 
 McdJS 是一个能够让你用 JavaScript / TypeScript 写出我的世界指令的工具。
 
