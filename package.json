@@ -7,12 +7,12 @@
 		"http-server": "^14.1.1",
 		"lage": "^2.7.5",
 		"nyc": "^15.1.0",
+		"serve": "^14.2.1",
 		"tape": "^5.6.6",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.1.6"
 	},
 	"scripts": {
-		"serve": "http-server .",
 		"build": "lage build",
 		"clear": "lage clear",
 		"test:cli": "lage test:cli",
