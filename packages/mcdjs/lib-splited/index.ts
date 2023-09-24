@@ -15,5 +15,6 @@ declare global {
 
 import * as me from '.';
 export * from './nodes';
+export * from './transformers';
 globalThis.McdJSPort.Lib.internalTemp = me;
 require('./exports');
