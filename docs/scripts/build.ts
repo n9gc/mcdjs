@@ -4,9 +4,7 @@
  */
 
 import * as fs from 'fs';
-import * as fsp from 'fs/promises';
 import Initer from 'lethal-build';
-import fetch from 'node-fetch';
 import 'promise-snake';
 
 class Handler {
@@ -21,19 +19,7 @@ class Handler {
 		await new Promise(res => stream.once('end', res));
 		return buffers.join('');
 	}
-	async outPuml() {
-		const pumlList = await this.lb.match(/.*\.puml$/);
-		await Promise.all(pumlList.map(async puml => {
-			if (await this.isExist(`${puml}.svg`)) return;
-			const text = await fsp.readFile(puml);
-			const url = `https://www.gravizo.com/svg?${encodeURIComponent(`${text}`)}`;
-			const svgRes = await fetch(url);
-			if (!svgRes.ok) throw new Error(`Failed to get SVG of ${puml}`, { cause: await this.waitStream(svgRes.body) });
-			await new Promise(res => svgRes.body?.pipe(fs.createWriteStream(`${puml}.svg`)).once('close', res));
-		}));
-	}
 	async snake() {
-		await this.outPuml();
 	}
 }
 

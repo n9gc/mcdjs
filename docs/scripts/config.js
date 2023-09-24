@@ -21,4 +21,5 @@ var $docsify = {
 		errorText: '失败',
 		successText: '成功',
 	},
+	auto2top: false,
 };

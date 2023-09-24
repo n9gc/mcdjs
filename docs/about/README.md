@@ -23,7 +23,7 @@
 
 大部分的核心代码位于此包中。
 
-![McdJS 架构图](../../packages/mcdjs/lib/arch.puml.svg)
+![McdJS 架构图](../../packages/mcdjs/lib/arch.puml ':class=img-puml')
 
 ## [`mcdjs-cli`](https://github.com/n9gc/mcdjs/blob/HEAD/packages/mcdjs-cli/) 命令行工具
 
@@ -35,8 +35,10 @@
 
 出于可拓展性和开发的便利方面需要，本项目有一部分代码是在环境模块里通过合并全局命名空间 `McdJSTemp` 来组织的。
 本工具就用以加载此类代码。
-![Aocudeo 架构图](../../packages/aocudeo/lib/arch.puml.svg)
+![Aocudeo 架构图](../../packages/aocudeo/lib/arch.puml  ':class=img-puml')
 
 ## [`devok`](https://github.com/n9gc/mcdjs/blob/HEAD/packages/dev/) Dev OK! 开发工具套装
 
 这些工具使开发 McdJS 这个 monorepo 模式的复杂 TS 项目不再令人产生极大的抗拒心理。
+
+<script src="scripts/puml.js"></script>
