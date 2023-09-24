@@ -1,13 +1,13 @@
 /**
  * @module mcdjs/lib-splited
- * @version 0.0.1
+ * @version 0.0.2
  * @license GPL-2.0-or-later
  */
 /// <reference path="./exports.ts" />
 declare module '.';
 declare global {
 	namespace McdJSPort {
-		namespace Lib {
+		namespace libs {
 			export import internalTemp = me;
 		}
 	}
@@ -16,5 +16,5 @@ declare global {
 import * as me from '.';
 export * from './nodes';
 export * from './transformers';
-globalThis.McdJSPort.Lib.internalTemp = me;
+globalThis.McdJSPort.libs.internalTemp = me;
 require('./exports');

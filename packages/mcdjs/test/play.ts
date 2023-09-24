@@ -1,4 +1,4 @@
-/// <reference path="../global.ts" />
+/// <reference types="../global" />
 import * as mcdjs from '..';
 
 mcdjs.appinf.parse('play', () => {

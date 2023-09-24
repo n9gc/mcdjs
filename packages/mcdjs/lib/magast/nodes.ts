@@ -1,15 +1,15 @@
 /**
  * 抽象语法树节点类型定义模块
  * @module mcdjs/lib/magast/nodes
- * @version 2.0.0
+ * @version 2.0.1
  * @license GPL-2.0-or-later
  */
 declare module './nodes';
 declare global {
 	namespace McdJSPort {
 		namespace Node {
-			export import Top = InternalNode.Top;
-			export import System = InternalNode.System;
+			export import Top = Internal.Top;
+			export import System = Internal.System;
 		}
 	}
 }
@@ -55,7 +55,7 @@ export function NodeAttr(proto: Base, key: string) {
 		: Reflect.defineMetadata('nodeAttr', nodeAttr = [], proto);
 	nodeAttr.push(key);
 }
-namespace InternalNode {
+namespace Internal {
 	export class Top extends Base {
 		ntype = NType.Top;
 		static readonly 'zh-CN' = '树顶空位';
@@ -87,7 +87,7 @@ export type Ast = McdJSPort.Node.System;
 export const tranumNType = regEnum('NType', NType);
 
 let nodeCount = 0;
-Port.Node = new Proxy<{ [x: keyof any]: new (...args: any[]) => Base; }>(InternalNode, {
+Port.Node = new Proxy<{ [x: keyof any]: new (...args: any[]) => Base; }>(Internal, {
 	set(Nodes, nodeName, nodeConstructor) {
 		if (!isNodeConstructor(nodeConstructor)) throwErr(EType.ErrIllegalParameter, Error('应为构造函数'), [nodeConstructor]);
 		Nodes[nodeName] = nodeConstructor;
@@ -98,6 +98,6 @@ Port.Node = new Proxy<{ [x: keyof any]: new (...args: any[]) => Base; }>(Interna
 	}
 }) as any;
 
-Object.assign(Port.Node, InternalNode);
+Object.assign(Port.Node, Internal);
 
 export import Node = McdJSPort.Node;

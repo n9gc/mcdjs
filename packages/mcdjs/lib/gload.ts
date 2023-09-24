@@ -1,7 +1,7 @@
 /**
  * 库注入相关全局配置
  * @module mcdjs/lib/gload
- * @version 1.0.0
+ * @version 1.1.0
  * @license GPL-2.0-or-later
  */
 declare module './gload';
@@ -16,12 +16,15 @@ declare global {
 		/**节点定义 */
 		namespace Node { }
 		/**被挂载的库 */
-		namespace Lib { }
+		namespace libs { }
+		/**订阅的生成事件 */
+		namespace genevents { }
 	}
 }
 
 globalThis.McdJSPort = {
 	portable: true,
-	Lib: {},
-} as typeof McdJSPort;
+	libs: {},
+	genevents: {},
+} as any;
 export import Port = globalThis.McdJSPort;

@@ -1,7 +1,7 @@
 /**
  * 功能无关类型定义模块
  * @module mcdjs/lib/types/base
- * @version 1.5.0
+ * @version 1.5.1
  * @license GPL-2.0-or-later
  */
 declare module './base';
@@ -67,7 +67,7 @@ export namespace Enum {
 	}
 }
 
-abstract class InitializableMap<K, V> extends Map<K, V> {
+export abstract class InitializableMap<K, V> extends Map<K, V> {
 	protected abstract initializeValue(): V;
 	forceGet(key: K) {
 		let value = this.get(key);

@@ -1,7 +1,7 @@
 /**
  * 指令生成模块
  * @module mcdjs/lib/generator
- * @version 1.0.2
+ * @version 1.1.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -68,3 +68,4 @@ export default async function generate(ast: Ast, option: ParseOption) {
 	};
 }
 export interface Generated extends ReturnType<typeof generate> { }
+export * from './genevents';

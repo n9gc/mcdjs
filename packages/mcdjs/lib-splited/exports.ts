@@ -1,6 +1,6 @@
 /**
  * @module mcdjs/lib-splited/exports
- * @version 0.0.1
+ * @version 0.0.2
  * @license GPL-2.0-or-later
  */
 /// <reference path="./index.ts" />
@@ -8,20 +8,20 @@
 
 namespace McdJSPort {
 	export namespace Node {
-		export import CodeBlock = Lib.internalTemp.CodeBlock;
-		export import Command = Lib.internalTemp.Command;
-		export import Branch = Lib.internalTemp.Branch;
-		export import CBGroup = Lib.internalTemp.CBGroup;
-		export import NameSpace = Lib.internalTemp.NameSpace;
-		export import CommandRslt = Lib.internalTemp.CommandRslt;
-		export import Selector = Lib.internalTemp.Selector;
-		export import ExpressionAnd = Lib.internalTemp.ExpressionAnd;
-		export import ExpressionOr = Lib.internalTemp.ExpressionOr;
-		export import ExpressionNot = Lib.internalTemp.ExpressionNot;
-		export import ExpressionNand = Lib.internalTemp.ExpressionNand;
-		export import ExpressionNor = Lib.internalTemp.ExpressionNor;
-		export import ExpressionXor = Lib.internalTemp.ExpressionXor;
-		export import ExpressionXnor = Lib.internalTemp.ExpressionXnor;
+		export import CodeBlock = libs.internalTemp.CodeBlock;
+		export import Command = libs.internalTemp.Command;
+		export import Branch = libs.internalTemp.Branch;
+		export import CBGroup = libs.internalTemp.CBGroup;
+		export import NameSpace = libs.internalTemp.NameSpace;
+		export import CommandRslt = libs.internalTemp.CommandRslt;
+		export import Selector = libs.internalTemp.Selector;
+		export import ExpressionAnd = libs.internalTemp.ExpressionAnd;
+		export import ExpressionOr = libs.internalTemp.ExpressionOr;
+		export import ExpressionNot = libs.internalTemp.ExpressionNot;
+		export import ExpressionNand = libs.internalTemp.ExpressionNand;
+		export import ExpressionNor = libs.internalTemp.ExpressionNor;
+		export import ExpressionXor = libs.internalTemp.ExpressionXor;
+		export import ExpressionXnor = libs.internalTemp.ExpressionXnor;
 	}
 }
 
