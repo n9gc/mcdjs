@@ -7,8 +7,9 @@
 	"types": "./lib",
 	"browser": "./browser",
 	"scripts": {
-		"clear": "ts-node ../dev/actor/clear -R",
+		"clear": "ts-node ../dev/actor/clear -R=\"[[['global.d.ts','browser.d.ts']]]\"",
 		"play": "nodemon --ext ts,js -r ts-node/register ./test/play",
+		"dev": "tsc -w",
 		"prebuild": "tsc",
 		"build": "ts-node build",
 		"test": "ts-node ../dev/tester/all -R=\"[[['test/run','test/sig','test/multi']]]\"",

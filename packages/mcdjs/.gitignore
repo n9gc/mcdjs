@@ -1,0 +1,5 @@
+**/*.d.ts
+**/*.js
+**/*.js.map
+!global.d.ts
+!browser.d.ts
