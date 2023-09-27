@@ -1,5 +1,6 @@
 **/*.d.ts
 **/*.js
 **/*.js.map
+**/*.LICENSE.txt
 !global.d.ts
 !browser.d.ts

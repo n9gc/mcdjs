@@ -37,7 +37,7 @@ jobs:
 
       - name: Save changes
         run: |
-          rm .gitignore
+          find . -name '.gitignore' -type f -print | xargs rm -rf
           git add .
 
       - name: Push Branch
