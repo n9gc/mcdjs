@@ -63,7 +63,7 @@ export async function cacheLink(node: HTMLScriptElement | HTMLLinkElement) {
 	const noPtc = url.slice(url.indexOf('//') + 1);
 	const file = comp('docs/local' + noPtc);
 	download(url, file);
-	if ('src' in node) download(`${url}.map`, `${file}.map`, { tryGet: true });
+	download(`${url}.map`, `${file}.map`, { tryGet: true });
 	const lk = './local' + noPtc;
 	'src' in node ? node.src = lk : node.href = lk;
 }
