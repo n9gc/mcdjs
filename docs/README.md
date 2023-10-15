@@ -1,4 +1,4 @@
-# 简介 <!-- {docsify-ignore-all} -->
+# 简介
 
 ![banner](../packages/mcdjs/lib/banner.svg)
 
