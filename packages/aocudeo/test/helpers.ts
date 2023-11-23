@@ -8,9 +8,11 @@ import {
 	PositionObj,
 	SignChecker,
 	SurePosition,
-	WorkerManagerAsync,
-	WorkerRunnerAsync,
-	WorkerRunnerSync,
+	WorkerAsyncFunction,
+	WorkerContext,
+	WorkerFunction,
+	WorkerManager,
+	WorkerRunner,
 } from "..";
 
 type MapObj<T, K extends Id = Id> = { [I in K]: T | undefined };
@@ -37,24 +39,19 @@ export class Tpm extends PositionMap<void> {
 	override insertedChecker = new Tsc.idv();
 	protected override splitedChecker = new Tsc<Hookable>();
 }
-export class Twma<T> extends WorkerManagerAsync<T> {
+export class Twma<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
 	get = () => ({
 		wm: this.workerMap,
 	});
 }
-export class Twra<T> extends WorkerRunnerAsync<T> {
-	get = () => ({
-		l: this.limiter,
-		wm: this.workerMap,
-		mc: this.makeContext.bind(this),
-	});
-}
-export class Twrs<T> extends WorkerRunnerSync<T> {
+class Twr<T, F extends WorkerAsyncFunction<T>> extends WorkerRunner<T, F> {
 	get = () => ({
 		wm: this.workerMap,
-		mc: this.makeContext.bind(this),
+		mc: (id: Id) => new WorkerContext(id, this),
 	});
 }
+export class Twra<T> extends Twr<T, WorkerAsyncFunction<T>> { }
+export class Twrs<T> extends Twr<T, WorkerFunction<T>> { }
 export function mm<K extends Id, V>(mapObj: false, kv: Iterable<readonly [K, V]>): Map<K, V>;
 export function mm<K extends Id, V>(mapObj: true, kv: Iterable<readonly [K, V]>): MapObj<V, K>;
 export function mm<K extends Id, V>(mapObj: boolean, kv: Iterable<readonly [K, V]>) {
