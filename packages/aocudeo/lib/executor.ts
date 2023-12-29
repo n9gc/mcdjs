@@ -1,7 +1,7 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.5.0
+ * @version 1.6.0
  * @license GPL-2.0-or-later
  */
 declare module './executor';
@@ -10,7 +10,7 @@ import { CircleChecker, SignChecker } from './checker';
 import { Organizer } from './organizer';
 import type { SurePosition } from './position';
 import type { Hookable, Id, MapObj } from './types';
-import type { WorkerRunner } from './worker';
+import type { Limiter, WorkerRunner } from './worker';
 
 export class Graph {
 	readonly edgeMap: MapObj<Id[]> = Object.create(null);
@@ -57,40 +57,50 @@ export class Graph {
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
 		this.indegreeMap[Organizer.start] = 1;
 	}
+	protected readonly circleChecker = new CircleChecker(this.edgeMap);
 	tryThrow() {
-		const circleChecker = new CircleChecker(this.edgeMap);
-		this.tryThrow = () => circleChecker.throw();
-		this.tryThrow();
+		this.circleChecker.tryThrow();
 	}
 	getExecutor<T>(workRunner: WorkerRunner<T, any>) {
-		return new Executor(this, workRunner);
+		return new Executor(this.edgeMap, this.indegreeMap, workRunner);
 	}
 }
 export class Executor<T> {
 	constructor(
-		graph: Graph,
+		protected readonly edgeMap: MapObj<readonly Id[]>,
+		indegreeMap: MapObj<number>,
 		protected readonly workRunner: WorkerRunner<T, any>,
 	) {
-		this.edgeMap = graph.edgeMap;
-		this.indegreeMap = Object.create(graph.indegreeMap);
+		this.indegreeMap = Object.create(indegreeMap);
 	}
-	protected readonly edgeMap: MapObj<readonly Id[]>;
 	protected readonly indegreeMap: MapObj<number>;
 	// protected judge(hookPosition: 'pre' | 'post', id: Id, n: T) {
 	// 	return this.positionObjMap[id]?.[`${hookPosition}Judger`]?.(n) === false;
 	// }
-	executeSync(id: Id = Organizer.start) {
+	private executeSyncSub(id: Id) {
 		if (--this.indegreeMap[id]!) return;
 		// if (this.judge('pre', id, n)) return n;
-		this.workRunner.run(id);
+		this.workRunner.runSync(id);
 		// if (this.judge('post', id, n)) return n;
-		this.edgeMap[id]!.forEach(id => this.executeSync(id));
+		this.edgeMap[id]!.forEach(id => this.executeSyncSub(id));
 	}
-	async executeAsync(id: Id = Organizer.start) {
+	executeSync() {
+		this.executeSyncSub(Organizer.start);
+		// this.workRunner.tryThrow();
+		return this.workRunner.data;
+	}
+	private limiter: Limiter | null = null;
+	private async executeAsyncSub(id: Id) {
 		if (--this.indegreeMap[id]!) return;
 		// if (this.judge('pre', id, n)) return n;
-		await this.workRunner.run(id);
+		await this.workRunner.runAsync(id, this.limiter!);
 		// if (this.judge('post', id, n)) return n;
-		await Promise.all(this.edgeMap[id]!.map(id => this.executeAsync(id)));
+		await Promise.all(this.edgeMap[id]!.map(id => this.executeAsyncSub(id)));
+	}
+	async executeAsync(limiter: Limiter) {
+		this.limiter = limiter;
+		await this.executeAsyncSub(Organizer.start);
+		// this.workRunner.tryThrow();
+		return this.workRunner.data;
 	}
 }

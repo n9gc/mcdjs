@@ -1,7 +1,7 @@
 /**
  * 各种检查器
  * @module aocudeo/lib/checker
- * @version 2.0.4
+ * @version 2.0.5
  * @license GPL-2.0-or-later
  */
 declare module './checker';
@@ -11,8 +11,8 @@ import type { Id, MapObj } from './types';
 import { throwError } from './util';
 
 export class SignChecker<I extends Id> {
-	protected ensureds = new Set<I>();
-	protected requireds = new Set<I>();
+	protected readonly ensureds = new Set<I>();
+	protected readonly requireds = new Set<I>();
 	countEnsureds() {
 		return this.ensureds.size;
 	}
@@ -67,7 +67,7 @@ export class CircleChecker {
 		throwError(2, Error('出现环形引用'), { circle: this.circle });
 	}
 	constructor(
-		private edgeMap: MapObj<readonly Id[]>,
+		private readonly edgeMap: MapObj<readonly Id[]>,
 	) {
 		if (!this.from(Organizer.start)) this.tryThrow = () => { };
 	}

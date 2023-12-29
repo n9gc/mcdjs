@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 3.0.0
+ * @version 3.1.0
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -47,13 +47,26 @@ export class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 	protected doFnAsync(id: Id) {
 		return Promise.all(this.workerMap.get(id)?.map(fn => fn(new WorkerContext(id, this)))!);
 	}
-	async runAsync(id: Id, limiter: Queue): Promise<void> {
+	async runAsync(id: Id, limiter: Limiter): Promise<void> {
 		if (this.workerMap.has(id)) {
-			const release = await new Promise<() => void>(grab => limiter.push(() => new Promise<void>(res => grab(res))));
+			const release = await limiter.wait();
 			await this.doFnAsync(id);
 			release();
 		}
 		if (Organizer.getHookTypeOf(id) === 'Main') return this.runAsync(Organizer.getHookedOf(id) as string, limiter);
+	}
+}
+export class Limiter {
+	constructor(
+		public concurrency: number,
+		public timeout: number,
+	) {
+		this.queue.concurrency = concurrency;
+		this.queue.timeout = timeout;
+	}
+	protected queue = new Queue({ autostart: true });
+	wait() {
+		return new Promise<() => void>(grab => this.queue.push(() => new Promise<void>(res => grab(res))));
 	}
 }
 export function getLimiter(concurrency: number) {
