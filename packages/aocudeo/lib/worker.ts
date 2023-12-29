@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 3.1.0
+ * @version 3.1.1
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -56,18 +56,26 @@ export class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 		if (Organizer.getHookTypeOf(id) === 'Main') return this.runAsync(Organizer.getHookedOf(id) as string, limiter);
 	}
 }
+export interface LimiterOption {
+	concurrency?: number;
+	timeout?: number;
+}
 export class Limiter {
-	constructor(
-		public concurrency: number,
-		public timeout: number,
-	) {
-		this.queue.concurrency = concurrency;
-		this.queue.timeout = timeout;
+	constructor(limiter: Limiter);
+	constructor(limiterOption: LimiterOption);
+	constructor(n: Limiter | LimiterOption) {
+		if ('wait' in n) return n;
+		this.concurrency = n.concurrency ?? 0;
+		this.timeout = n.timeout ?? 0;
 	}
 	protected queue = new Queue({ autostart: true });
 	wait() {
 		return new Promise<() => void>(grab => this.queue.push(() => new Promise<void>(res => grab(res))));
 	}
+	set concurrency(n: number) { this.queue.concurrency = n; }
+	get concurrency() { return this.queue.concurrency; }
+	set timeout(n: number) { this.queue.timeout = n; }
+	get timeout() { return this.queue.timeout; }
 }
 export function getLimiter(concurrency: number) {
 	return new Queue({ autostart: true, concurrency });

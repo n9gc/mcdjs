@@ -34,7 +34,7 @@ package worker {
 	WorkerRunner --o WorkerManager : < 每  执  行  生  成
 	WorkerContext --o WorkerRunner : < 每  函  数  生  成
 }
-Queue -o WorkerRunner
+Queue --> Executor
 Diagram -> Graph
 PositionMap --* Organizer
 Executor -o Graph : < 每  执  行  生  成
@@ -46,4 +46,5 @@ PositionMap o- Graph : 缓  存  生  成 >
 SignChecker --* Graph
 WorkerManager --* Organizer
 Diagram --o PositionMap : < 缓  存  生  成
+Organizer <-- Executor
 @enduml

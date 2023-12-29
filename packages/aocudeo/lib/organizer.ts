@@ -1,22 +1,21 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.4.2
+ * @version 1.5.0
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
 
-import type Queue from 'queue';
 import { Position, PositionMap, Positions } from './position';
 import type { Hookable, Id } from './types';
 import { isArray, isIdArray, mapMap } from './util';
 import {
+	Limiter,
+	LimiterOption,
 	Worker,
 	WorkerAsyncFunction,
 	WorkerFunction,
 	WorkerManager,
-	WorkerManagerAsync,
-	WorkerManagerSync,
 	Workers,
 } from './worker';
 
@@ -111,8 +110,9 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	static readonly start = Symbol('load start');
 	static readonly end = Symbol('load end');
 	static readonly unknown = Symbol('unknown module');
-	protected construct({ workers = {}, positions = {}, reusable = true }: OrganizerConfig<T, F>) {
-		this.reusable = reusable;
+	constructor({ workers = {}, positions = {}, reusable }: OrganizerConfig<T, F> = {}) {
+		super();
+		if (typeof reusable !== 'undefined') this.reusable = reusable;
 		this.addWorkers(workers);
 		this.addPositions(positions);
 	}
@@ -145,7 +145,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 			: mapMap(positions, (position, id) => this.addPosition(id, position));
 		return this;
 	}
-	protected abstract readonly workerManager: WorkerManager<T, F>;
+	protected readonly workerManager = new WorkerManager<T, F>();
 	/**
 	 * 增加动作回调
 	 * @param id 要增加的模块
@@ -182,6 +182,9 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	// 	this.walkAt(Organizer.start, this.getCount(), path);
 	// 	return path;
 	// }
+	protected getExecutor(data: T) {
+		return this.positionMap.getGraph().getExecutor(this.workerManager.getRunner(data));
+	}
 	/**
 	 * 加载！
 	 * @param data 初始运行参数
@@ -207,31 +210,22 @@ export interface OrganizerAsyncConfig<T = unknown> extends OrganizerConfig<T> {
 /**异步模块加载器 */
 export class OrganizerAsync<T = void> extends Organizer<T, WorkerAsyncFunction<T>> {
 	constructor({ concurrency = 0, ...organizerConfig }: OrganizerAsyncConfig<T> = {}) {
-		super();
+		super(organizerConfig);
 		this.concurrency = concurrency;
-		this.construct(organizerConfig);
 	}
 	/**最大同时任务数量 */
 	concurrency: number;
-	protected override readonly workerManager = new WorkerManagerAsync<T>();
-	override async execute(data: T) {
-		if (super.execute()) return data;
-		const runner = this.workerManager.getRunner(data, this.concurrency);
-		await this.positionMap.getGraph().getExecutor(runner).executeAsync();
-		return runner.data;
+	override execute(data: T, limiterOption: Limiter | LimiterOption = {}) {
+		return super.execute()
+			? data
+			: this.getExecutor(data).executeAsync(new Limiter(limiterOption));
 	}
 }
 /**模块加载器 */
 export class OrganizerSync<T = void> extends Organizer<T, WorkerFunction<T>> {
-	constructor(organizerConfig: OrganizerConfig<T, WorkerFunction<T>> = {}) {
-		super();
-		this.construct(organizerConfig);
-	}
-	protected override readonly workerManager = new WorkerManagerSync<T>();
 	override execute(data: T) {
-		if (super.execute()) return data;
-		const runner = this.workerManager.getRunner(data);
-		this.positionMap.getGraph().getExecutor(runner).executeSync();
-		return runner.data;
+		return super.execute()
+			? data
+			: this.getExecutor(data).executeSync();
 	}
 }
