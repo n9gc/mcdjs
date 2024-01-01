@@ -1,0 +1,58 @@
+{
+	"name": "task-simple-limiter",
+	"version": "1.0.0",
+	"description": "Use freely await calls of function which can block your async process to limit the concurrence",
+	"main": "./index",
+	"module": "./index",
+	"types": "./index",
+	"scripts": {
+		"clear": "pnpm ts-node ../dev/actor/clear -R",
+		"build": "pnpm tsc",
+		"test-nocover": "ts-node test",
+		"test": "nyc pnpm test-nocover",
+		"prepublishOnly": "pnpm run build",
+		"postpublish": "pnpm run clear"
+	},
+	"publishConfig": {
+		"scripts": {}
+	},
+	"files": [
+		"*",
+		"!test",
+		"!.turbo",
+		"!**/*.ts",
+		"**/*.d.ts",
+		"!*.swp",
+		"!.nyc_output",
+		"!tsconfig.json"
+	],
+	"keywords": [
+		"promise",
+		"limit",
+		"limited",
+		"concurrency",
+		"throttle",
+		"throat",
+		"rate",
+		"batch",
+		"ratelimit",
+		"task",
+		"async",
+		"asynchronous",
+		"await",
+		"promises"
+	],
+	"author": "e0selmy4v",
+	"license": "GPL-2.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/n9gc/mcdjs.git"
+	},
+	"bugs": {
+		"url": "https://github.com/n9gc/mcdjs/issues"
+	},
+	"devDependencies": {
+		"devok": "workspace:^"
+	},
+	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/concurrence-blocker-ts#readme"
+}
