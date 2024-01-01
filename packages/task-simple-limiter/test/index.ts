@@ -1,6 +1,6 @@
 import Limiter from "..";
 
-const a = new Limiter({ concurrency: 2 });
+const a = new Limiter(new Limiter({ concurrency: 2 }));
 async function to(t: number, i?: any) {
 	await new Promise(res => setTimeout(res, t));
 	i && console.log(i);

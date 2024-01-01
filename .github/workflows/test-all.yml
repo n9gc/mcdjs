@@ -44,6 +44,7 @@ jobs:
       matrix:
         package:
           - aocudeo
+          - task-simple-limiter
     steps:
       - name: Use Node.js
         uses: actions/setup-node@v3
