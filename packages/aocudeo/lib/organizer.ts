@@ -1,17 +1,16 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.5.0
+ * @version 1.5.1
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
 
+import Limiter, { LimiterOption } from 'task-simple-limiter';
 import { Position, PositionMap, Positions } from './position';
 import type { Hookable, Id } from './types';
 import { isArray, isIdArray, mapMap } from './util';
 import {
-	Limiter,
-	LimiterOption,
 	Worker,
 	WorkerAsyncFunction,
 	WorkerFunction,

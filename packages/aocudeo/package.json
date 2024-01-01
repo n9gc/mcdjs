@@ -50,7 +50,7 @@
 		"devok": "workspace:^"
 	},
 	"dependencies": {
-		"queue": "^6.0.2"
+		"task-simple-limiter": "workspace:^"
 	},
 	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/aocudeo#readme"
 }

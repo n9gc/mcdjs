@@ -1,16 +1,17 @@
 /**
  * 执行器
  * @module aocudeo/lib/executor
- * @version 1.6.0
+ * @version 1.6.1
  * @license GPL-2.0-or-later
  */
 declare module './executor';
 
+import type Limiter from 'task-simple-limiter';
 import { CircleChecker, SignChecker } from './checker';
 import { Organizer } from './organizer';
 import type { SurePosition } from './position';
 import type { Hookable, Id, MapObj } from './types';
-import type { Limiter, WorkerRunner } from './worker';
+import type { WorkerRunner } from './worker';
 
 export class Graph {
 	readonly edgeMap: MapObj<Id[]> = Object.create(null);

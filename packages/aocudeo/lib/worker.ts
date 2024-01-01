@@ -1,12 +1,12 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 3.1.1
+ * @version 3.1.2
  * @license GPL-2.0-or-later
  */
 declare module './worker';
 
-import Queue from 'queue';
+import type Limiter from 'task-simple-limiter';
 import { Organizer } from './organizer';
 import type { Id, MapLike, MayArray } from './types';
 import { ArrayMap, ReadonlyArrayMap } from './util';
@@ -49,36 +49,12 @@ export class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 	}
 	async runAsync(id: Id, limiter: Limiter): Promise<void> {
 		if (this.workerMap.has(id)) {
-			const release = await limiter.wait();
+			await limiter.hold();
 			await this.doFnAsync(id);
-			release();
+			limiter.release();
 		}
 		if (Organizer.getHookTypeOf(id) === 'Main') return this.runAsync(Organizer.getHookedOf(id) as string, limiter);
 	}
-}
-export interface LimiterOption {
-	concurrency?: number;
-	timeout?: number;
-}
-export class Limiter {
-	constructor(limiter: Limiter);
-	constructor(limiterOption: LimiterOption);
-	constructor(n: Limiter | LimiterOption) {
-		if ('wait' in n) return n;
-		this.concurrency = n.concurrency ?? 0;
-		this.timeout = n.timeout ?? 0;
-	}
-	protected queue = new Queue({ autostart: true });
-	wait() {
-		return new Promise<() => void>(grab => this.queue.push(() => new Promise<void>(res => grab(res))));
-	}
-	set concurrency(n: number) { this.queue.concurrency = n; }
-	get concurrency() { return this.queue.concurrency; }
-	set timeout(n: number) { this.queue.timeout = n; }
-	get timeout() { return this.queue.timeout; }
-}
-export function getLimiter(concurrency: number) {
-	return new Queue({ autostart: true, concurrency });
 }
 export class WorkerManager<T, F extends WorkerAsyncFunction<T>> {
 	protected readonly workerMap = new ArrayMap<Id, F>();
