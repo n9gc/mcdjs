@@ -1,6 +1,6 @@
 {
 	"name": "task-simple-limiter",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "使用阻塞函数来控制并发 Use await calls of method which can block async process to control the concurrency",
 	"main": "./index",
 	"module": "./index",

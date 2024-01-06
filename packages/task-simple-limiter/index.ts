@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 1.0.0
+ * @version 1.1.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -19,10 +19,10 @@ export default class Limiter {
 	concurrency = 0;
 	protected resolvers: (() => void)[] = [];
 	protected running = 0;
-	hold(): Promise<number> | number {
+	hold(): Promise<number> {
 		return this.concurrency && this.running >= this.concurrency
 			? new Promise(res => this.resolvers.push(() => res(++this.running)))
-			: ++this.running;
+			: Promise.resolve(++this.running);
 	}
 	release() {
 		this.running && (this.running--, this.resolvers.shift()?.());
