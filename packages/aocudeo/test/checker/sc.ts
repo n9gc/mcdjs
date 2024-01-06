@@ -20,7 +20,7 @@ function cer(i: Id[]) {
 				'requireds 中包含初始化的内容'
 			);
 			t.deepEqual(
-				sc.get().en,
+				sc.getEnsureds(),
 				new Set(se),
 				'ensureds 中包含起点终点标记'
 			);
@@ -38,7 +38,7 @@ function cer(i: Id[]) {
 				'requireds 数量正确'
 			);
 			t.deepEqual(
-				sc.get().en,
+				sc.getEnsureds(),
 				new Set(pse(i)),
 				'ensureds 包含所有'
 			);

@@ -1,6 +1,6 @@
 import test from 'tape';
-import { Id, Organizer, OrganizerSync } from '../..';
-import { csz } from '../helpers';
+import { Id, Organizer, OrganizerSync } from '..';
+import { csz } from './helpers';
 
 function cge(sign: boolean) {
 	return (k: [Id, Id][], init?: (o: OrganizerSync) => void) => {

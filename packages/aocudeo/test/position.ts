@@ -1,6 +1,6 @@
 import test from 'tape';
-import { Id, Organizer, PositionMap, SurePosition } from '../..';
-import { Tpm, aeh } from '../helpers';
+import { Id, Organizer, PositionMap, SurePosition } from '..';
+import { Tpm, aeh } from './helpers';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {

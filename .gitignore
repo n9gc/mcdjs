@@ -10,3 +10,4 @@ temp
 *.swp
 .nyc_output
 *.orig
+coverage
