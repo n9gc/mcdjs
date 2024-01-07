@@ -11,12 +11,15 @@ class Tl extends Limiter {
 }
 
 /**强制填充全部空闲编号 */
-async function gl(n: Tl) {
+async function gl(n: Tl, num = 2 * n.concurrency) {
 	let i = 0;
 	const res: Releaser[] = [];
-	while (i++ < n.concurrency) n.hold().then(re => res.push(re));
+	while (i++ < num) n.hold().then(re => res.push(re));
 	await new Promise(res => setTimeout(res));
-	res.forEach(re => re());
+	for (const re of res) {
+		await new Promise(res => setTimeout(res));
+		re();
+	}
 }
 
 test('构造测试', t => {
@@ -92,6 +95,30 @@ test('静态减少并发', async t => {
 		2,
 		new Set([1, 2]),
 	], '空白增加');
+});
+
+test('无限并发', async t => {
+	async function r(a: Tl, n: number) {
+		await gl(a, n);
+		t.deepEqual([
+			a.get().cn,
+			a.get().is,
+		], [
+			n,
+			new Set(Array(n).fill(0).map((_, i) => i + 1)),
+		], `${n} 并发`);
+	}
+
+	const a = new Tl();
+	await r(a, 3);
+	await r(a, 10);
+	await r(a, 50);
+
+	const b = new Tl({ concurrency: Infinity });
+	await r(b, 3);
+	await r(b, 10);
+	await r(b, 50);
+	t.end();
 });
 
 test('延时测试', t => {

@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 2.1.1
+ * @version 2.2.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -34,11 +34,11 @@ export default class Limiter {
 	protected readonly waiters: Waiter[] = [];
 	protected idleIds: number[] = [];
 	checkIdle() {
-		if (this.concurrencyNow > this.concurrency) {
+		if (this.concurrencyNow > this.concurrency && this.concurrency) {
 			this.concurrencyNow = this.concurrency;
 			this.idleIds = this.idleIds.filter(id => id <= this.concurrencyNow);
 		}
-		while (this.idleIds.length || this.concurrencyNow < this.concurrency) {
+		while (this.idleIds.length || this.concurrencyNow < this.concurrency || !this.concurrency) {
 			const next = this.waiters.shift();
 			if (!next) return;
 			next(this.idleIds.pop() || ++this.concurrencyNow);
@@ -47,7 +47,7 @@ export default class Limiter {
 	hold() {
 		return new Promise<Releaser>(res => {
 			const execute = (id: number) => res(() => {
-				if (id <= this.concurrency) this.idleIds.push(id);
+				if (id <= this.concurrency || !this.concurrency) this.idleIds.push(id);
 				this.checkIdle();
 			});
 			this.waiters.push(execute);
