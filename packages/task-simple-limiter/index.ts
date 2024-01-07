@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 2.0.0
+ * @version 2.1.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -27,20 +27,32 @@ export default class Limiter {
 	constructor(n: Limiter | LimiterOption = {}) {
 		if ('hold' in n) return n;
 		optionKeys.forEach(key => key in n && ((<any>this[key]) = n[key]));
-		let i = 0;
-		while (i++ < this.concurrency) this.idleIds.push(i);
+		this.checkIdle();
 	}
-	@Option readonly concurrency = 0;
+	@Option concurrency = 0;
+	protected concurrencyNow = 0;
 	protected readonly waiters: Waiter[] = [];
-	protected readonly idleIds: number[] = [];
+	protected idleIds: number[] = [];
+	checkIdle() {
+		while (this.concurrencyNow < this.concurrency) this.idleIds.push(++this.concurrencyNow);
+		if (this.concurrencyNow > this.concurrency) {
+			this.concurrencyNow = this.concurrency;
+			this.idleIds = this.idleIds.filter(id => id <= this.concurrencyNow);
+		}
+		while (this.idleIds.length) {
+			const next = this.waiters.shift();
+			if (!next) break;
+			next(this.idleIds.pop()!);
+		}
+	}
 	hold() {
 		return new Promise<Releaser>(res => {
 			const execute = (id: number) => res(() => {
-				const next = this.waiters.shift();
-				next ? next(id) : this.idleIds.push(id);
+				if (id <= this.concurrency) this.idleIds.push(id);
+				this.checkIdle();
 			});
-			const id = this.idleIds.pop();
-			id ? execute(id) : this.waiters.push(execute);
+			this.waiters.push(execute);
+			this.checkIdle();
 		});
 	}
 }
