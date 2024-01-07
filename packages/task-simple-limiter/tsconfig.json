@@ -3,4 +3,7 @@
 	"include": [
 		"*",
 	],
+	"compilerOptions": {
+		"target": "ES5",
+	}
 }

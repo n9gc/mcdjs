@@ -34,7 +34,7 @@ async function task() {
 
 ## 链接 Links
 
-- [concurrency-limiter](https://github.com/juju/concurrency-limiter)
+- [concurrency-limiter](https://www.npmjs.com/package/concurrency-limiter)
 
   限制并发的实现方式与本包类似。
 
