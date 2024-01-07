@@ -2,7 +2,7 @@
 
 [![github action](https://github.com/n9gc/mcdjs/actions/workflows/test-all.yml/badge.svg)](https://github.com/n9gc/mcdjs/actions)
 [![github action](https://github.com/n9gc/mcdjs/actions/workflows/dobuild.yml/badge.svg)](https://github.com/n9gc/mcdjs/actions)
-[![Coverage Status](https://coveralls.io/repos/github/n9gc/mcdjs/badge.svg?branch=x-cov-aocudeo)](https://coveralls.io/github/n9gc/mcdjs?branch=x-cov-task-simple-limiter)
+[![Coverage Status](https://coveralls.io/repos/github/n9gc/mcdjs/badge.svg?branch=x-cov-task-simple-limiter)](https://coveralls.io/github/n9gc/mcdjs?branch=x-cov-task-simple-limiter)
 
 本包可以方便的给异步任务限流，也就是并发控制。
 
@@ -22,20 +22,14 @@ const limiter = new Limiter({ concurrency: 2 });
 
 ```ts
 async function task() {
-  await limiter.hold();
-  await somethingAsync();
-  limiter.release();
+  const release = await limiter.hold();
+  try {
+    await somethingAsync();
+  }
+  finally {
+    release();
+  }
 }
-```
-
-相当于
-
-Equal to
-
-```ts
-limiter.hold()
-  .then(somethingAsync)
-  .finally(() => limiter.release());
 ```
 
 ## 链接 Links

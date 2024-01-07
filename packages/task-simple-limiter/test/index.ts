@@ -6,29 +6,35 @@ async function to(t: number, i?: any) {
 	i && console.log(i);
 }
 
-console.log(0);
+console.log(a);
 
 (async () => {
-	await a.hold();
+	const release = await a.hold();
 	await to(500, 11);
-	a.release();
+	release();
 	console.log(12);
 })();
 (async () => {
-	await a.hold();
-	await to(1200, 21);
-	a.release();
+	const release = await a.hold();
+	await to(500, 21);
+	release();
 	console.log(22);
 })();
 (async () => {
-	await a.hold();
+	const release = await a.hold();
 	await to(500, 31);
-	a.release();
+	release();
 	console.log(32);
 })();
 (async () => {
-	await a.hold();
+	const release = await a.hold();
 	await to(500, 41);
-	a.release();
+	release();
 	console.log(42);
+})();
+(async () => {
+	const release = await a.hold();
+	await to(500, 51);
+	release();
+	console.log(52);
 })();
