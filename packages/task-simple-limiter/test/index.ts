@@ -1,65 +1,102 @@
-import Limiter from "..";
+import Limiter, { Releaser } from "..";
 import test from 'tape';
 
 class Tl extends Limiter {
 	get = () => ({
 		cn: this.concurrencyNow,
 		w: this.waiters,
-		i: this.idleIds,
+		// i: this.idleIds,
+		is: new Set(this.idleIds),
 	});
 }
 
-test('初始测试', t => {
-	const a = new Tl({ concurrency: 2 });
+/**强制填充全部空闲编号 */
+async function gl(n: Tl) {
+	let i = 0;
+	const res: Releaser[] = [];
+	while (i++ < n.concurrency) n.hold().then(re => res.push(re));
+	await new Promise(res => setTimeout(res));
+	res.forEach(re => re());
+}
+
+test('构造测试', t => {
+	const a = new Tl({ concurrency: 123 });
 
 	const b = new Tl(a);
 	t.equal(a, b, '返回实例');
 
 	const c = new Tl();
-	c.concurrency = 2;
+	c.concurrency = 123;
 	t.deepEqual(a.concurrency, c.concurrency, '构造属性');
 
 	t.end();
 });
 
-test('静态增减测试', t => {
-
+test('初始结构', async t => {
 	const a = new Tl({ concurrency: 2 });
+
 	t.deepEqual([
 		a.get().cn,
-		a.get().i,
+		a.get().is,
+	], [
+		0,
+		new Set(),
+	], '空白初始');
+
+	await gl(a);
+	t.deepEqual([
+		a.get().cn,
+		a.get().is,
 	], [
 		2,
-		[1, 2],
-	], '# 初始结构');
+		new Set([1, 2]),
+	], '占用后初始');
+});
 
-	a.concurrency = 3;
+test('静态增加并发', async t => {
+	const a = new Tl({ concurrency: 2 });
+	await gl(a);
+
+	a.concurrency = 4;
 	a.checkIdle();
+
 	t.deepEqual([
 		a.get().cn,
-		a.get().i,
+		a.get().is,
 	], [
-		3,
-		[1, 2, 3],
-	], '# 增加并发');
+		2,
+		new Set([1, 2]),
+	], '空白增加');
 
-	a.concurrency = 1;
-	a.checkIdle();
+	await gl(a);
 	t.deepEqual([
 		a.get().cn,
-		a.get().i,
+		a.get().is,
 	], [
-		1,
-		[1],
-	], '# 减少并发');
+		4,
+		new Set([1, 2, 3, 4]),
+	], '占用后增加');
+});
 
-	t.end();
+test('静态减少并发', async t => {
+	const a = new Tl({ concurrency: 4 });
+	await gl(a);
+
+	a.concurrency = 2;
+	a.checkIdle();
+
+	t.deepEqual([
+		a.get().cn,
+		a.get().is,
+	], [
+		2,
+		new Set([1, 2]),
+	], '空白增加');
 });
 
 test('延时测试', t => {
 	t.plan(1);
 
-	const a = new Limiter({ concurrency: 2 });
 	async function to(t: number, i?: any) {
 		await new Promise(res => setTimeout(res, t));
 		i && infos.push(i);
@@ -74,6 +111,7 @@ test('延时测试', t => {
 		infos.push(`${no}_out`);
 	}
 
+	const a = new Limiter({ concurrency: 2 });
 	const timer = setInterval(() => infos.push('---'), 300);
 
 	runAsync(300);
