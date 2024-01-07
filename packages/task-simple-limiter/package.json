@@ -1,6 +1,6 @@
 {
 	"name": "task-simple-limiter",
-	"version": "2.2.2",
+	"version": "2.2.3",
 	"description": "使用阻塞函数来控制并发 Use await calls of method which can block async process to control the concurrency",
 	"main": "./index",
 	"module": "./index",
@@ -56,5 +56,5 @@
 	"devDependencies": {
 		"devok": "workspace:^"
 	},
-	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/concurrence-blocker-ts#readme"
+	"homepage": "https://github.com/n9gc/mcdjs/blob/HEAD/packages/task-simple-limiter#readme"
 }
