@@ -27,6 +27,7 @@
 		"*",
 		"!test",
 		"!.turbo",
+		"!coverage",
 		"!**/*.ts",
 		"!*.swp",
 		"!.nyc_output",

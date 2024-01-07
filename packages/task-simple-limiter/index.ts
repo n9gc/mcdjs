@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 2.2.1
+ * @version 2.2.2
  * @license GPL-2.0-or-later
  */
 declare module '.';
