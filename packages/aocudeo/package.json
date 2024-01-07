@@ -8,7 +8,7 @@
 	"scripts": {
 		"clear": "pnpm ts-node ../dev/actor/clear -R",
 		"build": "pnpm tsc",
-		"test-nocover": "ts-node test/checker | colortape",
+		"test-nocover": "ts-node test | colortape",
 		"test": "nyc pnpm test-nocover",
 		"test-report": "nyc report --reporter=html",
 		"prepublishOnly": "pnpm run build",

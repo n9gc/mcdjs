@@ -1,7 +1,7 @@
 /**
  * 回调相关
  * @module aocudeo/lib/worker
- * @version 3.1.2
+ * @version 3.1.3
  * @license GPL-2.0-or-later
  */
 declare module './worker';
@@ -49,9 +49,9 @@ export class WorkerRunner<T, F extends WorkerAsyncFunction<T>> {
 	}
 	async runAsync(id: Id, limiter: Limiter): Promise<void> {
 		if (this.workerMap.has(id)) {
-			await limiter.hold();
+			const release = await limiter.hold();
 			await this.doFnAsync(id);
-			limiter.release();
+			release();
 		}
 		if (Organizer.getHookTypeOf(id) === 'Main') return this.runAsync(Organizer.getHookedOf(id) as string, limiter);
 	}
