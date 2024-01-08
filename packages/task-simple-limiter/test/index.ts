@@ -64,7 +64,6 @@ test('静态增加并发', async t => {
 	await gl(a);
 
 	a.concurrency = 4;
-	a.checkIdle();
 
 	t.deepEqual([
 		a.get().cn,
@@ -89,7 +88,6 @@ test('静态减少并发', async t => {
 	await gl(a);
 
 	a.concurrency = 2;
-	a.checkIdle();
 
 	t.deepEqual([
 		a.get().cn,
@@ -127,7 +125,6 @@ test('阻塞所有任务', async t => {
 	re();
 	t.equal(a.get().w.length, 1, '被阻塞');
 	a.concurrency = Infinity;
-	a.checkIdle();
 	t.equal(a.get().w.length, 0, '通畅了');
 });
 
@@ -148,7 +145,7 @@ test('延时测试', t => {
 		infos.push(`${no}_out`);
 	}
 
-	const a = new Limiter({ concurrency: 2 });
+	const a = new Limiter({ concurrency: 2, autoCheckIdle: false });
 	const timer = setInterval(() => infos.push('---'), 300);
 
 	runAsync(300);

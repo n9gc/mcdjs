@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 3.0.0
+ * @version 3.1.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -24,6 +24,11 @@ export interface LimiterOption {
 	 * @default Infinity
 	 */
 	concurrency?: number;
+	/**
+	 * 是否在并发数改变后立刻尝试运行空闲任务
+	 * @default true
+	 */
+	autoCheckIdle?: boolean;
 }
 /**任务限流器 */
 export default class Limiter {
@@ -36,6 +41,8 @@ export default class Limiter {
 		optionKeys.forEach(key => key in n && ((<any>this[key]) = n[key]));
 		this.checkIdle();
 	}
+	/**是否在并发数改变后立刻尝试运行空闲任务 */
+	@Option autoCheckIdle = true;
 	/**最大并发数量 */
 	@Option
 	set concurrency(n) {
@@ -45,6 +52,7 @@ export default class Limiter {
 			this.concurrencyNow = n;
 			this.idleIds = this.idleIds.filter(id => id <= this.concurrencyNow);
 		}
+		if (this.autoCheckIdle) this.checkIdle();
 	}
 	get concurrency() { return this._concurrency; }
 	_concurrency = Infinity;
