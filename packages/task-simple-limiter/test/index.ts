@@ -54,6 +54,9 @@ test('初始结构', async t => {
 		2,
 		new Set([1, 2]),
 	], '占用后初始');
+
+	a.concurrency = -1;
+	t.equal(a.concurrency, Infinity, '负数为无限')
 });
 
 test('静态增加并发', async t => {
@@ -97,7 +100,7 @@ test('静态减少并发', async t => {
 	], '空白增加');
 });
 
-test('无限并发', async t => {
+test('默认无限并发', async t => {
 	async function r(a: Tl, n: number) {
 		await gl(a, n);
 		t.deepEqual([
@@ -109,16 +112,23 @@ test('无限并发', async t => {
 		], `${n} 并发`);
 	}
 
-	const a = new Tl();
-	await r(a, 3);
-	await r(a, 10);
-	await r(a, 50);
-
-	const b = new Tl({ concurrency: Infinity });
+	const b = new Tl();
 	await r(b, 3);
 	await r(b, 10);
 	await r(b, 50);
 	t.end();
+});
+
+test('阻塞所有任务', async t => {
+	const a = new Tl();
+	const re = await a.hold();
+	a.concurrency = 0;
+	const rep = a.hold();
+	re();
+	t.equal(a.get().w.length, 1, '被阻塞');
+	a.concurrency = Infinity;
+	a.checkIdle();
+	t.equal(a.get().w.length, 0, '通畅了');
 });
 
 test('延时测试', t => {
@@ -173,6 +183,7 @@ test('延时测试', t => {
 			'7_in',
 			'7_out',
 			'---',
+			'---',
 			'8_in',
 			'8_out',
 		], '顺序正确');
@@ -180,4 +191,9 @@ test('延时测试', t => {
 
 	setTimeout(() => a.concurrency = 3, 450);
 	setTimeout(() => a.concurrency = 1, 750);
+	setTimeout(() => a.concurrency = 0, 1050);
+	setTimeout(() => {
+		a.concurrency = 1;
+		a.checkIdle();
+	}, 1600);
 });

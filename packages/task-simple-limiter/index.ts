@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 2.2.3
+ * @version 3.0.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -18,8 +18,10 @@ const Option = (_: any, key: keyof LimiterOption) => void optionKeys.push(key);
 /**限流器配置 */
 export interface LimiterOption {
 	/**
-	 * 最大并发数量，默认为无限制
-	 * @default 0
+	 * 最大并发数量，范围 0 ~ Infinity
+	 * 
+	 * 若赋为负数则相当于 Infinity
+	 * @default Infinity
 	 */
 	concurrency?: number;
 }
@@ -37,20 +39,21 @@ export default class Limiter {
 	/**最大并发数量 */
 	@Option
 	set concurrency(n) {
+		n < 0 && (n = Infinity);
 		this._concurrency = n;
-		if (this.concurrencyNow > n && this._concurrency) {
+		if (this.concurrencyNow > n) {
 			this.concurrencyNow = n;
 			this.idleIds = this.idleIds.filter(id => id <= this.concurrencyNow);
 		}
 	}
 	get concurrency() { return this._concurrency; }
-	_concurrency = 0;
+	_concurrency = Infinity;
 	protected concurrencyNow = 0;
 	protected readonly waiters: Waiter[] = [];
 	protected idleIds: number[] = [];
 	/**检查并运行空闲的任务 */
 	checkIdle() {
-		while (this.idleIds.length || this.concurrencyNow < this._concurrency || !this._concurrency) {
+		while (this.idleIds.length || this.concurrencyNow < this._concurrency) {
 			const next = this.waiters.shift();
 			if (!next) return;
 			next(this.idleIds.pop() || ++this.concurrencyNow);
@@ -60,7 +63,7 @@ export default class Limiter {
 	hold() {
 		return new Promise<Releaser>(res => {
 			const execute = (id: number) => res(() => {
-				if (id <= this._concurrency || !this._concurrency) this.idleIds.push(id);
+				if (id <= this._concurrency) this.idleIds.push(id);
 				this.checkIdle();
 			});
 			this.waiters.push(execute);
