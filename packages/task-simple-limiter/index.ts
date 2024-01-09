@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 3.1.0
+ * @version 3.2.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -55,7 +55,7 @@ export default class Limiter {
 		if (this.autoCheckIdle) this.checkIdle();
 	}
 	get concurrency() { return this._concurrency; }
-	_concurrency = Infinity;
+	protected _concurrency = Infinity;
 	protected concurrencyNow = 0;
 	protected readonly waiters: Waiter[] = [];
 	protected idleIds: number[] = [];
@@ -77,5 +77,14 @@ export default class Limiter {
 			this.waiters.push(execute);
 			this.checkIdle();
 		});
+	}
+	async run<T>(fn: () => PromiseLike<T> | T) {
+		const release = await this.hold();
+		try {
+			return await fn();
+		}
+		finally {
+			release();
+		}
 	}
 }

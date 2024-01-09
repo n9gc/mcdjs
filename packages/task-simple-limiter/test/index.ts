@@ -121,7 +121,7 @@ test('阻塞所有任务', async t => {
 	const a = new Tl();
 	const re = await a.hold();
 	a.concurrency = 0;
-	const rep = a.hold();
+	a.hold();
 	re();
 	t.equal(a.get().w.length, 1, '被阻塞');
 	a.concurrency = Infinity;
@@ -139,9 +139,7 @@ test('延时测试', t => {
 	let fnNo = 0;
 	async function runAsync(time: number, con: number | null = null) {
 		let no = fnNo++;
-		const release = await a.hold();
-		await to(time, `${no}_in`);
-		release();
+		await a.run(() => to(time, `${no}_in`));
 		infos.push(`${no}_out`);
 	}
 
