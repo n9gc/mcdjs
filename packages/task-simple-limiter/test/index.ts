@@ -117,6 +117,16 @@ test('默认无限并发', async t => {
 	t.end();
 });
 
+test('防止重复释放', async t => {
+	const a = new Tl();
+	const re = await a.hold();
+	re();
+	t.deepEqual(a.get().is, new Set([1]), '已释放');
+	a.hold();
+	re();
+	t.deepEqual(a.get().is, new Set(), '未重复释放');
+});
+
 test('阻塞所有任务', async t => {
 	const a = new Tl();
 	const re = await a.hold();

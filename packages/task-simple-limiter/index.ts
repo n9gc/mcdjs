@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 3.2.0
+ * @version 3.2.1
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -70,10 +70,12 @@ export default class Limiter {
 	/**阻塞代码并获得释放器 */
 	hold() {
 		return new Promise<Releaser>(res => {
-			const execute = (id: number) => res(() => {
+			let ender: Waiter | null = (id: number) => {
 				if (id <= this._concurrency) this.idleIds.push(id);
 				this.checkIdle();
-			});
+				ender = null;
+			};
+			const execute = (id: number) => res(() => ender?.(id));
 			this.waiters.push(execute);
 			this.checkIdle();
 		});
