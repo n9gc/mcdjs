@@ -3,23 +3,8 @@ import test from 'tape';
 
 class Tl extends Limiter {
 	get = () => ({
-		cn: this.concurrencyNow,
 		w: this.waiters,
-		// i: this.idleIds,
-		is: new Set(this.idleIds),
 	});
-}
-
-/**强制填充全部空闲编号 */
-async function gl(n: Tl, num = 2 * n.concurrency) {
-	let i = 0;
-	const res: Releaser[] = [];
-	while (i++ < num) n.hold().then(re => res.push(re));
-	await new Promise(res => setTimeout(res));
-	for (const re of res) {
-		await new Promise(res => setTimeout(res));
-		re();
-	}
 }
 
 test('构造测试', t => {
@@ -35,85 +20,24 @@ test('构造测试', t => {
 	t.end();
 });
 
-test('初始结构', async t => {
-	const a = new Tl({ concurrency: 2 });
-
-	t.deepEqual([
-		a.get().cn,
-		a.get().is,
-	], [
-		0,
-		new Set(),
-	], '空白初始');
-
-	await gl(a);
-	t.deepEqual([
-		a.get().cn,
-		a.get().is,
-	], [
-		2,
-		new Set([1, 2]),
-	], '占用后初始');
-
-	a.concurrency = -1;
-	t.equal(a.concurrency, Infinity, '负数为无限')
-});
-
-test('静态增加并发', async t => {
-	const a = new Tl({ concurrency: 2 });
-	await gl(a);
-
-	a.concurrency = 4;
-
-	t.deepEqual([
-		a.get().cn,
-		a.get().is,
-	], [
-		2,
-		new Set([1, 2]),
-	], '空白增加');
-
-	await gl(a);
-	t.deepEqual([
-		a.get().cn,
-		a.get().is,
-	], [
-		4,
-		new Set([1, 2, 3, 4]),
-	], '占用后增加');
-});
-
-test('静态减少并发', async t => {
-	const a = new Tl({ concurrency: 4 });
-	await gl(a);
-
-	a.concurrency = 2;
-
-	t.deepEqual([
-		a.get().cn,
-		a.get().is,
-	], [
-		2,
-		new Set([1, 2]),
-	], '空白增加');
-});
-
 test('默认无限并发', async t => {
 	async function r(a: Tl, n: number) {
-		await gl(a, n);
-		t.deepEqual([
-			a.get().cn,
-			a.get().is,
-		], [
-			n,
-			new Set(Array(n).fill(0).map((_, i) => i + 1)),
-		], `${n} 并发`);
+		const resp = Promise.all(Array(n).fill(() => a.hold()).map(f => f()));
+		await new Promise(res => setTimeout(res));
+		t.equal(a.running, n, `${n} 并发`);
+		await resp.then(res => res.forEach(re => re()));
 	}
 
 	const b = new Tl();
 	await r(b, 3);
 	await r(b, 10);
 	await r(b, 50);
+
+	const c = new Tl({ concurrency: -1 });
+	await r(c, 3);
+	await r(c, 10);
+	await r(c, 50);
+
 	t.end();
 });
 
@@ -121,10 +45,10 @@ test('防止重复释放', async t => {
 	const a = new Tl();
 	const re = await a.hold();
 	re();
-	t.deepEqual(a.get().is, new Set([1]), '已释放');
+	t.equal(a.running, 0, '已释放');
 	a.hold();
 	re();
-	t.deepEqual(a.get().is, new Set(), '未重复释放');
+	t.notEqual(a.running, 0, '未重复释放');
 });
 
 test('阻塞所有任务', async t => {

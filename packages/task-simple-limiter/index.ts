@@ -1,7 +1,7 @@
 /**
  * 任务限流器
  * @module task-simple-limiter
- * @version 3.2.1
+ * @version 3.3.0
  * @license GPL-2.0-or-later
  */
 declare module '.';
@@ -10,9 +10,7 @@ declare module '.';
 export interface Releaser {
 	(): void;
 }
-interface Waiter {
-	(id: number): void;
-}
+type Vcb = () => void;
 const optionKeys: (keyof LimiterOption)[] = [];
 const Option = (_: any, key: keyof LimiterOption) => void optionKeys.push(key);
 /**限流器配置 */
@@ -48,34 +46,28 @@ export default class Limiter {
 	set concurrency(n) {
 		n < 0 && (n = Infinity);
 		this._concurrency = n;
-		if (this.concurrencyNow > n) {
-			this.concurrencyNow = n;
-			this.idleIds = this.idleIds.filter(id => id <= this.concurrencyNow);
-		}
 		if (this.autoCheckIdle) this.checkIdle();
 	}
 	get concurrency() { return this._concurrency; }
 	protected _concurrency = Infinity;
-	protected concurrencyNow = 0;
-	protected readonly waiters: Waiter[] = [];
-	protected idleIds: number[] = [];
+	running = 0;
+	protected readonly waiters: Vcb[] = [];
 	/**检查并运行空闲的任务 */
 	checkIdle() {
-		while (this.idleIds.length || this.concurrencyNow < this._concurrency) {
-			const next = this.waiters.shift();
-			if (!next) return;
-			next(this.idleIds.pop() || ++this.concurrencyNow);
+		while (this.waiters.length && this.running < this._concurrency) {
+			this.waiters.shift()!();
+			++this.running;
 		}
 	}
 	/**阻塞代码并获得释放器 */
 	hold() {
 		return new Promise<Releaser>(res => {
-			let ender: Waiter | null = (id: number) => {
-				if (id <= this._concurrency) this.idleIds.push(id);
+			let ender: Vcb | null = () => {
+				--this.running;
 				this.checkIdle();
 				ender = null;
 			};
-			const execute = (id: number) => res(() => ender?.(id));
+			const execute = () => res(() => ender?.());
 			this.waiters.push(execute);
 			this.checkIdle();
 		});
