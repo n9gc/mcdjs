@@ -1,12 +1,10 @@
 import type test from 'tape';
 import {
 	ErrorType,
-	Hookable,
 	Id,
 	MapObj,
 	Organizer,
 	Position,
-	PositionMap,
 	PositionObj,
 	SurePosition,
 	WorkerAsyncFunction,
@@ -15,30 +13,11 @@ import {
 	WorkerManager,
 	WorkerRunner
 } from '..';
-import { Tsc } from './checker/helpers';
 
 export interface AddonFn {
 	(t: test.Test): void;
 }
 
-/**用于调试的 {@link PositionMap} */
-export class Tpm extends PositionMap<void> {
-	get = () => ({
-		/** surePositionMap */
-		spm: this.surePositionMap,
-		/** splitedChecker */
-		sc: this.splitedChecker,
-		/** insertedChecker */
-		ic: this.insertedChecker,
-		/** countMap */
-		cm: this.countMap,
-		/** graphCache */
-		gc: this.graphCache,
-	});
-	/** surePositionMap */
-	override insertedChecker = new Tsc.idv();
-	protected override splitedChecker = new Tsc<Hookable>();
-}
 /**@borrows {@link WorkerManager} 异步 */
 export class Twma<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
 	get = () => ({

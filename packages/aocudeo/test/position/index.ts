@@ -1,6 +1,11 @@
 import test from 'tape';
-import { Id, Organizer, PositionMap, SurePosition } from '..';
-import { Tpm, aeh } from './helpers';
+import { Diagram } from '../../lib/diagram';
+import { PositionMap, SurePosition } from '../../lib/position';
+import type { Id } from '../../lib/types';
+import { aeh } from '../helpers';
+import { Tpm } from './helpers';
+
+import { Organizer } from '../../lib/organizer';
 
 function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {
@@ -223,6 +228,16 @@ test('##错误检查', t => {
 		);
 		t.end();
 	});
+
+	t.end();
+});
+
+test('获取图例', t => {
+	const pm = new Tpm();
+
+	const d = pm.getDiagram();
+	t.ok(d instanceof Diagram, '安全得到图例');
+	t.equal(pm.getDiagram(), d, '缓存图例');
 
 	t.end();
 });
