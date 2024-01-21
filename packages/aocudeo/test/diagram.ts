@@ -1,12 +1,15 @@
 import test from 'tape';
-import { Id, Organizer, OrganizerSync } from '..';
+import { PositionMap } from '../lib/position';
+import type { Id } from '../lib/types';
 import { csz } from './helpers';
 
+import { Organizer } from '../lib/organizer';
+
 function cge(sign: boolean) {
-	return (k: [Id, Id][], init?: (o: OrganizerSync) => void) => {
+	return (k: [Id, Id][], init?: (o: PositionMap) => void) => {
 		return (t: test.Test) => {
 			const c = k.map((([a, b]) => `\t"${a.toString()}" -> "${b.toString()}"`));
-			const o = new OrganizerSync();
+			const o = new PositionMap();
 			init?.(o);
 			const m = o.getDiagram().getDot(sign).split('\n').slice(1, -1);
 			const { rc, rm } = csz(m, c);
@@ -45,11 +48,9 @@ test('## 带起终点图示', t => {
 			[Symbol.for('b'), Organizer.end],
 			[Symbol.for('b'), Symbol.for('a')],
 		],
-		o => {
-			o.addPositions({
-				[Symbol.for('a')]: Symbol.for('b'),
-				[Symbol.for('b')]: [],
-			});
+		p => {
+			p.insert(Symbol.for('a'), Symbol.for('b'));
+			p.insert(Symbol.for('b'), {});
 		}
 	));
 
@@ -61,8 +62,8 @@ test('## 带起终点图示', t => {
 			['pre:hh', 'main:hh'],
 			['main:hh', 'post:hh'],
 		],
-		o => {
-			o.addPosition('hh', {});
+		p => {
+			p.insert('hh', {});
 		}
 	));
 
@@ -84,9 +85,9 @@ test('## 带起终点图示', t => {
 			['post:post:main:post:hh', 'post:post:hh'],
 			['post:post:hh', Organizer.end],
 		],
-		o => {
-			o.addPosition('pre:pre:hh', {});
-			o.addPosition('post:main:post:hh', {});
+		p => {
+			p.insert('pre:pre:hh', {});
+			p.insert('post:main:post:hh', {});
 		}
 	));
 
@@ -104,11 +105,9 @@ test('## 不带起终点图示', t => {
 		[
 			[Symbol.for('b'), Symbol.for('a')],
 		],
-		o => {
-			o.addPositions({
-				[Symbol.for('a')]: Symbol.for('b'),
-				[Symbol.for('b')]: [],
-			});
+		p => {
+			p.insert(Symbol.for('a'), Symbol.for('b'));
+			p.insert(Symbol.for('b'), {});
 		}
 	));
 
@@ -117,8 +116,8 @@ test('## 不带起终点图示', t => {
 			['pre:hh', 'main:hh'],
 			['main:hh', 'post:hh'],
 		],
-		o => {
-			o.addPosition('hh', {});
+		p => {
+			p.insert('hh', {});
 		}
 	));
 
@@ -137,9 +136,9 @@ test('## 不带起终点图示', t => {
 			['main:post:main:post:hh', 'post:post:main:post:hh'],
 			['post:post:main:post:hh', 'post:post:hh'],
 		],
-		o => {
-			o.addPosition('pre:pre:hh', {});
-			o.addPosition('post:main:post:hh', {});
+		p => {
+			p.insert('pre:pre:hh', {});
+			p.insert('post:main:post:hh', {});
 		}
 	));
 
