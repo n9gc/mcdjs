@@ -15,6 +15,11 @@ import {
 	WorkerManager,
 	WorkerRunner,
 } from '..';
+import type test from 'tape';
+
+export interface AddonFn {
+	(t: test.Test): void;
+}
 
 /**用于调试的 {@link SignChecker} */
 export class Tsc<I extends Id> extends SignChecker<I> {

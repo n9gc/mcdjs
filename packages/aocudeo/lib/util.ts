@@ -1,7 +1,7 @@
 /**
  * 实用工具
  * @module aocudeo/lib/util
- * @version 1.1.2
+ * @version 1.1.3
  * @license GPL-2.0-or-later
  */
 declare module './util';
@@ -9,7 +9,7 @@ declare module './util';
 import { SurePosition } from './position';
 import type { Id, MapObj, MayArray } from './types';
 
-abstract class InitializableMap<K, V> extends Map<K, V> {
+export abstract class InitializableMap<K, V> extends Map<K, V> {
 	protected abstract initializeValue(): V;
 	forceGet(key: K) {
 		let value = this.get(key);
@@ -33,10 +33,7 @@ export class ArrayMap<K, T> extends InitializableMap<K, T[]> {
 	}
 }
 export interface ReadonlyArrayMap<K, T> extends ReadonlyMap<K, readonly T[]> { }
-export const isArray: (n: any) => n is readonly any[] = Array.isArray;
-export function getArray<T>(mayArray: MayArray<T>) {
-	return isArray(mayArray) ? mayArray : [mayArray];
-}
+
 /**错误类型 */
 export enum ErrorType {
 	/**在 {@link Organizer.start|`Loader.START`} 前插入模块 */
@@ -64,10 +61,18 @@ export class AocudeoError {
 export function throwError(type: ErrorType, tracker: Error, infos?: any): never {
 	throw new AocudeoError(type, tracker, infos);
 }
-export function mapMapObj<N>(mapObj: MapObj<N>, walker: (value: N, id: Id) => void) {
+
+export const isArray: (n: any) => n is readonly any[] = Array.isArray;
+export function getArray<T>(mayArray: MayArray<T>) {
+	return isArray(mayArray) ? mayArray : [mayArray];
+}
+export function isIdArray(n: MayArray<readonly Id[]>): n is readonly Id[] {
+	return typeof n[0] !== 'object';
+}
+export function mapMapObj<N, K extends Id>(mapObj: MapObj<N, K>, walker: (value: N, id: K) => void) {
 	Reflect.ownKeys(mapObj).forEach(id => {
-		const n = mapObj[id];
-		if (typeof n !== 'undefined') walker(n, id);
+		const n = mapObj[<K>id];
+		if (typeof n !== 'undefined') walker(n, <K>id);
 	});
 }
 /**遍历 {@link map} */
@@ -75,7 +80,4 @@ export function mapMap<N>(map: MapObj<N> | Map<Id, N>, walker: (value: N, id: Id
 	map instanceof Map
 		? map.forEach(walker)
 		: mapMapObj(map, walker);
-}
-export function isIdArray(n: MayArray<readonly Id[]>): n is readonly Id[] {
-	return typeof n[0] !== 'object';
 }
