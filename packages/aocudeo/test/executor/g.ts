@@ -1,10 +1,15 @@
 import test from 'tape';
-import { Id, Organizer, PositionMap } from '../..';
+import { Executor } from '../../lib/executor';
+import { PositionMap } from '../../lib/position';
+import type { Id } from '../../lib/types';
+import { WorkerManager } from '../../lib/worker';
 import { aeh, mm, mmo, nem, se } from '../helpers';
 
-function cer(init: (pm: PositionMap<void>) => void, liv: [Id, Id[]?][]) {
+import { Organizer } from '../../lib/organizer';
+
+function cer(init: (pm: PositionMap) => void, liv: [Id, Id[]?][]) {
 	return (t: test.Test) => {
-		const pm = new PositionMap<void>();
+		const pm = new PositionMap();
 		init(pm);
 		const g = pm.getGraph();
 		const k = new Map<Id, number>();
@@ -131,6 +136,14 @@ test('##应用接口', t => {
 		);
 		t.end();
 	});
+
+	t.end();
+});
+
+test('得到执行器', t => {
+	const pm = new PositionMap();
+	const e = pm.getGraph().getExecutor(new WorkerManager<void, any>().getRunner());
+	t.ok(e instanceof Executor, '安全得到执行器');
 
 	t.end();
 });

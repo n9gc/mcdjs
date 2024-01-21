@@ -1,20 +1,19 @@
 import test from 'tape';
-import {
-	Id,
-	Organizer,
-	PositionMap,
-	WorkerManagerAsync,
-	WorkerManagerSync
-} from '../..';
+import Limiter from 'task-simple-limiter';
+import { PositionMap } from '../../lib/position';
+import { Id } from '../../lib/types';
+import { WorkerManager } from '../../lib/worker';
 import { msf, ra } from '../helpers';
 
+import { Organizer } from '../../lib/organizer';
+
 function cge(a: boolean) {
-	function cer(sa: readonly Id[], init?: (pm: PositionMap<void>) => void) {
+	function cer(sa: readonly Id[], init?: (pm: PositionMap) => void) {
 		return (t: test.Test) => {
 			t.plan(1);
-			const pm = new PositionMap<void>();
+			const pm = new PositionMap();
 			init?.(pm);
-			const wr = new (a ? WorkerManagerAsync : WorkerManagerSync)<void>();
+			const wr = new WorkerManager<void, any>();
 			const mf = msf();
 			ra(sa).forEach(i => wr.add(i, a ? async () => mf(i)() : mf(i)));
 			wr.add(Organizer.end, () => {
@@ -24,8 +23,8 @@ function cge(a: boolean) {
 					'顺序正确'
 				);
 			});
-			pm.getGraph().getExecutor(wr.getRunner(void 0, 0))[a ? 'executeAsync' : 'executeSync']();
-		}
+			pm.getGraph().getExecutor(wr.getRunner(void 0))[a ? 'executeAsync' : 'executeSync'](new Limiter());
+		};
 	}
 
 	return (t: test.Test) => {
@@ -74,7 +73,7 @@ function cge(a: boolean) {
 		));
 
 		t.end();
-	}
+	};
 }
 
 test('##同步执行器', cge(false));
