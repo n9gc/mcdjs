@@ -2,7 +2,7 @@ import test from 'tape';
 import { Diagram } from '../../lib/diagram';
 import { PositionMap, SurePosition } from '../../lib/position';
 import type { Id } from '../../lib/types';
-import { aeh } from '../helpers';
+import { aeh } from '../util/helpers';
 import { Tpm } from './helpers';
 
 import { Organizer } from '../../lib/organizer';

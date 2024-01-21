@@ -1,6 +1,7 @@
 import test from 'tape';
 import type { Id } from '../../lib/types';
-import { aeh, pse, se } from '../helpers';
+import { pse, se } from '../helpers';
+import { aeh } from '../util/helpers';
 import { Tsc } from './helpers';
 
 function cer(i: Id[]) {

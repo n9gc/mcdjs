@@ -1,13 +1,7 @@
 import type test from 'tape';
-import {
-	ErrorType,
-	Id,
-	MapObj,
-	Organizer,
-	Position,
-	PositionObj,
-	SurePosition
-} from '..';
+import { Organizer } from '../lib/organizer';
+import type { Id, MapObj } from '../lib/types';
+
 
 export interface AddonFn {
 	(t: test.Test): void;
@@ -22,10 +16,6 @@ export function mm<K extends Id, V>(mapObj: boolean, kv: Iterable<readonly [K, V
 	const o: MapObj<V, K> = Object.create(null);
 	[...kv].forEach(([k, v]) => o[k] = v);
 	return o;
-}
-/**快捷用 {@link Position} 输入来创造一个 {@link SurePosition} 输出 */
-export function ti(i: Position) {
-	return new SurePosition(new PositionObj(i));
 }
 /**把 {@link Map} 改成{@link MapObj|映射对象} */
 export function cma<T>(j: Map<Id, T>) {
@@ -91,23 +81,6 @@ export function ra<T>(a: readonly T[]) {
 		[r[i], r[rd]] = [r[rd], r[i]];
 	}
 	return r;
-}
-/**代为运行函数并处理抛出的问题 */
-export function aeh(fn: () => void) {
-	return () => {
-		try { fn(); }
-		catch (err: any) {
-			err = { ...err };
-			// 翻译错误类型
-			err.type = ErrorType[err.type];
-			// 删除多余追踪信息
-			delete err.tracker;
-			// 把数组变成集合
-			if ('list' in err) err.list = new Set(err.list);
-			if ('circle' in err) err.circle = new Set(err.circle);
-			throw err;
-		}
-	};
 }
 /**按顺序用 c 中的字符串抵消 m 中的。若 m 中的包含 c 中的则抵消成功。
  *

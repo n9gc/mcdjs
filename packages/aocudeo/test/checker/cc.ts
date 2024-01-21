@@ -1,7 +1,8 @@
 import test from 'tape';
 import { CircleChecker } from '../../lib/checker';
 import { Id } from '../../lib/types';
-import { aeh, mm, nem } from '../helpers';
+import { mm, nem } from '../helpers';
+import { aeh } from '../util/helpers';
 
 import { Organizer } from '../../lib/organizer';
 

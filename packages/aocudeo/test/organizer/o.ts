@@ -1,6 +1,9 @@
 import test from 'tape';
-import { Id, Organizer, OrganizerAsync, OrganizerSync } from '../..';
-import { aeh, msf } from '../helpers';
+import { Diagram } from '../../lib/diagram';
+import { Organizer, OrganizerAsync, OrganizerSync } from '../../lib/organizer';
+import { Id } from '../../lib/types';
+import { msf } from '../helpers';
+import { aeh } from '../util/helpers';
 
 test('##组织器', t => {
 	t.test('空转测试', t => {
@@ -163,6 +166,16 @@ test('##组织器', t => {
 		});
 		o.execute();
 	});
+
+	t.end();
+});
+
+test('获取图例', t => {
+	const o = new OrganizerSync();
+
+	const d = o.getDiagram();
+	t.ok(d instanceof Diagram, '安全得到图例');
+	t.equal(o.getDiagram(), d, '缓存图例');
 
 	t.end();
 });

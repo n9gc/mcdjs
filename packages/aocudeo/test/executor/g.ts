@@ -3,7 +3,8 @@ import { Executor } from '../../lib/executor';
 import { PositionMap } from '../../lib/position';
 import type { Id } from '../../lib/types';
 import { WorkerManager } from '../../lib/worker';
-import { aeh, mm, mmo, nem, se } from '../helpers';
+import { mm, mmo, nem, se } from '../helpers';
+import { aeh } from '../util/helpers';
 
 import { Organizer } from '../../lib/organizer';
 
