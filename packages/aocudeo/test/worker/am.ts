@@ -1,31 +1,29 @@
-import Queue from "queue";
 import test from "tape";
-import {
-	Id,
-	Organizer,
-	WorkerContext,
-	WorkerManagerAsync,
-	WorkerManagerSync,
-} from '../..';
-import { Twma, Twra, msf, to } from '../helpers';
+import Limiter from "task-simple-limiter";
+import type { Id } from "../../lib/types";
+import { WorkerContext, WorkerManager } from "../../lib/worker";
+import { msf, range, to } from '../helpers';
+import { Twm, Twma, Twra } from "./helpers";
+
+import { Organizer } from "../../lib/organizer";
 
 function ger(a: boolean) {
 	function cer(i: Id[], r: Id[]) {
 		return async (t: test.Test) => {
-			const wm = new (a ? WorkerManagerAsync : WorkerManagerSync)<void>();
+			const wm = new WorkerManager<void, any>();
 			const mf = msf();
 			i.forEach((i, d) => wm.add(i, a ? async () => mf(d)() : mf(d)));
-			const wr = wm.getRunner(void 0, 0);
+			const wr = wm.getRunner(void 0);
 			let rw = Promise.resolve();
-			r.forEach(i => rw = rw.then(() => wr.run(i)));
+			r.forEach(i => rw = rw.then(() => wr[a ? 'runAsync' : 'runSync'](i, new Limiter())));
 			await rw;
 			t.deepEqual(
 				mf()(),
-				Array(i.length).fill(1).map((_, i) => i),
+				range(i.length),
 				'顺序正确'
 			);
 			t.end();
-		}
+		};
 	}
 
 	return (t: test.Test) => {
@@ -45,7 +43,7 @@ function ger(a: boolean) {
 		));
 
 		t.end();
-	}
+	};
 }
 
 test('##同步回调冒泡', ger(false));
@@ -55,23 +53,23 @@ test('##异步回调冒泡', ger(true));
 test('##同步函数', t => {
 	t.test('普通回调', t => {
 		t.plan(1);
-		const wm = new WorkerManagerSync<void>();
+		const wm = new Twm<void>();
 		wm.add(Organizer.start, () => t.pass('函数运行'));
 		const wr = wm.getRunner();
-		wr.run(Organizer.start);
+		wr.runSync(Organizer.start);
 	});
 
 	t.test('多个回调', t => {
 		t.plan(2);
-		const wm = new WorkerManagerSync<void>();
+		const wm = new Twm<void>();
 		wm.add(Organizer.start, () => t.pass('第一个函数'));
 		wm.add(Organizer.start, () => t.pass('第二个函数'));
 		const wr = wm.getRunner();
-		wr.run(Organizer.start);
+		wr.runSync(Organizer.start);
 	});
 
 	t.test('携带参数', t => {
-		const wm = new WorkerManagerSync<5>();
+		const wm = new Twm<5>();
 		wm.add(Organizer.start, context => {
 			t.equal(
 				context.data,
@@ -81,11 +79,11 @@ test('##同步函数', t => {
 			t.end();
 		});
 		const wr = wm.getRunner(5);
-		wr.run(Organizer.start);
+		wr.runSync(Organizer.start);
 	});
 
 	t.test('修改参数', t => {
-		const wm = new WorkerManagerSync<number>();
+		const wm = new Twm<number>();
 		wm.add(Organizer.start, context => {
 			t.equal(
 				context.data,
@@ -103,7 +101,7 @@ test('##同步函数', t => {
 		});
 		wm.add(Organizer.start, () => t.end());
 		const wr = wm.getRunner(123);
-		wr.run(Organizer.start);
+		wr.runSync(Organizer.start);
 	});
 
 	t.end();
@@ -113,14 +111,14 @@ test('##异步函数', t => {
 
 	t.test('普通回调', t => {
 		t.plan(1);
-		const wm = new WorkerManagerAsync<void>();
+		const wm = new Twma<void>();
 		wm.add(Organizer.start, { run: async () => t.pass('函数运行') });
-		const wr = wm.getRunner(void 0, 0);
-		wr.run(Organizer.start);
+		const wr = wm.getRunner(void 0);
+		wr.runAsync(Organizer.start, new Limiter());
 	});
 
 	t.test('携带参数', t => {
-		const wm = new WorkerManagerAsync<5>();
+		const wm = new Twma<5>();
 		wm.add(Organizer.start, async context => {
 			t.equal(
 				context.data,
@@ -129,12 +127,12 @@ test('##异步函数', t => {
 			);
 			t.end();
 		});
-		const wr = wm.getRunner(5, 0);
-		wr.run(Organizer.start);
+		const wr = wm.getRunner(5);
+		wr.runAsync(Organizer.start, new Limiter());
 	});
 
 	t.test('连续回调', t => {
-		const wm = new WorkerManagerAsync<number>();
+		const wm = new Twma<number>();
 		wm.add(Organizer.start, async context => {
 			t.equal(
 				context.data,
@@ -151,13 +149,13 @@ test('##异步函数', t => {
 			);
 		});
 		wm.add(Organizer.start, () => t.end());
-		const wr = wm.getRunner(1, 0);
-		wr.run(Organizer.start);
+		const wr = wm.getRunner(1);
+		wr.runAsync(Organizer.start, new Limiter());
 	});
 
 	t.test('并行回调', t => {
 		t.plan(6);
-		const wm = new WorkerManagerAsync<[number, string]>();
+		const wm = new Twma<[number, string]>();
 		wm.add(Organizer.start, async context => {
 			await to(5);
 			t.equal(
@@ -173,17 +171,19 @@ test('##异步函数', t => {
 			t.pass(`后结束了：${context.data[1]}`);
 			context.data[0]++;
 		});
-		const wr0 = wm.getRunner([0, '先 end'], 0);
-		wr0.run(Organizer.end);
-		wr0.run(Organizer.start);
-		const wr1 = wm.getRunner([0, '先 start'], 0);
-		wr1.run(Organizer.start);
-		wr1.run(Organizer.end);
+		const wr0 = wm.getRunner([0, '先 end']);
+		const l0 = new Limiter();
+		wr0.runAsync(Organizer.end, l0);
+		wr0.runAsync(Organizer.start, l0);
+		const wr1 = wm.getRunner([0, '先 start']);
+		const l1 = new Limiter();
+		wr1.runAsync(Organizer.start, l1);
+		wr1.runAsync(Organizer.end, l1);
 	});
 
 	t.test('并行限制', t => {
 		t.plan(6);
-		const wm = new WorkerManagerAsync<number>();
+		const wm = new Twma<number>();
 		async function a(context: WorkerContext<number>) {
 			context.data++;
 			t.assert(
@@ -200,28 +200,36 @@ test('##异步函数', t => {
 		wm.add(Organizer.start, a);
 		wm.add(Organizer.end, a);
 		wm.add(Organizer.unknown, a);
-		const wr = wm.getRunner(0, 2);
-		wr.run(Organizer.end);
-		wr.run(Organizer.start);
-		wr.run(Organizer.unknown);
+		const wr = wm.getRunner(0);
+		const l = new Limiter({ concurrency: 2 })
+		wr.runAsync(Organizer.end, l);
+		wr.runAsync(Organizer.start, l);
+		wr.runAsync(Organizer.unknown, l);
 	});
 
 	t.test('跳过空值', t => {
 		const wm = new Twma<void>();
-		const l0 = new Queue({ autostart: true, concurrency: 0 });
-		const wr0 = new Twra(wm.get().wm, void 0, l0);
-		wr0.run(Organizer.start);
+		const wr0 = new Twra(wm.get().wm, void 0);
+		class Tl extends Limiter {
+			count = 0;
+			hold() {
+				this.count++;
+				return super.hold();
+			}
+		}
+		const l0 = new Tl();
+		wr0.runAsync(Organizer.start, l0);
 		t.equal(
-			l0.length,
+			l0.count,
 			0,
 			'没使用任何队列资源：未定义'
 		);
 		wm.add(Organizer.end, []);
-		const l1 = new Queue({ autostart: true, concurrency: 0 });
-		const wr1 = new Twra(wm.get().wm, void 0, l1);
-		wr1.run(Organizer.end);
+		const l1 = new Tl();
+		const wr1 = new Twra(wm.get().wm, void 0);
+		wr1.runAsync(Organizer.end, l1);
 		t.equal(
-			l1.length,
+			l1.count,
 			0,
 			'没使用任何队列资源：空数组'
 		);

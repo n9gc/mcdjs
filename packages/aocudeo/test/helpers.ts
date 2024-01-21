@@ -6,37 +6,13 @@ import {
 	Organizer,
 	Position,
 	PositionObj,
-	SurePosition,
-	WorkerAsyncFunction,
-	WorkerContext,
-	WorkerFunction,
-	WorkerManager,
-	WorkerRunner
+	SurePosition
 } from '..';
 
 export interface AddonFn {
 	(t: test.Test): void;
 }
 
-/**@borrows {@link WorkerManager} 异步 */
-export class Twma<T> extends WorkerManager<T, WorkerAsyncFunction<T>> {
-	get = () => ({
-		/** workerMap */
-		wm: this.workerMap,
-	});
-}
-/**@borrows {@link WorkerRunner} */
-class Twr<T, F extends WorkerAsyncFunction<T>> extends WorkerRunner<T, F> {
-	get = () => ({
-		/** workerMap */
-		wm: this.workerMap,
-		mc: (id: Id) => new WorkerContext(id, this),
-	});
-}
-/**@borrows {@link WorkerRunner} 异步 */
-export class Twra<T> extends Twr<T, WorkerAsyncFunction<T>> { }
-/**@borrows {@link WorkerRunner} 同步 */
-export class Twrs<T> extends Twr<T, WorkerFunction<T>> { }
 /**以数组为输入制作 {@link Map} */
 export function mm<K extends Id, V>(mapObj: false, kv: Iterable<readonly [K, V]>): Map<K, V>;
 /**以数组为输入制作{@link MapObj|映射对象} */
@@ -149,4 +125,12 @@ export function csz(m: string[], c: string[]) {
 		m = l;
 	}
 	return { rc, rm: m };
+}
+/**就像 Python 的 `range` 一样 */
+export function range(stop: number): number[];
+export function range(start: number, stop: number): number[];
+export function range(start: number, stop: number, step: number): number[];
+export function range(a: number, b: number | null = null, c: number = 1) {
+	let [start, stop, step] = b === null ? [0, a, 1] : [a, b, c];
+	return [...function* () { while (start < stop) yield start, start += step; }()];
 }

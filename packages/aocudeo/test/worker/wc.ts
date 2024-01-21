@@ -1,10 +1,9 @@
-import Queue from 'queue';
 import test from 'tape';
-import { Twra, Twrs } from '../helpers';
+import { Twra, Twrs } from './helpers';
 
 function cer(Twr: typeof Twrs | typeof Twra) {
 	return (t: test.Test) => {
-		const wcm = new Twr<number>(new Map(), 123, new Queue);
+		const wcm = new Twr<number>(new Map(), 123);
 		const wc0 = wcm.get().mc('hh0');
 		t.equal(
 			wc0.id,
