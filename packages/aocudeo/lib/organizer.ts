@@ -1,7 +1,7 @@
 /**
  * 组织器类
  * @module aocudeo/lib/organizer
- * @version 1.5.1
+ * @version 1.5.2
  * @license GPL-2.0-or-later
  */
 declare module './organizer';
@@ -103,7 +103,7 @@ export interface OrganizerConfig<T = unknown, F extends WorkerAsyncFunction<T> =
 	 * 各个模块的位置信息
 	 * @default {}
 	 */
-	positions?: Positions<T>;
+	positions?: Positions;
 }
 export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends AffixsToolKit {
 	static readonly start = Symbol('load start');
@@ -119,14 +119,14 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	reusable = true;
 	/**是否已经加载完一次了 */
 	loaded = false;
-	protected readonly positionMap = new PositionMap<T>();
+	protected readonly positionMap = new PositionMap();
 	/**
 	 * 插入模块
 	 * @param id 模块标识符
 	 * @param position 位置信息
 	 * @param worker 动作回调
 	 */
-	addPosition(id: Id, position: Position<T> = {}, worker: Worker<T, F> | null = null) {
+	addPosition(id: Id, position: Position = {}, worker: Worker<T, F> | null = null) {
 		if (worker) this.addWorker(id, worker);
 		this.positionMap.insert(id, position);
 		return this;
@@ -135,7 +135,7 @@ export abstract class Organizer<T, F extends WorkerAsyncFunction<T>> extends Aff
 	 * 插入多个模块
 	 * @param positions 各个模块的位置信息
 	 */
-	addPositions(positions: Positions<T>) {
+	addPositions(positions: Positions) {
 		isArray(positions)
 			? (isIdArray(positions) ? [positions] : positions).forEach(array => {
 				this.addPosition(array[0]);

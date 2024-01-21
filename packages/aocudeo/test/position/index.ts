@@ -7,7 +7,7 @@ import { Tpm } from './helpers';
 
 import { Organizer } from '../../lib/organizer';
 
-function cer(init: (pm: PositionMap<void>) => void, ss: string[], di: Id[] = []) {
+function cer(init: (pm: PositionMap) => void, ss: string[], di: Id[] = []) {
 	return (t: test.Test) => {
 		const pm = new Tpm();
 		init(pm);
@@ -135,7 +135,7 @@ test('##基础功能', t => {
 	t.end();
 });
 
-function der(init: (pm: PositionMap<void>) => void, ce: boolean) {
+function der(init: (pm: PositionMap) => void, ce: boolean) {
 	return (t: test.Test) => {
 		const pm = new Tpm();
 		pm.insert('hh1', 'hh2');

@@ -1,7 +1,7 @@
 /**
  * 位置相关定义
  * @module aocudeo/lib/position
- * @version 1.2.1
+ * @version 1.3.0
  * @license GPL-2.0-or-later
  */
 declare module './position';
@@ -14,7 +14,7 @@ import type { Hookable, Id, Judger, MapLike, MayArray } from './types';
 import { SurePositionMap, getArray, throwError } from './util';
 
 /**拦截器对象 */
-export interface JudgerObj<T> {
+export interface JudgerObj {
 	// /**运行前的拦截器，若返回 `false` 则停止运行此模块 */
 	// preJudger?: Judger<T>;
 	// /**运行后的拦截器，若返回 `false` 则停止运行依赖此模块的模块 */
@@ -23,8 +23,8 @@ export interface JudgerObj<T> {
 /**{@link PositionObj.after|`PositionObj#after`} 的简写 */
 export type PositionArray = readonly Id[];
 /**位置信息 */
-export type Position<T = unknown> = PositionObj<T> | PositionArray | Id;
-export type Positions<T = unknown> = MapLike<Position<T>> | MayArray<readonly Id[]>;
+export type Position = PositionObj | PositionArray | Id;
+export type Positions = MapLike<Position> | MayArray<readonly Id[]>;
 export class SurePosition {
 	static keys = ['after', 'before'] as const;
 	private static fillSet(surePosition: Partial<SurePosition>): asserts surePosition is SurePosition {
@@ -34,7 +34,7 @@ export class SurePosition {
 		this.fillSet(surePosition);
 		return surePosition;
 	}
-	constructor(positionObj: PositionObj<any>) {
+	constructor(positionObj: PositionObj) {
 		const preOf = getArray(positionObj.preOf || []);
 		const postOf = getArray(positionObj.postOf || []);
 		this.after = new Set([
@@ -52,15 +52,15 @@ export class SurePosition {
 	before: Set<Id>;
 }
 /**位置信息对象 */
-export class PositionObj<T> implements JudgerObj<T> {
+export class PositionObj implements JudgerObj {
 	static keys = [...SurePosition.keys, 'preOf', 'postOf'] as const;
-	constructor(position: Position<T>) {
+	constructor(position: Position) {
 		if (typeof position !== 'object') position = [position];
 		if ('length' in position) this.after = position;
 		else return position;
 	}
-	preJudger?: Judger<T>;
-	postJudger?: Judger<T>;
+	preJudger?: Judger;
+	postJudger?: Judger;
 	/**此模块依赖的模块 */
 	after?: MayArray<Id>;
 	/**依赖此模块的模块 */
@@ -70,7 +70,7 @@ export class PositionObj<T> implements JudgerObj<T> {
 	/**挂在哪些模块后面作为钩子 */
 	postOf?: MayArray<Hookable>;
 }
-export class PositionMap<T> {
+export class PositionMap {
 	constructor() {
 		this.insertedChecker.ensure(Organizer.start, Organizer.end);
 		this.insert(Organizer.end, Organizer.start);
@@ -136,7 +136,7 @@ export class PositionMap<T> {
 			return false;
 		}
 	}
-	insert(id: Id, position: Position<T>) {
+	insert(id: Id, position: Position) {
 		const siz = this.insertedChecker.countEnsureds();
 		const len = this.countMap.get(id);
 		const surePosition = new SurePosition(new PositionObj(position));
