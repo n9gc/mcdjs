@@ -8,14 +8,14 @@ import fse from 'fs-extra';
 import * as fsp from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import Initer from 'lethal-build';
-import fetch from 'node-fetch';
+import needle from 'needle';
 import * as path from 'path';
 import 'promise-snake';
 
 export const {
 	comp,
 	dir,
-} = Initer(import.meta.url + '/../..');
+} = Initer(__dirname + '/../..');
 
 export async function pipeStream(from: NodeJS.ReadableStream, to: NodeJS.WritableStream) {
 	await new Promise(res => from.pipe(to).once('close', res));
@@ -32,9 +32,9 @@ export function outFilename(file: string) {
 	return path.relative(dir, file);
 }
 
-export async function curl(url: string) {
-	const rep = await fetch(url, { protocol: 'http:' });
-	if (!rep.ok) throw new Error(`Failed to fetch ${url}`);
+export async function curl(url: string): Promise<NodeJS.ReadableStream> {
+	const rep = await needle('get', url, { protocol: 'https:' });
+	if (rep.errored) throw new Error(`Failed to fetch ${url}`);
 	console.log(`Fetched ${url}`);
 	return rep;
 }
@@ -51,7 +51,7 @@ export interface DownloadCfg {
 export async function download(url: string, file: string, { force = false, tryGet = false }: DownloadCfg = {}) {
 	if (!force && await fse.exists(file)) return console.log(`Already find ${outFilename(file)}`);
 	try {
-		await writeFile((await curl(url)).body, file);
+		await writeFile(await curl(url), file);
 	}
 	catch (err) {
 		if (!tryGet) throw err;
