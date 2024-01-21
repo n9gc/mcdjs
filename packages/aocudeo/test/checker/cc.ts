@@ -1,6 +1,9 @@
 import test from 'tape';
-import { CircleChecker, Id, Organizer, throwError } from '../..';
+import { CircleChecker } from '../../lib/checker';
+import { Id } from '../../lib/types';
 import { aeh, mm, nem } from '../helpers';
+
+import { Organizer } from '../../lib/organizer';
 
 function cer(liv: [Id, Id[]?][], r: Id[] | false) {
 	return (t: test.Test) => {

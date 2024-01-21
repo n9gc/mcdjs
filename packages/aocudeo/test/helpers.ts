@@ -1,3 +1,4 @@
+import type test from 'tape';
 import {
 	ErrorType,
 	Hookable,
@@ -7,36 +8,19 @@ import {
 	Position,
 	PositionMap,
 	PositionObj,
-	SignChecker,
 	SurePosition,
 	WorkerAsyncFunction,
 	WorkerContext,
 	WorkerFunction,
 	WorkerManager,
-	WorkerRunner,
+	WorkerRunner
 } from '..';
-import type test from 'tape';
+import { Tsc } from './checker/helpers';
 
 export interface AddonFn {
 	(t: test.Test): void;
 }
 
-/**用于调试的 {@link SignChecker} */
-export class Tsc<I extends Id> extends SignChecker<I> {
-	/**添加了{@link Organizer.start|开头标记}和{@link Organizer.end|结束标记}的 {@link Tsc} */
-	static idv = class extends Tsc<Id> {
-		constructor() {
-			super();
-			this.ensureds.add(Organizer.start).add(Organizer.end);
-		}
-	};
-	get = () => ({
-		/** ensureds */
-		en: this.ensureds,
-		/** requireds */
-		re: this.requireds,
-	});
-}
 /**用于调试的 {@link PositionMap} */
 export class Tpm extends PositionMap<void> {
 	get = () => ({
