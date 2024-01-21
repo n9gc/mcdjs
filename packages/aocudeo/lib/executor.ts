@@ -57,11 +57,10 @@ export class Graph {
 		[...surePositionMap.keys()].filter(id => id !== Organizer.end && id !== Organizer.start).forEach(id => this.linkSymbol(id));
 		splitedChecker.getEnsureds().forEach(id => this.insertEdge(Organizer.affixMain + id, [Organizer.affixPre + id], [Organizer.affixPost + id]));
 		this.indegreeMap[Organizer.start] = 1;
+		const circleChecker = new CircleChecker(this.edgeMap);
+		this.tryThrow = () => circleChecker.tryThrow();
 	}
-	protected readonly circleChecker = new CircleChecker(this.edgeMap);
-	tryThrow() {
-		this.circleChecker.tryThrow();
-	}
+	tryThrow: () => void;
 	getExecutor<T>(workRunner: WorkerRunner<T, any>) {
 		return new Executor(this.edgeMap, this.indegreeMap, workRunner);
 	}
