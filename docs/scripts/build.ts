@@ -11,11 +11,14 @@ import Initer from 'lethal-build';
 import needle from 'needle';
 import * as path from 'path';
 import 'promise-snake';
+import stream from 'stream';
 
 export const {
 	comp,
 	dir,
 } = Initer(__dirname + '/../..');
+
+const debug = process.argv[2] === '--debug'
 
 export async function pipeStream(from: NodeJS.ReadableStream, to: NodeJS.WritableStream) {
 	await new Promise(res => from.pipe(to).once('close', res));
@@ -36,7 +39,7 @@ export async function curl(url: string): Promise<NodeJS.ReadableStream> {
 	const rep = await needle('get', url, { protocol: 'https:' });
 	if (rep.errored) throw new Error(`Failed to fetch ${url}`);
 	console.log(`Fetched ${url}`);
-	return rep;
+	return stream.Readable.from(rep.body);
 }
 export async function writeFile(stream: NodeJS.ReadableStream | null, file: string) {
 	if (!stream) throw new Error(`Failed to write ${outFilename(file)}`);
@@ -76,7 +79,7 @@ export async function readHtml() {
 	document.querySelectorAll('script').forEach(node => sclist.push(cacheLink(node)));
 	document.querySelectorAll('link').forEach(node => sclist.push(cacheLink(node)));
 	await Promise.all(sclist);
-	await fsp.writeFile(comp('docs/index.html'), dom.serialize());
+	if (!debug) await fsp.writeFile(comp('docs/index.html'), dom.serialize());
 }
 export default async function snake() {
 	await readHtml();
