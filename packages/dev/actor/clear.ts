@@ -1,7 +1,6 @@
 /**
  * 清理目录
- * @module @mcdjs/dev/tester/all
- * @version 1.1.1
+ * @version 1.2.0
  * @license GPL-2.0-or-later
  */
 declare module './clear';
@@ -22,10 +21,11 @@ const {
 	ignoreList,
 } = lb;
 
-export default function def(ignores: string[] = []) {
+export default function def(ignores: string[] = [], patterns: (string | RegExp)[] = []) {
 	lb.ignoreList = [...ignores, ...ignoreList];
+	const tempReg = RegExp(`${goodReg(dir + path.sep)}.*(\\.d\\.ts|\\.js|\\.js\\.map)$`);
 	return snake(
-		dels(RegExp(`${goodReg(dir + path.sep)}.*(\\.d\\.ts|\\.js|\\.js\\.map)$`)),
+		dels(lb.match([...patterns, tempReg])),
 		timeEnd(),
 		log<any>('Clear successfully in', time(), 'ms')
 	);

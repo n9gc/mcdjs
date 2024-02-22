@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"target": "ESNext",
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"incremental": true,
+		"noImplicitAny": true,
+		"strict": true,
+		"alwaysStrict": true,
+		"strictPropertyInitialization": true,
+		"strictBindCallApply": true,
+		"noImplicitThis": true,
+	},
+	"exclude": [
+		"node_modules",
+		"**/node_modules/*"
+	],
+}
