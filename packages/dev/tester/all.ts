@@ -1,7 +1,6 @@
 /**
  * 批量测试
- * @module @mcdjs/dev/tester/all
- * @version 1.4.0
+ * @version 1.4.1
  * @license GPL-2.0-or-later
  */
 declare module './all';
