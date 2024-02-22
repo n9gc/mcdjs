@@ -1,7 +1,6 @@
 /**
  * 测试导入
- * @module @mcdjs/dev/tester/import
- * @version 1.2.1
+ * @version 1.2.2
  * @license GPL-2.0-or-later
  */
 declare module './import';
